@@ -88,8 +88,8 @@ defmodule LittleGrapeWeb do
       import LittleGrapeWeb.CoreComponents
 
       # Common modules used in templates
-      alias Phoenix.LiveView.JS
       alias LittleGrapeWeb.Layouts
+      alias Phoenix.LiveView.JS
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())

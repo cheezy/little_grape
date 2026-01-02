@@ -5,13 +5,14 @@ defmodule LittleGrape.MixProject do
     [
       app: :little_grape,
       version: "0.1.0",
-      elixir: "~> 1.15",
+      elixir: "~> 1.19",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
       compilers: [:phoenix_live_view] ++ Mix.compilers(),
-      listeners: [Phoenix.CodeReloader]
+      listeners: [Phoenix.CodeReloader],
+      test_coverage: test_coverage()
     ]
   end
 
@@ -65,7 +66,12 @@ defmodule LittleGrape.MixProject do
       {:gettext, "~> 1.0"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false},
+      {:usage_rules, "~> 0.1"},
+      {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
+      {:tidewave, "~> 0.2", only: :dev}
     ]
   end
 
@@ -91,4 +97,12 @@ defmodule LittleGrape.MixProject do
       precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"]
     ]
   end
+
+    defp test_coverage do
+    [
+      ignore_modules: [
+      ]
+    ]
+  end
+
 end
