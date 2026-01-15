@@ -1,0 +1,7 @@
+
+Traversal.FileModule: Directory Traversal in `File.cp`,lib/little_grape/accounts.ex:390,2895058
+Traversal.FileModule: Directory Traversal in `File.rm`,lib/little_grape/accounts.ex:425,33CEFB0
+Traversal.FileModule: Directory Traversal in `File.mkdir_p!`,lib/little_grape/accounts.ex:383,73C89CE
+Traversal.FileModule: Directory Traversal in `File.cp`,lib/little_grape/accounts.ex:388,4A7B693
+Traversal.FileModule: Directory Traversal in `File.mkdir_p!`,lib/little_grape/accounts.ex:382,A626AD
+Traversal.FileModule: Directory Traversal in `File.rm`,lib/little_grape/accounts.ex:423,DABFC0

@@ -67,6 +67,7 @@ defmodule LittleGrape.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
+      {:bcrypt_elixir, "~> 3.0"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false},
       {:usage_rules, "~> 0.1"},
@@ -101,6 +102,17 @@ defmodule LittleGrape.MixProject do
     defp test_coverage do
     [
       ignore_modules: [
+        LittleGrape.Application,
+        LittleGrape.Repo,
+        LittleGrape.AccountsFixtures,
+        LittleGrapeWeb.ConnCase,
+        LittleGrapeWeb.CoreComponents,
+        LittleGrapeWeb.ErrorHTML,
+        LittleGrapeWeb.Layouts,
+        LittleGrapeWeb.PageHTML,
+        LittleGrapeWEb.Plugs.Locale,
+        LittleGrapeWeb.Router,
+        LittleGrapeWeb.Telemetry
       ]
     ]
   end

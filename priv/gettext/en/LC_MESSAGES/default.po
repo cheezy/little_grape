@@ -1,0 +1,667 @@
+## English translations for Zemra Ime
+msgid ""
+msgstr ""
+"Language: en\n"
+
+## Navigation
+msgid "Features"
+msgstr "Features"
+
+msgid "About"
+msgstr "About"
+
+msgid "Success Stories"
+msgstr "Success Stories"
+
+msgid "Log In"
+msgstr "Log In"
+
+msgid "Sign Up"
+msgstr "Sign Up"
+
+## Hero Section
+msgid "Join 50,000+ Albanians worldwide"
+msgstr "Join 50,000+ Albanians worldwide"
+
+msgid "Find Your"
+msgstr "Find Your"
+
+msgid "Albanian"
+msgstr "Albanian"
+
+msgid "Soulmate"
+msgstr "Soulmate"
+
+msgid "Connect with Albanians from around the world. Whether you're in Tirana, New York, London, or anywhere else — your perfect match is waiting."
+msgstr "Connect with Albanians from around the world. Whether you're in Tirana, New York, London, or anywhere else — your perfect match is waiting."
+
+msgid "Start Free Today"
+msgstr "Start Free Today"
+
+msgid "How It Works"
+msgstr "How It Works"
+
+msgid "Verified Profiles"
+msgstr "Verified Profiles"
+
+msgid "100% Private"
+msgstr "100% Private"
+
+msgid "4.8 Star Rating"
+msgstr "4.8 Star Rating"
+
+msgid "Your match awaits"
+msgstr "Your match awaits"
+
+msgid "Find Your Perfect Match"
+msgstr "Find Your Perfect Match"
+
+msgid "Based on culture & compatibility"
+msgstr "Based on culture & compatibility"
+
+## Features Section
+msgid "Why Choose Zemra Ime?"
+msgstr "Why Choose Zemra Ime?"
+
+msgid "Built by Albanians, for Albanians. We understand our culture, traditions, and what matters in finding a life partner."
+msgstr "Built by Albanians, for Albanians. We understand our culture, traditions, and what matters in finding a life partner."
+
+msgid "Global Albanian Community"
+msgstr "Global Albanian Community"
+
+msgid "Connect with Albanians from Kosovo, Albania, North Macedonia, Montenegro, and diaspora communities worldwide."
+msgstr "Connect with Albanians from Kosovo, Albania, North Macedonia, Montenegro, and diaspora communities worldwide."
+
+msgid "Verified & Safe"
+msgstr "Verified & Safe"
+
+msgid "Every profile is verified. Your privacy and security are our top priority with advanced safety features."
+msgstr "Every profile is verified. Your privacy and security are our top priority with advanced safety features."
+
+msgid "Smart Matching"
+msgstr "Smart Matching"
+
+msgid "Our algorithm considers cultural values, family traditions, and personal preferences for meaningful connections."
+msgstr "Our algorithm considers cultural values, family traditions, and personal preferences for meaningful connections."
+
+## Stats Section
+msgid "Active Members"
+msgstr "Active Members"
+
+msgid "Successful Matches"
+msgstr "Successful Matches"
+
+msgid "Countries"
+msgstr "Countries"
+
+msgid "App Store Rating"
+msgstr "App Store Rating"
+
+## About Section
+msgid "More Than Dating —"
+msgstr "More Than Dating —"
+
+msgid "A Cultural Connection"
+msgstr "A Cultural Connection"
+
+msgid "Zemra Ime (meaning \"My Heart\" in Albanian) captures the essence of what we're all searching for — that special connection. We created this platform because we understand that for Albanians, finding a partner is about more than just compatibility — it's about shared values, family, and cultural understanding."
+msgstr "Zemra Ime (meaning \"My Heart\" in Albanian) captures the essence of what we're all searching for — that special connection. We created this platform because we understand that for Albanians, finding a partner is about more than just compatibility — it's about shared values, family, and cultural understanding."
+
+msgid "Whether you're looking for someone who appreciates our traditions, speaks the language, or simply shares your Albanian heritage, you'll find them here."
+msgstr "Whether you're looking for someone who appreciates our traditions, speaks the language, or simply shares your Albanian heritage, you'll find them here."
+
+msgid "Albania"
+msgstr "Albania"
+
+msgid "Kosovo"
+msgstr "Kosovo"
+
+msgid "North Macedonia"
+msgstr "North Macedonia"
+
+msgid "Diaspora"
+msgstr "Diaspora"
+
+msgid "Where there's smoke, there's fire. Where there's love, there's family."
+msgstr "Where there's smoke, there's fire. Where there's love, there's family."
+
+msgid "Albanian Proverb"
+msgstr "Albanian Proverb"
+
+msgid "Traditional Wisdom"
+msgstr "Traditional Wisdom"
+
+## CTA Section
+msgid "Ready to Find Your Albanian Match?"
+msgstr "Ready to Find Your Albanian Match?"
+
+msgid "Join thousands of Albanians who have found love, friendship, and meaningful connections on Zemra Ime."
+msgstr "Join thousands of Albanians who have found love, friendship, and meaningful connections on Zemra Ime."
+
+msgid "Create Free Account"
+msgstr "Create Free Account"
+
+msgid "Learn More"
+msgstr "Learn More"
+
+## Footer
+msgid "Connecting Albanians worldwide. Find love, build relationships, honor traditions."
+msgstr "Connecting Albanians worldwide. Find love, build relationships, honor traditions."
+
+msgid "Company"
+msgstr "Company"
+
+msgid "About Us"
+msgstr "About Us"
+
+msgid "Careers"
+msgstr "Careers"
+
+msgid "Press"
+msgstr "Press"
+
+msgid "Contact"
+msgstr "Contact"
+
+msgid "Support"
+msgstr "Support"
+
+msgid "Help Center"
+msgstr "Help Center"
+
+msgid "Safety Tips"
+msgstr "Safety Tips"
+
+msgid "Community Guidelines"
+msgstr "Community Guidelines"
+
+msgid "Report an Issue"
+msgstr "Report an Issue"
+
+msgid "Legal"
+msgstr "Legal"
+
+msgid "Privacy Policy"
+msgstr "Privacy Policy"
+
+msgid "Terms of Service"
+msgstr "Terms of Service"
+
+msgid "Cookie Policy"
+msgstr "Cookie Policy"
+
+msgid "Made with love for Albanians everywhere."
+msgstr "Made with love for Albanians everywhere."
+
+## Language Switcher
+msgid "Language"
+msgstr "Language"
+
+msgid "English"
+msgstr "English"
+
+msgid "Shqip"
+msgstr "Shqip"
+
+## Authentication
+msgid "Register"
+msgstr "Register"
+
+msgid "Register for an account"
+msgstr "Register for an account"
+
+msgid "Already registered?"
+msgstr "Already registered?"
+
+msgid "Log in"
+msgstr "Log in"
+
+msgid "to your account now."
+msgstr "to your account now."
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Create an account"
+msgstr "Create an account"
+
+msgid "Creating account..."
+msgstr "Creating account..."
+
+msgid "Don't have an account?"
+msgstr "Don't have an account?"
+
+msgid "Sign up"
+msgstr "Sign up"
+
+msgid "for an account now."
+msgstr "for an account now."
+
+msgid "Password"
+msgstr "Password"
+
+msgid "Log in with email"
+msgstr "Log in with email"
+
+msgid "or"
+msgstr "or"
+
+msgid "Log in and stay logged in"
+msgstr "Log in and stay logged in"
+
+msgid "Log in only this time"
+msgstr "Log in only this time"
+
+msgid "Log out"
+msgstr "Log out"
+
+msgid "Settings"
+msgstr "Settings"
+
+msgid "Account Settings"
+msgstr "Account Settings"
+
+msgid "Manage your account email address and password settings"
+msgstr "Manage your account email address and password settings"
+
+msgid "Change Email"
+msgstr "Change Email"
+
+msgid "Changing..."
+msgstr "Changing..."
+
+msgid "New password"
+msgstr "New password"
+
+msgid "Confirm new password"
+msgstr "Confirm new password"
+
+msgid "Confirm password"
+msgstr "Confirm password"
+
+msgid "Save Password"
+msgstr "Save Password"
+
+msgid "Welcome"
+msgstr "Welcome"
+
+msgid "Confirm and stay logged in"
+msgstr "Confirm and stay logged in"
+
+msgid "Confirm and log in only this time"
+msgstr "Confirm and log in only this time"
+
+msgid "Keep me logged in on this device"
+msgstr "Keep me logged in on this device"
+
+msgid "Log me in only this time"
+msgstr "Log me in only this time"
+
+msgid "Confirming..."
+msgstr "Confirming..."
+
+msgid "Logging in..."
+msgstr "Logging in..."
+
+msgid "You need to reauthenticate to perform sensitive actions on your account."
+msgstr "You need to reauthenticate to perform sensitive actions on your account."
+
+msgid "You are running the local mail adapter."
+msgstr "You are running the local mail adapter."
+
+msgid "To see sent emails, visit"
+msgstr "To see sent emails, visit"
+
+msgid "the mailbox page"
+msgstr "the mailbox page"
+
+msgid "Tip: If you prefer passwords, you can enable them in the user settings."
+msgstr "Tip: If you prefer passwords, you can enable them in the user settings."
+
+## Authentication Errors
+msgid "Invalid email or password"
+msgstr "Invalid email or password"
+
+msgid "must have the @ sign and no spaces"
+msgstr "must have the @ sign and no spaces"
+
+msgid "has already been taken"
+msgstr "has already been taken"
+
+msgid "does not match password"
+msgstr "does not match password"
+
+msgid "Click below to confirm your account and log in."
+msgstr "Click below to confirm your account and log in."
+
+msgid "Your account is confirmed. Click below to log in."
+msgstr "Your account is confirmed. Click below to log in."
+
+msgid "should be at least %{count} character(s)"
+msgstr "should be at least %{count} character(s)"
+
+msgid "should be at most %{count} character(s)"
+msgstr "should be at most %{count} character(s)"
+
+msgid "Set your password to complete registration."
+msgstr "Set your password to complete registration."
+
+msgid "Complete registration"
+msgstr "Complete registration"
+
+msgid "must contain at least one lowercase letter"
+msgstr "must contain at least one lowercase letter"
+
+msgid "must contain at least one uppercase letter"
+msgstr "must contain at least one uppercase letter"
+
+msgid "must contain at least one number"
+msgstr "must contain at least one number"
+
+msgid "must contain at least one special character (!?@#$%^&*_-+=)"
+msgstr "must contain at least one special character (!?@#$%^&*_-+=)"
+
+## Profile
+msgid "Profile"
+msgstr "Profile"
+
+msgid "My Profile"
+msgstr "My Profile"
+
+msgid "Tell us about yourself to find your perfect match"
+msgstr "Tell us about yourself to find your perfect match"
+
+msgid "Basic Info"
+msgstr "Basic Info"
+
+msgid "First Name"
+msgstr "First Name"
+
+msgid "Last Name"
+msgstr "Last Name"
+
+msgid "Birthdate"
+msgstr "Birthdate"
+
+msgid "Gender"
+msgstr "Gender"
+
+msgid "City"
+msgstr "City"
+
+msgid "Country"
+msgstr "Country"
+
+msgid "About Me"
+msgstr "About Me"
+
+msgid "Bio"
+msgstr "Bio"
+
+msgid "Tell others about yourself..."
+msgstr "Tell others about yourself..."
+
+msgid "Occupation"
+msgstr "Occupation"
+
+msgid "Physical Attributes"
+msgstr "Physical Attributes"
+
+msgid "Height (cm)"
+msgstr "Height (cm)"
+
+msgid "Body Type"
+msgstr "Body Type"
+
+msgid "Eye Color"
+msgstr "Eye Color"
+
+msgid "Hair Color"
+msgstr "Hair Color"
+
+msgid "Preferences"
+msgstr "Preferences"
+
+msgid "Looking For"
+msgstr "Looking For"
+
+msgid "Preferred Age (Min)"
+msgstr "Preferred Age (Min)"
+
+msgid "Preferred Age (Max)"
+msgstr "Preferred Age (Max)"
+
+msgid "Preferred Country"
+msgstr "Preferred Country"
+
+msgid "Save Profile"
+msgstr "Save Profile"
+
+msgid "Select..."
+msgstr "Select..."
+
+## Gender Options
+msgid "Male"
+msgstr "Male"
+
+msgid "Female"
+msgstr "Female"
+
+msgid "Other"
+msgstr "Other"
+
+## Body Type Options
+msgid "Slim"
+msgstr "Slim"
+
+msgid "Athletic"
+msgstr "Athletic"
+
+msgid "Average"
+msgstr "Average"
+
+msgid "Curvy"
+msgstr "Curvy"
+
+msgid "Muscular"
+msgstr "Muscular"
+
+msgid "Plus Size"
+msgstr "Plus Size"
+
+## Eye Color Options
+msgid "Brown"
+msgstr "Brown"
+
+msgid "Blue"
+msgstr "Blue"
+
+msgid "Green"
+msgstr "Green"
+
+msgid "Hazel"
+msgstr "Hazel"
+
+msgid "Gray"
+msgstr "Gray"
+
+msgid "Black"
+msgstr "Black"
+
+## Hair Color Options
+msgid "Blonde"
+msgstr "Blonde"
+
+msgid "Red"
+msgstr "Red"
+
+msgid "White"
+msgstr "White"
+
+## Looking For Options
+msgid "Friendship"
+msgstr "Friendship"
+
+msgid "Dating"
+msgstr "Dating"
+
+msgid "Relationship"
+msgstr "Relationship"
+
+msgid "Marriage"
+msgstr "Marriage"
+
+msgid "Not Sure"
+msgstr "Not Sure"
+
+## Profile Validation Errors
+msgid "is too far in the past"
+msgstr "is too far in the past"
+
+msgid "you must be at least 18 years old"
+msgstr "you must be at least 18 years old"
+
+msgid "must be greater than or equal to minimum age"
+msgstr "must be greater than or equal to minimum age"
+
+## Lifestyle Section
+msgid "Lifestyle"
+msgstr "Lifestyle"
+
+msgid "Smoking"
+msgstr "Smoking"
+
+msgid "Non-smoker"
+msgstr "Non-smoker"
+
+msgid "Occasional smoker"
+msgstr "Occasional smoker"
+
+msgid "Regular smoker"
+msgstr "Regular smoker"
+
+msgid "Drinking"
+msgstr "Drinking"
+
+msgid "Non-drinker"
+msgstr "Non-drinker"
+
+msgid "Social drinker"
+msgstr "Social drinker"
+
+msgid "Regular drinker"
+msgstr "Regular drinker"
+
+msgid "Has Children"
+msgstr "Has Children"
+
+msgid "Wants Children"
+msgstr "Wants Children"
+
+msgid "Have children, want more"
+msgstr "Have children, want more"
+
+## Background Section
+msgid "Background"
+msgstr "Background"
+
+msgid "Education"
+msgstr "Education"
+
+msgid "High School"
+msgstr "High School"
+
+msgid "Some College"
+msgstr "Some College"
+
+msgid "Bachelor's Degree"
+msgstr "Bachelor's Degree"
+
+msgid "Master's Degree"
+msgstr "Master's Degree"
+
+msgid "Doctorate"
+msgstr "Doctorate"
+
+msgid "Religion"
+msgstr "Religion"
+
+msgid "Muslim"
+msgstr "Muslim"
+
+msgid "Orthodox Christian"
+msgstr "Orthodox Christian"
+
+msgid "Catholic"
+msgstr "Catholic"
+
+msgid "Atheist"
+msgstr "Atheist"
+
+msgid "Prefer not to say"
+msgstr "Prefer not to say"
+
+msgid "Languages Spoken"
+msgstr "Languages Spoken"
+
+msgid "Other Languages"
+msgstr "Other Languages"
+
+msgid "e.g., Greek, Spanish, Portuguese"
+msgstr "e.g., Greek, Spanish, Portuguese"
+
+## Preferences Section
+msgid "Interested In"
+msgstr "Interested In"
+
+msgid "Any"
+msgstr "Any"
+
+## Interests Section
+msgid "Interests"
+msgstr "Interests"
+
+msgid "Select your interests to help find better matches"
+msgstr "Select your interests to help find better matches"
+
+msgid "Sports"
+msgstr "Sports"
+
+msgid "Music"
+msgstr "Music"
+
+msgid "Travel"
+msgstr "Travel"
+
+msgid "Reading"
+msgstr "Reading"
+
+msgid "Cooking"
+msgstr "Cooking"
+
+msgid "Movies"
+msgstr "Movies"
+
+msgid "Fitness"
+msgstr "Fitness"
+
+msgid "Art"
+msgstr "Art"
+
+msgid "Nature"
+msgstr "Nature"
+
+msgid "Technology"
+msgstr "Technology"
+
+msgid "Gaming"
+msgstr "Gaming"
+
+msgid "Photography"
+msgstr "Photography"
+
+msgid "Dancing"
+msgstr "Dancing"
+
+msgid "Fashion"
+msgstr "Fashion"

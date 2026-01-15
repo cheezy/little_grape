@@ -295,10 +295,14 @@ defmodule LittleGrapeWeb.CoreComponents do
     """
   end
 
-  # Helper used by inputs to generate form errors
-  defp error(assigns) do
+@doc """
+  Generates a form error message.
+  """
+  slot :inner_block, required: true
+
+  def error(assigns) do
     ~H"""
-    <p class="mt-1.5 flex gap-2 items-center text-sm text-error">
+    <p class="mt-1.5 flex gap-2 items-center text-sm text-red-600">
       <.icon name="hero-exclamation-circle" class="size-5" />
       {render_slot(@inner_block)}
     </p>

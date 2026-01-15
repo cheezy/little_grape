@@ -1,0 +1,786 @@
+## Albanian translations for Zemra Ime
+msgid ""
+msgstr ""
+"Language: sq\n"
+
+## Navigation
+msgid "Features"
+msgstr "Veçoritë"
+
+msgid "About"
+msgstr "Rreth Nesh"
+
+msgid "Success Stories"
+msgstr "Histori Suksesi"
+
+msgid "Log In"
+msgstr "Hyr"
+
+msgid "Sign Up"
+msgstr "Regjistrohu"
+
+## Hero Section
+msgid "Join 50,000+ Albanians worldwide"
+msgstr "Bashkohu me 50,000+ shqiptarë në mbarë botën"
+
+msgid "Find Your"
+msgstr "Gjej"
+
+msgid "Albanian"
+msgstr "Zemrën"
+
+msgid "Soulmate"
+msgstr "Tënde"
+
+msgid "Connect with Albanians from around the world. Whether you're in Tirana, New York, London, or anywhere else — your perfect match is waiting."
+msgstr "Lidhu me shqiptarë nga e gjithë bota. Qoftë në Tiranë, Nju Jork, Londër, ose kudo tjetër — partneri/ja yt/jote e përsosur po të pret."
+
+msgid "Start Free Today"
+msgstr "Fillo Falas Sot"
+
+msgid "How It Works"
+msgstr "Si Funksionon"
+
+msgid "Verified Profiles"
+msgstr "Profile të Verifikuara"
+
+msgid "100% Private"
+msgstr "100% Private"
+
+msgid "4.8 Star Rating"
+msgstr "Vlerësim 4.8 Yje"
+
+msgid "Your match awaits"
+msgstr "Partneri/ja jote po të pret"
+
+msgid "Find Your Perfect Match"
+msgstr "Gjej Partnerin/en e Përsosur"
+
+msgid "Based on culture & compatibility"
+msgstr "Bazuar në kulturë dhe përshtatshmëri"
+
+## Features Section
+msgid "Why Choose Zemra Ime?"
+msgstr "Pse të Zgjedhësh Zemra Ime?"
+
+msgid "Built by Albanians, for Albanians. We understand our culture, traditions, and what matters in finding a life partner."
+msgstr "Ndërtuar nga shqiptarët, për shqiptarët. Ne e kuptojmë kulturën, traditat tona, dhe çfarë ka rëndësi në gjetjen e një partneri jete."
+
+msgid "Global Albanian Community"
+msgstr "Komuniteti Global Shqiptar"
+
+msgid "Connect with Albanians from Kosovo, Albania, North Macedonia, Montenegro, and diaspora communities worldwide."
+msgstr "Lidhu me shqiptarë nga Kosova, Shqipëria, Maqedonia e Veriut, Mali i Zi, dhe komunitetet e diasporës në mbarë botën."
+
+msgid "Verified & Safe"
+msgstr "I Verifikuar dhe i Sigurt"
+
+msgid "Every profile is verified. Your privacy and security are our top priority with advanced safety features."
+msgstr "Çdo profil është i verifikuar. Privatësia dhe siguria juaj janë prioriteti ynë kryesor me veçori të avancuara sigurie."
+
+msgid "Smart Matching"
+msgstr "Përputhje Inteligjente"
+
+msgid "Our algorithm considers cultural values, family traditions, and personal preferences for meaningful connections."
+msgstr "Algoritmi ynë merr parasysh vlerat kulturore, traditat familjare, dhe preferencat personale për lidhje kuptimplota."
+
+## Stats Section
+msgid "Active Members"
+msgstr "Anëtarë Aktivë"
+
+msgid "Successful Matches"
+msgstr "Përputhje të Suksesshme"
+
+msgid "Countries"
+msgstr "Vende"
+
+msgid "App Store Rating"
+msgstr "Vlerësimi në App Store"
+
+## About Section
+msgid "More Than Dating —"
+msgstr "Më Shumë se Takime —"
+
+msgid "A Cultural Connection"
+msgstr "Një Lidhje Kulturore"
+
+msgid "Zemra Ime (meaning \"My Heart\" in Albanian) captures the essence of what we're all searching for — that special connection. We created this platform because we understand that for Albanians, finding a partner is about more than just compatibility — it's about shared values, family, and cultural understanding."
+msgstr "Zemra Ime kap thelbin e asaj që të gjithë po kërkojmë — atë lidhje të veçantë. Ne e krijuam këtë platformë sepse e kuptojmë që për shqiptarët, gjetja e një partneri është më shumë se thjesht përshtatshmëri — bëhet fjalë për vlera të përbashkëta, familje, dhe mirëkuptim kulturor."
+
+msgid "Whether you're looking for someone who appreciates our traditions, speaks the language, or simply shares your Albanian heritage, you'll find them here."
+msgstr "Qoftë duke kërkuar dikë që vlerëson traditat tona, flet gjuhën, ose thjesht ndan trashëgiminë tuaj shqiptare, do ta gjeni këtu."
+
+msgid "Albania"
+msgstr "Shqipëria"
+
+msgid "Kosovo"
+msgstr "Kosova"
+
+msgid "North Macedonia"
+msgstr "Maqedonia e Veriut"
+
+msgid "Diaspora"
+msgstr "Diaspora"
+
+msgid "Where there's smoke, there's fire. Where there's love, there's family."
+msgstr "Ku ka tym, ka zjarr. Ku ka dashuri, ka familje."
+
+msgid "Albanian Proverb"
+msgstr "Proverb Shqiptar"
+
+msgid "Traditional Wisdom"
+msgstr "Urtësi Tradicionale"
+
+## CTA Section
+msgid "Ready to Find Your Albanian Match?"
+msgstr "Gati të Gjesh Partnerin/en Tënd/e Shqiptar/e?"
+
+msgid "Join thousands of Albanians who have found love, friendship, and meaningful connections on Zemra Ime."
+msgstr "Bashkohu me mijëra shqiptarë që kanë gjetur dashurinë, miqësinë, dhe lidhje kuptimplota në Zemra Ime."
+
+msgid "Create Free Account"
+msgstr "Krijo Llogari Falas"
+
+msgid "Learn More"
+msgstr "Mëso Më Shumë"
+
+## Footer
+msgid "Connecting Albanians worldwide. Find love, build relationships, honor traditions."
+msgstr "Duke lidhur shqiptarët në mbarë botën. Gjej dashurinë, ndërto marrëdhënie, ndero traditat."
+
+msgid "Company"
+msgstr "Kompania"
+
+msgid "About Us"
+msgstr "Rreth Nesh"
+
+msgid "Careers"
+msgstr "Karriera"
+
+msgid "Press"
+msgstr "Shtypi"
+
+msgid "Contact"
+msgstr "Kontakti"
+
+msgid "Support"
+msgstr "Mbështetja"
+
+msgid "Help Center"
+msgstr "Qendra e Ndihmës"
+
+msgid "Safety Tips"
+msgstr "Këshilla Sigurie"
+
+msgid "Community Guidelines"
+msgstr "Udhëzimet e Komunitetit"
+
+msgid "Report an Issue"
+msgstr "Raporto një Problem"
+
+msgid "Legal"
+msgstr "Ligjore"
+
+msgid "Privacy Policy"
+msgstr "Politika e Privatësisë"
+
+msgid "Terms of Service"
+msgstr "Kushtet e Shërbimit"
+
+msgid "Cookie Policy"
+msgstr "Politika e Cookie-ve"
+
+msgid "Made with love for Albanians everywhere."
+msgstr "Bërë me dashuri për shqiptarët kudo."
+
+## Language Switcher
+msgid "Language"
+msgstr "Gjuha"
+
+msgid "English"
+msgstr "Anglisht"
+
+msgid "Shqip"
+msgstr "Shqip"
+
+## Authentication
+msgid "Register"
+msgstr "Regjistrohu"
+
+msgid "Register for an account"
+msgstr "Regjistrohu për një llogari"
+
+msgid "Already registered?"
+msgstr "Je regjistruar tashmë?"
+
+msgid "Log in"
+msgstr "Hyr"
+
+msgid "to your account now."
+msgstr "në llogarinë tënde tani."
+
+msgid "Email"
+msgstr "Email-i"
+
+msgid "Create an account"
+msgstr "Krijo një llogari"
+
+msgid "Creating account..."
+msgstr "Duke krijuar llogarinë..."
+
+msgid "Don't have an account?"
+msgstr "Nuk ke llogari?"
+
+msgid "Sign up"
+msgstr "Regjistrohu"
+
+msgid "for an account now."
+msgstr "për një llogari tani."
+
+msgid "Password"
+msgstr "Fjalëkalimi"
+
+msgid "Log in with email"
+msgstr "Hyr me email"
+
+msgid "or"
+msgstr "ose"
+
+msgid "Log in and stay logged in"
+msgstr "Hyr dhe qëndro i kyçur"
+
+msgid "Log in only this time"
+msgstr "Hyr vetëm këtë herë"
+
+msgid "Log out"
+msgstr "Dil"
+
+msgid "Settings"
+msgstr "Profili"
+
+msgid "Account Settings"
+msgstr "Cilësimet e Llogarisë"
+
+msgid "Manage your account email address and password settings"
+msgstr "Menaxho email-in dhe fjalëkalimin e llogarisë tënde"
+
+msgid "Change Email"
+msgstr "Ndrysho Email-in"
+
+msgid "Changing..."
+msgstr "Duke ndryshuar..."
+
+msgid "New password"
+msgstr "Fjalëkalimi i ri"
+
+msgid "Confirm new password"
+msgstr "Konfirmo fjalëkalimin e ri"
+
+msgid "Confirm password"
+msgstr "Konfirmo fjalëkalimin"
+
+msgid "Save Password"
+msgstr "Ruaj Fjalëkalimin"
+
+msgid "Welcome"
+msgstr "Mirë se vjen"
+
+msgid "Confirm and stay logged in"
+msgstr "Konfirmo dhe qëndro i kyçur"
+
+msgid "Confirm and log in only this time"
+msgstr "Konfirmo dhe hyr vetëm këtë herë"
+
+msgid "Keep me logged in on this device"
+msgstr "Mbaj më të kyçur në këtë pajisje"
+
+msgid "Log me in only this time"
+msgstr "Hyrm vetëm këtë herë"
+
+msgid "Confirming..."
+msgstr "Duke konfirmuar..."
+
+msgid "Logging in..."
+msgstr "Duke hyrë..."
+
+msgid "You need to reauthenticate to perform sensitive actions on your account."
+msgstr "Duhet të identifikohesh përsëri për të kryer veprime të ndjeshme në llogarinë tënde."
+
+msgid "You are running the local mail adapter."
+msgstr "Po përdor adapterin lokal të postës."
+
+msgid "To see sent emails, visit"
+msgstr "Për të parë email-et e dërguara, vizito"
+
+msgid "the mailbox page"
+msgstr "faqen e kutisë postare"
+
+msgid "Tip: If you prefer passwords, you can enable them in the user settings."
+msgstr "Këshillë: Nëse preferon fjalëkalimet, mund t'i aktivizosh në cilësimet e përdoruesit."
+
+## Authentication Errors
+msgid "Invalid email or password"
+msgstr "Email ose fjalëkalim i pavlefshëm"
+
+msgid "must have the @ sign and no spaces"
+msgstr "duhet të ketë shenjën @ dhe pa hapësira"
+
+msgid "has already been taken"
+msgstr "është marrë tashmë"
+
+msgid "does not match password"
+msgstr "nuk përputhet me fjalëkalimin"
+
+msgid "Click below to confirm your account and log in."
+msgstr "Kliko më poshtë për të konfirmuar llogarinë dhe hyrë."
+
+msgid "Your account is confirmed. Click below to log in."
+msgstr "Llogaria jote është konfirmuar. Kliko më poshtë për të hyrë."
+
+msgid "should be at least %{count} character(s)"
+msgstr "duhet të jetë së paku %{count} karaktere"
+
+msgid "should be at most %{count} character(s)"
+msgstr "duhet të jetë më së shumti %{count} karaktere"
+
+msgid "Set your password to complete registration."
+msgstr "Vendos fjalëkalimin për të përfunduar regjistrimin."
+
+msgid "Complete registration"
+msgstr "Përfundo regjistrimin"
+
+msgid "must contain at least one lowercase letter"
+msgstr "duhet të përmbajë së paku një shkronjë të vogël"
+
+msgid "must contain at least one uppercase letter"
+msgstr "duhet të përmbajë së paku një shkronjë të madhe"
+
+msgid "must contain at least one number"
+msgstr "duhet të përmbajë së paku një numër"
+
+msgid "must contain at least one special character (!?@#$%^&*_-+=)"
+msgstr "duhet të përmbajë së paku një karakter special (!?@#$%^&*_-+=)"
+
+## Profile
+msgid "Profile"
+msgstr "Profili"
+
+msgid "My Profile"
+msgstr "Profili Im"
+
+msgid "Tell us about yourself to find your perfect match"
+msgstr "Na trego për veten tënde për të gjetur partnerin/en e përsosur"
+
+msgid "Basic Info"
+msgstr "Informacionet Bazë"
+
+msgid "First Name"
+msgstr "Emri"
+
+msgid "Last Name"
+msgstr "Mbiemri"
+
+msgid "Birthdate"
+msgstr "Datëlindja"
+
+msgid "Gender"
+msgstr "Gjinia"
+
+msgid "City"
+msgstr "Qyteti"
+
+msgid "Country"
+msgstr "Shteti"
+
+msgid "About Me"
+msgstr "Rreth Meje"
+
+msgid "Bio"
+msgstr "Biografia"
+
+msgid "Tell others about yourself..."
+msgstr "Tregoju të tjerëve për veten..."
+
+msgid "Occupation"
+msgstr "Profesioni"
+
+msgid "Physical Attributes"
+msgstr "Karakteristikat Fizike"
+
+msgid "Height (cm)"
+msgstr "Gjatësia (cm)"
+
+msgid "Body Type"
+msgstr "Lloji i Trupit"
+
+msgid "Eye Color"
+msgstr "Ngjyra e Syve"
+
+msgid "Hair Color"
+msgstr "Ngjyra e Flokëve"
+
+msgid "Preferences"
+msgstr "Preferencat"
+
+msgid "Looking For"
+msgstr "Kërkoj"
+
+msgid "Preferred Age (Min)"
+msgstr "Mosha e Preferuar (Min)"
+
+msgid "Preferred Age (Max)"
+msgstr "Mosha e Preferuar (Maks)"
+
+msgid "Preferred Country"
+msgstr "Vendi i Preferuar"
+
+msgid "Save Profile"
+msgstr "Ruaj Profilin"
+
+msgid "Select..."
+msgstr "Zgjidh..."
+
+## Gender Options
+msgid "Male"
+msgstr "Mashkull"
+
+msgid "Female"
+msgstr "Femër"
+
+msgid "Other"
+msgstr "Tjetër"
+
+## Body Type Options
+msgid "Slim"
+msgstr "I Hollë"
+
+msgid "Athletic"
+msgstr "Atletik"
+
+msgid "Average"
+msgstr "Mesatar"
+
+msgid "Curvy"
+msgstr "Me Forma"
+
+msgid "Muscular"
+msgstr "Muskuloz"
+
+msgid "Plus Size"
+msgstr "Madhësi Plus"
+
+## Eye Color Options
+msgid "Brown"
+msgstr "Kafe"
+
+msgid "Blue"
+msgstr "Blu"
+
+msgid "Green"
+msgstr "Gjelbër"
+
+msgid "Hazel"
+msgstr "Lajthi"
+
+msgid "Gray"
+msgstr "Gri"
+
+msgid "Black"
+msgstr "Zi"
+
+## Hair Color Options
+msgid "Blonde"
+msgstr "Biond"
+
+msgid "Red"
+msgstr "Kuq"
+
+msgid "White"
+msgstr "Bardhë"
+
+## Looking For Options
+msgid "Friendship"
+msgstr "Miqësi"
+
+msgid "Dating"
+msgstr "Takime"
+
+msgid "Relationship"
+msgstr "Lidhje"
+
+msgid "Marriage"
+msgstr "Martesë"
+
+msgid "Not Sure"
+msgstr "Nuk Jam i Sigurt"
+
+## Profile Validation Errors
+msgid "is too far in the past"
+msgstr "është shumë larg në të kaluarën"
+
+msgid "you must be at least 18 years old"
+msgstr "duhet të jesh së paku 18 vjeç"
+
+msgid "must be greater than or equal to minimum age"
+msgstr "duhet të jetë më e madhe ose e barabartë me moshën minimale"
+
+## Country Options
+msgid "Montenegro"
+msgstr "Mali i Zi"
+
+msgid "Serbia"
+msgstr "Serbia"
+
+msgid "Bosnia and Herzegovina"
+msgstr "Bosnja dhe Hercegovina"
+
+msgid "Croatia"
+msgstr "Kroacia"
+
+msgid "Slovenia"
+msgstr "Sllovenia"
+
+msgid "Greece"
+msgstr "Greqia"
+
+msgid "Italy"
+msgstr "Italia"
+
+msgid "Austria"
+msgstr "Austria"
+
+msgid "Germany"
+msgstr "Gjermania"
+
+msgid "Switzerland"
+msgstr "Zvicra"
+
+msgid "Belgium"
+msgstr "Belgjika"
+
+msgid "Netherlands"
+msgstr "Holanda"
+
+msgid "France"
+msgstr "Franca"
+
+msgid "United Kingdom"
+msgstr "Mbretëria e Bashkuar"
+
+msgid "United States"
+msgstr "Shtetet e Bashkuara"
+
+msgid "Canada"
+msgstr "Kanadaja"
+
+msgid "Australia"
+msgstr "Australia"
+
+msgid "Sweden"
+msgstr "Suedia"
+
+msgid "Norway"
+msgstr "Norvegjia"
+
+msgid "Denmark"
+msgstr "Danimarka"
+
+msgid "Finland"
+msgstr "Finlanda"
+
+msgid "Spain"
+msgstr "Spanja"
+
+msgid "Portugal"
+msgstr "Portugalia"
+
+msgid "Turkey"
+msgstr "Turqia"
+
+msgid "Cyprus"
+msgstr "Qiproja"
+
+msgid "Malta"
+msgstr "Malta"
+
+## Profile Picture
+msgid "Profile Picture"
+msgstr "Fotoja e Profilit"
+
+msgid "Profile picture"
+msgstr "Fotoja e profilit"
+
+msgid "Upload New Picture"
+msgstr "Ngarko Foto të Re"
+
+msgid "JPG, PNG, GIF or WebP. Max 5MB."
+msgstr "JPG, PNG, GIF ose WebP. Maks 5MB."
+
+msgid "Are you sure you want to remove your profile picture?"
+msgstr "Je i sigurt që dëshiron të heqësh foton e profilit?"
+
+msgid "Profile picture removed."
+msgstr "Fotoja e profilit u hoq."
+
+msgid "Failed to remove profile picture."
+msgstr "Dështoi heqja e fotos së profilit."
+
+## Lifestyle Section
+msgid "Lifestyle"
+msgstr "Stili i Jetës"
+
+msgid "Smoking"
+msgstr "Pirja e Duhanit"
+
+msgid "Non-smoker"
+msgstr "Jo duhanpirës"
+
+msgid "Occasional smoker"
+msgstr "Duhanpirës rastësor"
+
+msgid "Regular smoker"
+msgstr "Duhanpirës i rregullt"
+
+msgid "Drinking"
+msgstr "Pirja e Alkoolit"
+
+msgid "Non-drinker"
+msgstr "Jo pirës"
+
+msgid "Social drinker"
+msgstr "Pirës shoqëror"
+
+msgid "Regular drinker"
+msgstr "Pirës i rregullt"
+
+msgid "Has Children"
+msgstr "Ka Fëmijë"
+
+msgid "Wants Children"
+msgstr "Dëshiron Fëmijë"
+
+msgid "Have children, want more"
+msgstr "Kam fëmijë, dua më shumë"
+
+## Background Section
+msgid "Background"
+msgstr "Prapavija"
+
+msgid "Education"
+msgstr "Arsimi"
+
+msgid "High School"
+msgstr "Shkolla e Mesme"
+
+msgid "Some College"
+msgstr "Disa Studime"
+
+msgid "Bachelor's Degree"
+msgstr "Diplomë Bachelor"
+
+msgid "Master's Degree"
+msgstr "Diplomë Master"
+
+msgid "Doctorate"
+msgstr "Doktoraturë"
+
+msgid "Religion"
+msgstr "Feja"
+
+msgid "Muslim"
+msgstr "Mysliman"
+
+msgid "Orthodox Christian"
+msgstr "Ortodoks"
+
+msgid "Catholic"
+msgstr "Katolik"
+
+msgid "Atheist"
+msgstr "Ateist"
+
+msgid "Prefer not to say"
+msgstr "Preferoj të mos them"
+
+msgid "Languages Spoken"
+msgstr "Gjuhët e Folura"
+
+msgid "Italian"
+msgstr "Italisht"
+
+msgid "German"
+msgstr "Gjermanisht"
+
+msgid "French"
+msgstr "Frëngjisht"
+
+msgid "Serbian"
+msgstr "Serbisht"
+
+msgid "Macedonian"
+msgstr "Maqedonisht"
+
+msgid "Turkish"
+msgstr "Turqisht"
+
+msgid "Other Languages"
+msgstr "Gjuhë të Tjera"
+
+msgid "e.g., Greek, Spanish, Portuguese"
+msgstr "p.sh., Greqisht, Spanjisht, Portugalisht"
+
+## Preferences Section
+msgid "Interested In"
+msgstr "Të Interesuar Për"
+
+msgid "Any"
+msgstr "Çdo"
+
+## Interests Section
+msgid "Interests"
+msgstr "Interesat"
+
+msgid "Select your interests to help find better matches"
+msgstr "Zgjidhni interesat tuaja për të gjetur përputhje më të mira"
+
+msgid "Sports"
+msgstr "Sporteve"
+
+msgid "Music"
+msgstr "Muzikë"
+
+msgid "Travel"
+msgstr "Udhëtim"
+
+msgid "Reading"
+msgstr "Lexim"
+
+msgid "Cooking"
+msgstr "Gatim"
+
+msgid "Movies"
+msgstr "Filma"
+
+msgid "Fitness"
+msgstr "Fitnes"
+
+msgid "Art"
+msgstr "Art"
+
+msgid "Nature"
+msgstr "Natyrë"
+
+msgid "Technology"
+msgstr "Teknologji"
+
+msgid "Gaming"
+msgstr "Lojëra"
+
+msgid "Photography"
+msgstr "Fotografi"
+
+msgid "Dancing"
+msgstr "Vallëzim"
+
+msgid "Fashion"
+msgstr "Modë"

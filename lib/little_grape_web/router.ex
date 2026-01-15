@@ -1,6 +1,8 @@
 defmodule LittleGrapeWeb.Router do
   use LittleGrapeWeb, :router
 
+  import LittleGrapeWeb.UserAuth
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -9,8 +11,10 @@ defmodule LittleGrapeWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers, %{
       "content-security-policy" =>
-        "default-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; style-src 'self' 'unsafe-inline'"
+        "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net"
     }
+    plug :fetch_current_scope_for_user
+    plug LittleGrapeWeb.Plugs.Locale
   end
 
   pipeline :api do
@@ -43,5 +47,35 @@ defmodule LittleGrapeWeb.Router do
       live_dashboard "/dashboard", metrics: LittleGrapeWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
+  end
+
+  ## Authentication routes
+
+  scope "/", LittleGrapeWeb do
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
+
+    get "/users/register", UserRegistrationController, :new
+    post "/users/register", UserRegistrationController, :create
+  end
+
+  scope "/", LittleGrapeWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    get "/users/settings", UserSettingsController, :edit
+    put "/users/settings", UserSettingsController, :update
+    get "/users/settings/confirm-email/:token", UserSettingsController, :confirm_email
+
+    get "/users/profile", UserProfileController, :edit
+    put "/users/profile", UserProfileController, :update
+    delete "/users/profile/picture", UserProfileController, :delete_picture
+  end
+
+  scope "/", LittleGrapeWeb do
+    pipe_through [:browser]
+
+    get "/users/log-in", UserSessionController, :new
+    get "/users/log-in/:token", UserSessionController, :confirm
+    post "/users/log-in", UserSessionController, :create
+    delete "/users/log-out", UserSessionController, :delete
   end
 end
