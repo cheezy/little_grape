@@ -103,6 +103,7 @@ defmodule LittleGrape.MixProject do
     [
       ignore_modules: [
         LittleGrape.Application,
+        LittleGrape.Release,
         LittleGrape.Repo,
         LittleGrape.AccountsFixtures,
         LittleGrapeWeb.ConnCase,
@@ -112,7 +113,10 @@ defmodule LittleGrape.MixProject do
         LittleGrapeWeb.PageHTML,
         LittleGrapeWEb.Plugs.Locale,
         LittleGrapeWeb.Router,
-        LittleGrapeWeb.Telemetry
+        LittleGrapeWeb.Telemetry,
+        LittleGrapeWeb.UserRegistrationHTML,
+        LittleGrapeWeb.UserSessionHTML,
+        LittleGrapeWeb.UserSettingsHTML
       ]
     ]
   end

@@ -399,6 +399,162 @@ defmodule LittleGrape.AccountsTest do
     test "does not include password" do
       refute inspect(%User{password: "123456"}) =~ "password: \"123456\""
     end
+
+    test "does not include hashed_password" do
+      refute inspect(%User{hashed_password: "somehash"}) =~ "hashed_password: \"somehash\""
+    end
+  end
+
+  ## User Changeset Tests
+
+  describe "User.email_changeset/3" do
+    test "validates email format - requires @ sign" do
+      changeset = User.email_changeset(%User{}, %{email: "invalid"})
+      assert "must have the @ sign and no spaces" in errors_on(changeset).email
+    end
+
+    test "validates email format - no spaces allowed" do
+      changeset = User.email_changeset(%User{}, %{email: "test @example.com"})
+      assert "must have the @ sign and no spaces" in errors_on(changeset).email
+    end
+
+    test "validates email format - accepts valid email" do
+      changeset = User.email_changeset(%User{}, %{email: "valid@example.com"}, validate_unique: false)
+      assert changeset.valid?
+    end
+
+    test "validates email max length" do
+      too_long = String.duplicate("a", 150) <> "@example.com"
+      changeset = User.email_changeset(%User{}, %{email: too_long})
+      assert "should be at most 160 character(s)" in errors_on(changeset).email
+    end
+
+    test "validates email did not change when updating existing user" do
+      user = user_fixture()
+      changeset = User.email_changeset(user, %{email: user.email})
+      assert "did not change" in errors_on(changeset).email
+    end
+
+    test "does not validate uniqueness when option is false" do
+      user = user_fixture()
+      changeset = User.email_changeset(%User{}, %{email: user.email}, validate_unique: false)
+      assert changeset.valid?
+    end
+  end
+
+  describe "User.password_changeset/3" do
+    test "validates password min length" do
+      changeset = User.password_changeset(%User{}, %{password: "Short1!"})
+      assert "should be at least 8 character(s)" in errors_on(changeset).password
+    end
+
+    test "validates password max length" do
+      too_long = String.duplicate("Aa1!", 25)
+      changeset = User.password_changeset(%User{}, %{password: too_long})
+      assert "should be at most 72 character(s)" in errors_on(changeset).password
+    end
+
+    test "validates password requires lowercase letter" do
+      changeset = User.password_changeset(%User{}, %{password: "PASSWORD1!"})
+      assert "must contain at least one lowercase letter" in errors_on(changeset).password
+    end
+
+    test "validates password requires uppercase letter" do
+      changeset = User.password_changeset(%User{}, %{password: "password1!"})
+      assert "must contain at least one uppercase letter" in errors_on(changeset).password
+    end
+
+    test "validates password requires number" do
+      changeset = User.password_changeset(%User{}, %{password: "Password!!"})
+      assert "must contain at least one number" in errors_on(changeset).password
+    end
+
+    test "validates password requires special character" do
+      changeset = User.password_changeset(%User{}, %{password: "Password123"})
+      assert "must contain at least one special character (!?@#$%^&*_-+=)" in errors_on(changeset).password
+    end
+
+    test "validates password confirmation" do
+      changeset = User.password_changeset(%User{}, %{
+        password: "Password1!",
+        password_confirmation: "Different1!"
+      })
+      assert "does not match password" in errors_on(changeset).password_confirmation
+    end
+
+    test "accepts valid password with all requirements" do
+      changeset = User.password_changeset(%User{}, %{password: "ValidPass1!"}, hash_password: false)
+      assert changeset.valid?
+    end
+
+    test "hashes password by default" do
+      changeset = User.password_changeset(%User{}, %{password: "ValidPass1!"})
+      assert changeset.valid?
+      assert get_change(changeset, :hashed_password)
+      refute get_change(changeset, :password)
+    end
+
+    test "does not hash password when option is false" do
+      changeset = User.password_changeset(%User{}, %{password: "ValidPass1!"}, hash_password: false)
+      assert changeset.valid?
+      refute get_change(changeset, :hashed_password)
+      assert get_change(changeset, :password) == "ValidPass1!"
+    end
+  end
+
+  describe "User.registration_changeset/3" do
+    test "validates both email and password" do
+      changeset = User.registration_changeset(%User{}, %{})
+      errors = errors_on(changeset)
+      assert "can't be blank" in errors.email
+      assert "can't be blank" in errors.password
+    end
+
+    test "accepts valid email and password" do
+      changeset = User.registration_changeset(
+        %User{},
+        %{email: "test@example.com", password: "ValidPass1!"},
+        validate_unique: false
+      )
+      assert changeset.valid?
+    end
+  end
+
+  describe "User.confirm_changeset/1" do
+    test "sets confirmed_at to current time" do
+      user = %User{}
+      changeset = User.confirm_changeset(user)
+      confirmed_at = get_change(changeset, :confirmed_at)
+      assert confirmed_at
+      assert DateTime.diff(DateTime.utc_now(), confirmed_at) < 2
+    end
+  end
+
+  describe "User.valid_password?/2" do
+    setup do
+      user = user_fixture() |> set_password()
+      %{user: user}
+    end
+
+    test "returns true for valid password", %{user: user} do
+      assert User.valid_password?(user, valid_user_password())
+    end
+
+    test "returns false for invalid password", %{user: user} do
+      refute User.valid_password?(user, "wrongpassword")
+    end
+
+    test "returns false for empty password", %{user: user} do
+      refute User.valid_password?(user, "")
+    end
+
+    test "returns false for nil user" do
+      refute User.valid_password?(nil, "somepassword")
+    end
+
+    test "returns false for user without hashed_password" do
+      refute User.valid_password?(%User{hashed_password: nil}, "somepassword")
+    end
   end
 
   ## Profile Tests
@@ -700,6 +856,419 @@ defmodule LittleGrape.AccountsTest do
       assert "sports" in options
       assert "travel" in options
       assert "technology" in options
+    end
+  end
+
+  describe "Profile.body_type_options/0" do
+    test "returns the list of body type options" do
+      options = Profile.body_type_options()
+      assert "slim" in options
+      assert "athletic" in options
+      assert "plus_size" in options
+    end
+  end
+
+  describe "Profile.eye_color_options/0" do
+    test "returns the list of eye color options" do
+      options = Profile.eye_color_options()
+      assert "brown" in options
+      assert "blue" in options
+      assert "green" in options
+    end
+  end
+
+  describe "Profile.hair_color_options/0" do
+    test "returns the list of hair color options" do
+      options = Profile.hair_color_options()
+      assert "black" in options
+      assert "blonde" in options
+      assert "other" in options
+    end
+  end
+
+  describe "Profile.looking_for_options/0" do
+    test "returns the list of looking_for options" do
+      options = Profile.looking_for_options()
+      assert "friendship" in options
+      assert "relationship" in options
+      assert "marriage" in options
+    end
+  end
+
+  ## Profile Picture Tests
+
+  describe "update_profile_picture/2" do
+    setup do
+      user = user_fixture()
+      profile = Accounts.get_or_create_profile(user)
+      %{user: user, profile: profile}
+    end
+
+    test "returns profile unchanged when given nil", %{profile: profile} do
+      assert {:ok, returned_profile} = Accounts.update_profile_picture(profile, nil)
+      assert returned_profile.id == profile.id
+    end
+
+    test "rejects invalid file extensions", %{profile: profile} do
+      upload = %Plug.Upload{
+        path: "/tmp/test.txt",
+        filename: "test.txt",
+        content_type: "text/plain"
+      }
+
+      assert {:error, changeset} = Accounts.update_profile_picture(profile, upload)
+      assert "invalid file type" in errors_on(changeset).profile_picture
+    end
+
+    test "rejects .exe files", %{profile: profile} do
+      upload = %Plug.Upload{
+        path: "/tmp/test.exe",
+        filename: "malicious.exe",
+        content_type: "application/x-executable"
+      }
+
+      assert {:error, changeset} = Accounts.update_profile_picture(profile, upload)
+      assert "invalid file type" in errors_on(changeset).profile_picture
+    end
+
+    test "rejects .pdf files", %{profile: profile} do
+      upload = %Plug.Upload{
+        path: "/tmp/test.pdf",
+        filename: "document.pdf",
+        content_type: "application/pdf"
+      }
+
+      assert {:error, changeset} = Accounts.update_profile_picture(profile, upload)
+      assert "invalid file type" in errors_on(changeset).profile_picture
+    end
+
+    test "accepts jpg extension", %{profile: profile} do
+      # Create a temporary test file
+      tmp_path = Path.join(System.tmp_dir!(), "test_#{System.unique_integer()}.jpg")
+      File.write!(tmp_path, "fake image content")
+
+      upload = %Plug.Upload{
+        path: tmp_path,
+        filename: "photo.jpg",
+        content_type: "image/jpeg"
+      }
+
+      assert {:ok, updated_profile} = Accounts.update_profile_picture(profile, upload)
+      assert updated_profile.profile_picture =~ ~r/\/uploads\/profile_pictures\/.*\.jpg$/
+
+      # Cleanup
+      File.rm(tmp_path)
+    end
+
+    test "accepts jpeg extension", %{profile: profile} do
+      tmp_path = Path.join(System.tmp_dir!(), "test_#{System.unique_integer()}.jpeg")
+      File.write!(tmp_path, "fake image content")
+
+      upload = %Plug.Upload{
+        path: tmp_path,
+        filename: "photo.jpeg",
+        content_type: "image/jpeg"
+      }
+
+      assert {:ok, updated_profile} = Accounts.update_profile_picture(profile, upload)
+      assert updated_profile.profile_picture =~ ~r/\/uploads\/profile_pictures\/.*\.jpeg$/
+
+      File.rm(tmp_path)
+    end
+
+    test "accepts png extension", %{profile: profile} do
+      tmp_path = Path.join(System.tmp_dir!(), "test_#{System.unique_integer()}.png")
+      File.write!(tmp_path, "fake image content")
+
+      upload = %Plug.Upload{
+        path: tmp_path,
+        filename: "photo.png",
+        content_type: "image/png"
+      }
+
+      assert {:ok, updated_profile} = Accounts.update_profile_picture(profile, upload)
+      assert updated_profile.profile_picture =~ ~r/\/uploads\/profile_pictures\/.*\.png$/
+
+      File.rm(tmp_path)
+    end
+
+    test "accepts gif extension", %{profile: profile} do
+      tmp_path = Path.join(System.tmp_dir!(), "test_#{System.unique_integer()}.gif")
+      File.write!(tmp_path, "fake image content")
+
+      upload = %Plug.Upload{
+        path: tmp_path,
+        filename: "photo.gif",
+        content_type: "image/gif"
+      }
+
+      assert {:ok, updated_profile} = Accounts.update_profile_picture(profile, upload)
+      assert updated_profile.profile_picture =~ ~r/\/uploads\/profile_pictures\/.*\.gif$/
+
+      File.rm(tmp_path)
+    end
+
+    test "accepts webp extension", %{profile: profile} do
+      tmp_path = Path.join(System.tmp_dir!(), "test_#{System.unique_integer()}.webp")
+      File.write!(tmp_path, "fake image content")
+
+      upload = %Plug.Upload{
+        path: tmp_path,
+        filename: "photo.webp",
+        content_type: "image/webp"
+      }
+
+      assert {:ok, updated_profile} = Accounts.update_profile_picture(profile, upload)
+      assert updated_profile.profile_picture =~ ~r/\/uploads\/profile_pictures\/.*\.webp$/
+
+      File.rm(tmp_path)
+    end
+
+    test "normalizes extension to lowercase", %{profile: profile} do
+      tmp_path = Path.join(System.tmp_dir!(), "test_#{System.unique_integer()}.JPG")
+      File.write!(tmp_path, "fake image content")
+
+      upload = %Plug.Upload{
+        path: tmp_path,
+        filename: "photo.JPG",
+        content_type: "image/jpeg"
+      }
+
+      assert {:ok, updated_profile} = Accounts.update_profile_picture(profile, upload)
+      # The saved extension should be lowercase
+      assert updated_profile.profile_picture =~ ~r/\/uploads\/profile_pictures\/.*\.jpg$/
+
+      File.rm(tmp_path)
+    end
+
+    test "generates safe filename from profile id and timestamp", %{profile: profile} do
+      tmp_path = Path.join(System.tmp_dir!(), "test_#{System.unique_integer()}.jpg")
+      File.write!(tmp_path, "fake image content")
+
+      upload = %Plug.Upload{
+        path: tmp_path,
+        filename: "../../../etc/passwd.jpg",
+        content_type: "image/jpeg"
+      }
+
+      assert {:ok, updated_profile} = Accounts.update_profile_picture(profile, upload)
+      # Should not contain path traversal attempts
+      refute updated_profile.profile_picture =~ ".."
+      # Should start with expected path
+      assert String.starts_with?(updated_profile.profile_picture, "/uploads/profile_pictures/")
+
+      File.rm(tmp_path)
+    end
+  end
+
+  describe "delete_profile_picture/1" do
+    setup do
+      user = user_fixture()
+      profile = Accounts.get_or_create_profile(user)
+      %{user: user, profile: profile}
+    end
+
+    test "returns ok when profile has no picture", %{profile: profile} do
+      assert {:ok, returned_profile} = Accounts.delete_profile_picture(profile)
+      assert returned_profile.id == profile.id
+      refute returned_profile.profile_picture
+    end
+
+    test "clears profile_picture field when profile has a picture", %{profile: profile} do
+      # First add a profile picture
+      tmp_path = Path.join(System.tmp_dir!(), "test_#{System.unique_integer()}.jpg")
+      File.write!(tmp_path, "fake image content")
+
+      upload = %Plug.Upload{
+        path: tmp_path,
+        filename: "photo.jpg",
+        content_type: "image/jpeg"
+      }
+
+      {:ok, profile_with_picture} = Accounts.update_profile_picture(profile, upload)
+      assert profile_with_picture.profile_picture
+
+      # Now delete it
+      {:ok, profile_without_picture} = Accounts.delete_profile_picture(profile_with_picture)
+      refute profile_without_picture.profile_picture
+
+      File.rm(tmp_path)
+    end
+  end
+
+  ## Profile Changeset Tests
+
+  describe "Profile.profile_picture_changeset/2" do
+    test "casts profile_picture field" do
+      profile = %Profile{}
+      changeset = Profile.profile_picture_changeset(profile, %{profile_picture: "/uploads/test.jpg"})
+      assert get_change(changeset, :profile_picture) == "/uploads/test.jpg"
+    end
+
+    test "allows setting profile_picture to nil" do
+      profile = %Profile{profile_picture: "/uploads/existing.jpg"}
+      changeset = Profile.profile_picture_changeset(profile, %{profile_picture: nil})
+      assert get_change(changeset, :profile_picture) == nil
+    end
+  end
+
+  ## Additional Edge Case Tests
+
+  describe "login_user_by_magic_link/2 edge cases" do
+    test "returns error for invalid password when confirming" do
+      user = unconfirmed_user_fixture()
+      {encoded_token, _hashed_token} = generate_user_magic_link_token(user)
+
+      # Password doesn't meet complexity requirements
+      assert {:error, changeset} =
+               Accounts.login_user_by_magic_link(encoded_token, %{password: "short"})
+
+      assert "should be at least 8 character(s)" in errors_on(changeset).password
+    end
+
+    test "returns error for password confirmation mismatch" do
+      user = unconfirmed_user_fixture()
+      {encoded_token, _hashed_token} = generate_user_magic_link_token(user)
+
+      assert {:error, changeset} =
+               Accounts.login_user_by_magic_link(encoded_token, %{
+                 password: "ValidPass1!",
+                 password_confirmation: "Different1!"
+               })
+
+      assert "does not match password" in errors_on(changeset).password_confirmation
+    end
+  end
+
+  describe "change_user_email/3 edge cases" do
+    test "allows attrs to be passed" do
+      changeset = Accounts.change_user_email(%User{}, %{email: "new@example.com"}, validate_unique: false)
+      assert get_change(changeset, :email) == "new@example.com"
+    end
+  end
+
+  describe "change_user_password/3 edge cases" do
+    test "allows attrs to be passed" do
+      changeset = Accounts.change_user_password(%User{}, %{password: "ValidPass1!"}, hash_password: false)
+      assert get_change(changeset, :password) == "ValidPass1!"
+    end
+  end
+
+  describe "change_profile/2 edge cases" do
+    test "allows attrs to be passed" do
+      user = user_fixture()
+      profile = Accounts.get_or_create_profile(user)
+      changeset = Accounts.change_profile(profile, %{first_name: "NewName"})
+      assert get_change(changeset, :first_name) == "NewName"
+    end
+  end
+
+  describe "update_profile/2 additional validations" do
+    setup do
+      user = user_fixture()
+      profile = Accounts.get_or_create_profile(user)
+      %{profile: profile}
+    end
+
+    test "validates occupation max length", %{profile: profile} do
+      too_long = String.duplicate("a", 101)
+      {:error, changeset} = Accounts.update_profile(profile, %{occupation: too_long})
+      assert "should be at most 100 character(s)" in errors_on(changeset).occupation
+    end
+
+    test "validates city max length", %{profile: profile} do
+      too_long = String.duplicate("a", 101)
+      {:error, changeset} = Accounts.update_profile(profile, %{city: too_long})
+      assert "should be at most 100 character(s)" in errors_on(changeset).city
+    end
+
+    test "validates preferred_gender includes 'any' option", %{profile: profile} do
+      {:ok, updated_profile} = Accounts.update_profile(profile, %{preferred_gender: "any"})
+      assert updated_profile.preferred_gender == "any"
+    end
+
+    test "validates preferred_country is one of allowed options", %{profile: profile} do
+      {:error, changeset} = Accounts.update_profile(profile, %{preferred_country: "XX"})
+      assert "is invalid" in errors_on(changeset).preferred_country
+    end
+
+    test "accepts valid preferred_country", %{profile: profile} do
+      {:ok, updated_profile} = Accounts.update_profile(profile, %{preferred_country: "XK"})
+      assert updated_profile.preferred_country == "XK"
+    end
+
+    test "validates has_children is boolean", %{profile: profile} do
+      {:ok, updated_profile} = Accounts.update_profile(profile, %{has_children: true})
+      assert updated_profile.has_children == true
+
+      {:ok, updated_profile} = Accounts.update_profile(profile, %{has_children: false})
+      assert updated_profile.has_children == false
+    end
+
+    test "accepts empty languages array", %{profile: profile} do
+      {:ok, updated_profile} = Accounts.update_profile(profile, %{languages: []})
+      assert updated_profile.languages == []
+    end
+
+    test "accepts empty interests array", %{profile: profile} do
+      {:ok, updated_profile} = Accounts.update_profile(profile, %{interests: []})
+      assert updated_profile.interests == []
+    end
+
+    test "accepts all valid languages", %{profile: profile} do
+      all_languages = Profile.language_options()
+      {:ok, updated_profile} = Accounts.update_profile(profile, %{languages: all_languages})
+      assert updated_profile.languages == all_languages
+    end
+
+    test "accepts all valid interests", %{profile: profile} do
+      all_interests = Profile.interest_options()
+      {:ok, updated_profile} = Accounts.update_profile(profile, %{interests: all_interests})
+      assert updated_profile.interests == all_interests
+    end
+
+    test "validates preferred_age_max is less than 100", %{profile: profile} do
+      {:error, changeset} = Accounts.update_profile(profile, %{preferred_age_max: 100})
+      assert "must be less than 100" in errors_on(changeset).preferred_age_max
+    end
+
+    test "validates preferred_age_min is less than 100", %{profile: profile} do
+      {:error, changeset} = Accounts.update_profile(profile, %{preferred_age_min: 100})
+      assert "must be less than 100" in errors_on(changeset).preferred_age_min
+    end
+
+    test "accepts valid birthdate exactly 18 years ago", %{profile: profile} do
+      eighteen_years_ago = Date.add(Date.utc_today(), -18 * 365 - 5)
+      {:ok, updated_profile} = Accounts.update_profile(profile, %{birthdate: eighteen_years_ago})
+      assert updated_profile.birthdate == eighteen_years_ago
+    end
+
+    test "allows all body type options", %{profile: profile} do
+      for body_type <- Profile.body_type_options() do
+        {:ok, updated_profile} = Accounts.update_profile(profile, %{body_type: body_type})
+        assert updated_profile.body_type == body_type
+      end
+    end
+
+    test "allows all eye color options", %{profile: profile} do
+      for eye_color <- Profile.eye_color_options() do
+        {:ok, updated_profile} = Accounts.update_profile(profile, %{eye_color: eye_color})
+        assert updated_profile.eye_color == eye_color
+      end
+    end
+
+    test "allows all hair color options", %{profile: profile} do
+      for hair_color <- Profile.hair_color_options() do
+        {:ok, updated_profile} = Accounts.update_profile(profile, %{hair_color: hair_color})
+        assert updated_profile.hair_color == hair_color
+      end
+    end
+
+    test "allows all looking_for options", %{profile: profile} do
+      for looking_for <- Profile.looking_for_options() do
+        {:ok, updated_profile} = Accounts.update_profile(profile, %{looking_for: looking_for})
+        assert updated_profile.looking_for == looking_for
+      end
     end
   end
 end
