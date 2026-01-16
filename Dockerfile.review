@@ -57,8 +57,8 @@ RUN mix compile
 
 COPY assets assets
 
-WORKDIR /app/assets
-RUN npm install
+# WORKDIR /app/assets
+# RUN npm install
 
 WORKDIR /app
 
