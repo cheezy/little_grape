@@ -4,14 +4,13 @@ defmodule LittleGrapeWeb.UserSettingsController do
   alias LittleGrape.Accounts
   alias LittleGrapeWeb.UserAuth
 
-  plug :assign_email_and_password_changesets
-
-  def edit(conn, _params) do
-    render(conn, :edit)
+  def edit_email(conn, _params) do
+    user = conn.assigns.current_scope.user
+    changeset = Accounts.change_user_email(user)
+    render(conn, :edit_email, email_changeset: changeset)
   end
 
-  def update(conn, %{"action" => "update_email"} = params) do
-    %{"user" => user_params} = params
+  def update_email(conn, %{"user" => user_params}) do
     user = conn.assigns.current_scope.user
 
     case Accounts.change_user_email(user, user_params) do
@@ -20,7 +19,7 @@ defmodule LittleGrapeWeb.UserSettingsController do
         |> Ecto.Changeset.apply_action!(:insert)
         |> Accounts.deliver_user_update_email_instructions(
           user.email,
-          &url(~p"/users/settings/confirm-email/#{&1}")
+          &url(~p"/users/settings/email/confirm/#{&1}")
         )
 
         conn
@@ -28,26 +27,10 @@ defmodule LittleGrapeWeb.UserSettingsController do
           :info,
           "A link to confirm your email change has been sent to the new address."
         )
-        |> redirect(to: ~p"/users/settings")
+        |> redirect(to: ~p"/users/settings/email")
 
       changeset ->
-        render(conn, :edit, email_changeset: %{changeset | action: :insert})
-    end
-  end
-
-  def update(conn, %{"action" => "update_password"} = params) do
-    %{"user" => user_params} = params
-    user = conn.assigns.current_scope.user
-
-    case Accounts.update_user_password(user, user_params) do
-      {:ok, {user, _}} ->
-        conn
-        |> put_flash(:info, "Password updated successfully.")
-        |> put_session(:user_return_to, ~p"/users/settings")
-        |> UserAuth.log_in_user(user)
-
-      {:error, changeset} ->
-        render(conn, :edit, password_changeset: changeset)
+        render(conn, :edit_email, email_changeset: %{changeset | action: :insert})
     end
   end
 
@@ -56,20 +39,33 @@ defmodule LittleGrapeWeb.UserSettingsController do
       {:ok, _user} ->
         conn
         |> put_flash(:info, "Email changed successfully.")
-        |> redirect(to: ~p"/users/settings")
+        |> redirect(to: ~p"/users/settings/email")
 
       {:error, _} ->
         conn
         |> put_flash(:error, "Email change link is invalid or it has expired.")
-        |> redirect(to: ~p"/users/settings")
+        |> redirect(to: ~p"/users/settings/email")
     end
   end
 
-  defp assign_email_and_password_changesets(conn, _opts) do
+  def edit_password(conn, _params) do
+    user = conn.assigns.current_scope.user
+    changeset = Accounts.change_user_password(user)
+    render(conn, :edit_password, password_changeset: changeset)
+  end
+
+  def update_password(conn, %{"user" => user_params}) do
     user = conn.assigns.current_scope.user
 
-    conn
-    |> assign(:email_changeset, Accounts.change_user_email(user))
-    |> assign(:password_changeset, Accounts.change_user_password(user))
+    case Accounts.update_user_password(user, user_params) do
+      {:ok, {user, _}} ->
+        conn
+        |> put_flash(:info, "Password updated successfully.")
+        |> put_session(:user_return_to, ~p"/users/settings/password")
+        |> UserAuth.log_in_user(user)
+
+      {:error, changeset} ->
+        render(conn, :edit_password, password_changeset: changeset)
+    end
   end
 end

@@ -61,9 +61,11 @@ defmodule LittleGrapeWeb.Router do
   scope "/", LittleGrapeWeb do
     pipe_through [:browser, :require_authenticated_user]
 
-    get "/users/settings", UserSettingsController, :edit
-    put "/users/settings", UserSettingsController, :update
-    get "/users/settings/confirm-email/:token", UserSettingsController, :confirm_email
+    get "/users/settings/email", UserSettingsController, :edit_email
+    put "/users/settings/email", UserSettingsController, :update_email
+    get "/users/settings/email/confirm/:token", UserSettingsController, :confirm_email
+    get "/users/settings/password", UserSettingsController, :edit_password
+    put "/users/settings/password", UserSettingsController, :update_password
 
     get "/users/profile", UserProfileController, :edit
     put "/users/profile", UserProfileController, :update

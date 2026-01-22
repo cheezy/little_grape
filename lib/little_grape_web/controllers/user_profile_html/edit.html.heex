@@ -10,8 +10,14 @@
         <span class="text-gray-900 text-2xl font-bold">Zemra Ime</span>
       </a>
       <div class="flex items-center gap-4">
-        <.link href={~p"/users/settings"} class="text-gray-600 hover:text-red-600 transition font-medium">
-          {gettext("Settings")}
+        <.link href={~p"/"} class="text-gray-600 hover:text-red-600 transition font-medium">
+          {gettext("Home")}
+        </.link>
+        <.link href={~p"/users/settings/email"} class="text-gray-600 hover:text-red-600 transition font-medium">
+          {gettext("Change Email")}
+        </.link>
+        <.link href={~p"/users/settings/password"} class="text-gray-600 hover:text-red-600 transition font-medium">
+          {gettext("Change Password")}
         </.link>
         <.link href={~p"/users/log-out"} method="delete" class="text-gray-600 hover:text-red-600 transition font-medium">
           {gettext("Log out")}

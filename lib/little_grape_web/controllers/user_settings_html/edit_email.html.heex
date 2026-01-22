@@ -24,16 +24,14 @@
       <Layouts.flash_group flash={@flash} />
 
       <div class="text-center mb-8">
-        <h1 class="text-2xl font-bold text-gray-900 mb-2">{gettext("Account Settings")}</h1>
-        <p class="text-gray-600">{gettext("Manage your account email address and password settings")}</p>
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">{gettext("Change Email")}</h1>
+        <p class="text-gray-600">{gettext("Update your email address")}</p>
       </div>
 
       <!-- Email Change Form -->
-      <.form :let={f} for={@email_changeset} action={~p"/users/settings"} id="update_email" class="mb-8">
-        <input type="hidden" name="action" value="update_email" />
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">{gettext("Change Email")}</h3>
+      <.form :let={f} for={@email_changeset} action={~p"/users/settings/email"} id="update_email">
         <div class="mb-4">
-          <label class="block text-gray-700 font-medium mb-2">{gettext("Email")}</label>
+          <label class="block text-gray-700 font-medium mb-2">{gettext("New Email")}</label>
           <input
             type="email"
             name={f[:email].name}
@@ -44,43 +42,18 @@
           />
           <.error :for={msg <- f[:email].errors}>{translate_error(msg)}</.error>
         </div>
-        <button type="submit" class="bg-red-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-red-700 transition shadow-lg">
+        <button type="submit" class="w-full bg-red-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-red-700 transition shadow-lg">
           {gettext("Change Email")}
         </button>
       </.form>
 
       <div class="border-t border-gray-200 my-8"></div>
 
-      <!-- Password Change Form -->
-      <.form :let={f} for={@password_changeset} action={~p"/users/settings"} id="update_password">
-        <input type="hidden" name="action" value="update_password" />
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">{gettext("Save Password")}</h3>
-        <div class="mb-4">
-          <label class="block text-gray-700 font-medium mb-2">{gettext("New password")}</label>
-          <input
-            type="password"
-            name={f[:password].name}
-            autocomplete="new-password"
-            required
-            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-500 focus:ring-2 focus:ring-red-100 transition outline-none"
-          />
-          <.error :for={msg <- f[:password].errors}>{translate_error(msg)}</.error>
-        </div>
-        <div class="mb-6">
-          <label class="block text-gray-700 font-medium mb-2">{gettext("Confirm new password")}</label>
-          <input
-            type="password"
-            name={f[:password_confirmation].name}
-            autocomplete="new-password"
-            required
-            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-500 focus:ring-2 focus:ring-red-100 transition outline-none"
-          />
-          <.error :for={msg <- f[:password_confirmation].errors}>{translate_error(msg)}</.error>
-        </div>
-        <button type="submit" class="bg-red-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-red-700 transition shadow-lg">
-          {gettext("Save Password")}
-        </button>
-      </.form>
+      <div class="text-center">
+        <.link href={~p"/users/settings/password"} class="text-red-600 hover:text-red-700 font-medium">
+          {gettext("Change Password instead")}
+        </.link>
+      </div>
     </div>
 
     <!-- Language Switcher -->

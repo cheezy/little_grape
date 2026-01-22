@@ -111,7 +111,7 @@ defmodule LittleGrape.MixProject do
         LittleGrapeWeb.ErrorHTML,
         LittleGrapeWeb.Layouts,
         LittleGrapeWeb.PageHTML,
-        LittleGrapeWEb.Plugs.Locale,
+        LittleGrapeWeb.Plugs.Locale,
         LittleGrapeWeb.Router,
         LittleGrapeWeb.Telemetry,
         LittleGrapeWeb.UserRegistrationHTML,

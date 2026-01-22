@@ -44,8 +44,8 @@
         </div>
 <%= if @current_scope && @current_scope.user do %>
           <span class="text-gray-700">{@current_scope.user.email}</span>
-          <.link href={~p"/users/settings"} class="text-gray-700 hover:text-red-600 transition font-medium">
-            {gettext("Settings")}
+          <.link href={~p"/users/profile"} class="text-gray-700 hover:text-red-600 transition font-medium">
+            {gettext("Profile")}
           </.link>
           <.link href={~p"/users/log-out"} method="delete" class="bg-red-600 text-white px-6 py-2.5 rounded-full font-semibold hover:bg-red-700 transition shadow-lg">
             {gettext("Log out")}
