@@ -28,8 +28,8 @@
           </.link>
         <% end %>
         <a href="#features" class="text-gray-600 hover:text-red-600 transition">{gettext("Features")}</a>
-        <a href="#about" class="text-gray-600 hover:text-red-600 transition">{gettext("About")}</a>
         <a href="#" class="text-gray-600 hover:text-red-600 transition">{gettext("Success Stories")}</a>
+        <a href="#about" class="text-gray-600 hover:text-red-600 transition">{gettext("About")}</a>
         <div class="flex items-center gap-4">
 <%= if @current_scope && @current_scope.user do %>
           <.link href={~p"/users/log-out"} method="delete" class="bg-red-600 text-white px-6 py-2.5 rounded-full font-semibold hover:bg-red-700 transition shadow-lg">
