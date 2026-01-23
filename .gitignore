@@ -37,3 +37,6 @@ npm-debug.log
 
 .expert/
 .claude/settings.local.json
+
+# Stride authentication (contains secrets)
+.stride_auth.md
