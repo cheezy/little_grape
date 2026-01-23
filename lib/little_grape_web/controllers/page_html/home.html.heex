@@ -20,9 +20,9 @@
         </svg>
         <span class="text-gray-900 text-2xl font-bold tracking-tight">Zemra Ime</span>
       </div>
-      <div class="hidden md:flex items-center gap-8">
+      <div class="hidden md:flex items-center gap-6 ml-auto">
 <%= if @current_scope && @current_scope.user do %>
-          <span class="text-gray-700">{@current_scope.user.email}</span>
+          <span class="text-gray-500 text-sm bg-gray-100 px-3 py-1 rounded-full">{@current_scope.user.email}</span>
           <.link href={~p"/users/profile"} class="text-gray-600 hover:text-red-600 transition font-medium">
             {gettext("Profile")}
           </.link>
@@ -30,8 +30,7 @@
         <a href="#features" class="text-gray-600 hover:text-red-600 transition">{gettext("Features")}</a>
         <a href="#about" class="text-gray-600 hover:text-red-600 transition">{gettext("About")}</a>
         <a href="#" class="text-gray-600 hover:text-red-600 transition">{gettext("Success Stories")}</a>
-      </div>
-      <div class="flex items-center gap-4 ml-auto">
+        <div class="flex items-center gap-4">
 <%= if @current_scope && @current_scope.user do %>
           <.link href={~p"/users/log-out"} method="delete" class="bg-red-600 text-white px-6 py-2.5 rounded-full font-semibold hover:bg-red-700 transition shadow-lg">
             {gettext("Log out")}
@@ -56,6 +55,7 @@
             <option value="sq" selected={@locale == "sq"}>Shqip</option>
             <option value="en" selected={@locale == "en"}>English</option>
           </select>
+        </div>
         </div>
       </div>
     </div>
