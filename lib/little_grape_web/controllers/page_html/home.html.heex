@@ -44,21 +44,18 @@
             {gettext("Sign Up")}
           </.link>
         <% end %>
-        <!-- Language Switcher - Simple inline approach for Safari compatibility -->
+        <!-- Language Switcher -->
         <div class="flex items-center gap-2">
-          <a
-            href="/?locale=sq"
-            class={"px-2 py-1 text-sm font-medium rounded transition #{if @locale == "sq", do: "bg-red-600 text-white", else: "text-gray-500 hover:text-red-600 hover:bg-red-50"}"}
+          <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+          </svg>
+          <select
+            onchange="window.location.href='/?locale=' + this.value"
+            class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
           >
-            SQ
-          </a>
-          <span class="text-gray-300">|</span>
-          <a
-            href="/?locale=en"
-            class={"px-2 py-1 text-sm font-medium rounded transition #{if @locale == "en", do: "bg-red-600 text-white", else: "text-gray-500 hover:text-red-600 hover:bg-red-50"}"}
-          >
-            EN
-          </a>
+            <option value="sq" selected={@locale == "sq"}>Shqip</option>
+            <option value="en" selected={@locale == "en"}>English</option>
+          </select>
         </div>
       </div>
     </div>
