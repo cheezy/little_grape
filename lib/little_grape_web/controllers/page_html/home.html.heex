@@ -21,11 +21,29 @@
         <span class="text-gray-900 text-2xl font-bold tracking-tight">Zemra Ime</span>
       </div>
       <div class="hidden md:flex items-center gap-8">
+<%= if @current_scope && @current_scope.user do %>
+          <span class="text-gray-700">{@current_scope.user.email}</span>
+          <.link href={~p"/users/profile"} class="text-gray-600 hover:text-red-600 transition font-medium">
+            {gettext("Profile")}
+          </.link>
+        <% end %>
         <a href="#features" class="text-gray-600 hover:text-red-600 transition">{gettext("Features")}</a>
         <a href="#about" class="text-gray-600 hover:text-red-600 transition">{gettext("About")}</a>
         <a href="#" class="text-gray-600 hover:text-red-600 transition">{gettext("Success Stories")}</a>
       </div>
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-4 ml-auto">
+<%= if @current_scope && @current_scope.user do %>
+          <.link href={~p"/users/log-out"} method="delete" class="bg-red-600 text-white px-6 py-2.5 rounded-full font-semibold hover:bg-red-700 transition shadow-lg">
+            {gettext("Log out")}
+          </.link>
+        <% else %>
+          <.link href={~p"/users/log-in"} class="text-gray-700 hover:text-red-600 transition font-medium">
+            {gettext("Log In")}
+          </.link>
+          <.link href={~p"/users/register"} class="bg-red-600 text-white px-6 py-2.5 rounded-full font-semibold hover:bg-red-700 transition shadow-lg">
+            {gettext("Sign Up")}
+          </.link>
+        <% end %>
         <!-- Language Switcher - Simple inline approach for Safari compatibility -->
         <div class="flex items-center gap-2">
           <a
@@ -42,22 +60,6 @@
             EN
           </a>
         </div>
-<%= if @current_scope && @current_scope.user do %>
-          <span class="text-gray-700">{@current_scope.user.email}</span>
-          <.link href={~p"/users/profile"} class="text-gray-700 hover:text-red-600 transition font-medium">
-            {gettext("Profile")}
-          </.link>
-          <.link href={~p"/users/log-out"} method="delete" class="bg-red-600 text-white px-6 py-2.5 rounded-full font-semibold hover:bg-red-700 transition shadow-lg">
-            {gettext("Log out")}
-          </.link>
-        <% else %>
-          <.link href={~p"/users/log-in"} class="text-gray-700 hover:text-red-600 transition font-medium">
-            {gettext("Log In")}
-          </.link>
-          <.link href={~p"/users/register"} class="bg-red-600 text-white px-6 py-2.5 rounded-full font-semibold hover:bg-red-700 transition shadow-lg">
-            {gettext("Sign Up")}
-          </.link>
-        <% end %>
       </div>
     </div>
   </nav>
