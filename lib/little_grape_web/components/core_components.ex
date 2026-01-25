@@ -295,7 +295,7 @@ defmodule LittleGrapeWeb.CoreComponents do
     """
   end
 
-@doc """
+  @doc """
   Generates a form error message.
   """
   slot :inner_block, required: true

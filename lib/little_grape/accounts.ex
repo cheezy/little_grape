@@ -390,7 +390,9 @@ defmodule LittleGrape.Accounts do
           delete_old_picture(profile, uploads_dir)
 
           profile
-          |> Profile.profile_picture_changeset(%{profile_picture: "/uploads/profile_pictures/#{filename}"})
+          |> Profile.profile_picture_changeset(%{
+            profile_picture: "/uploads/profile_pictures/#{filename}"
+          })
           |> Repo.update()
 
         {:error, reason} ->

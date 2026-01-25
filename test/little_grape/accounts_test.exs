@@ -419,7 +419,9 @@ defmodule LittleGrape.AccountsTest do
     end
 
     test "validates email format - accepts valid email" do
-      changeset = User.email_changeset(%User{}, %{email: "valid@example.com"}, validate_unique: false)
+      changeset =
+        User.email_changeset(%User{}, %{email: "valid@example.com"}, validate_unique: false)
+
       assert changeset.valid?
     end
 
@@ -471,19 +473,24 @@ defmodule LittleGrape.AccountsTest do
 
     test "validates password requires special character" do
       changeset = User.password_changeset(%User{}, %{password: "Password123"})
+
       assert "must contain at least one special character (!?@#$%^&*_-+=)" in errors_on(changeset).password
     end
 
     test "validates password confirmation" do
-      changeset = User.password_changeset(%User{}, %{
-        password: "Password1!",
-        password_confirmation: "Different1!"
-      })
+      changeset =
+        User.password_changeset(%User{}, %{
+          password: "Password1!",
+          password_confirmation: "Different1!"
+        })
+
       assert "does not match password" in errors_on(changeset).password_confirmation
     end
 
     test "accepts valid password with all requirements" do
-      changeset = User.password_changeset(%User{}, %{password: "ValidPass1!"}, hash_password: false)
+      changeset =
+        User.password_changeset(%User{}, %{password: "ValidPass1!"}, hash_password: false)
+
       assert changeset.valid?
     end
 
@@ -495,7 +502,9 @@ defmodule LittleGrape.AccountsTest do
     end
 
     test "does not hash password when option is false" do
-      changeset = User.password_changeset(%User{}, %{password: "ValidPass1!"}, hash_password: false)
+      changeset =
+        User.password_changeset(%User{}, %{password: "ValidPass1!"}, hash_password: false)
+
       assert changeset.valid?
       refute get_change(changeset, :hashed_password)
       assert get_change(changeset, :password) == "ValidPass1!"
@@ -511,11 +520,13 @@ defmodule LittleGrape.AccountsTest do
     end
 
     test "accepts valid email and password" do
-      changeset = User.registration_changeset(
-        %User{},
-        %{email: "test@example.com", password: "ValidPass1!"},
-        validate_unique: false
-      )
+      changeset =
+        User.registration_changeset(
+          %User{},
+          %{email: "test@example.com", password: "ValidPass1!"},
+          validate_unique: false
+        )
+
       assert changeset.valid?
     end
   end
@@ -1101,7 +1112,10 @@ defmodule LittleGrape.AccountsTest do
   describe "Profile.profile_picture_changeset/2" do
     test "casts profile_picture field" do
       profile = %Profile{}
-      changeset = Profile.profile_picture_changeset(profile, %{profile_picture: "/uploads/test.jpg"})
+
+      changeset =
+        Profile.profile_picture_changeset(profile, %{profile_picture: "/uploads/test.jpg"})
+
       assert get_change(changeset, :profile_picture) == "/uploads/test.jpg"
     end
 
@@ -1142,14 +1156,18 @@ defmodule LittleGrape.AccountsTest do
 
   describe "change_user_email/3 edge cases" do
     test "allows attrs to be passed" do
-      changeset = Accounts.change_user_email(%User{}, %{email: "new@example.com"}, validate_unique: false)
+      changeset =
+        Accounts.change_user_email(%User{}, %{email: "new@example.com"}, validate_unique: false)
+
       assert get_change(changeset, :email) == "new@example.com"
     end
   end
 
   describe "change_user_password/3 edge cases" do
     test "allows attrs to be passed" do
-      changeset = Accounts.change_user_password(%User{}, %{password: "ValidPass1!"}, hash_password: false)
+      changeset =
+        Accounts.change_user_password(%User{}, %{password: "ValidPass1!"}, hash_password: false)
+
       assert get_change(changeset, :password) == "ValidPass1!"
     end
   end

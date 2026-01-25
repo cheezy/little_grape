@@ -185,7 +185,10 @@ defmodule LittleGrapeWeb.UserSessionControllerTest do
       assert response =~ ~s(name="user[email]")
     end
 
-    test "does not log in unconfirmed user without password", %{conn: conn, unconfirmed_user: user} do
+    test "does not log in unconfirmed user without password", %{
+      conn: conn,
+      unconfirmed_user: user
+    } do
       # Unconfirmed users don't have a password set, so password login should fail
       conn =
         post(conn, ~p"/users/log-in?mode=password", %{

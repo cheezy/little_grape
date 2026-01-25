@@ -99,7 +99,7 @@ defmodule LittleGrape.MixProject do
     ]
   end
 
-    defp test_coverage do
+  defp test_coverage do
     [
       ignore_modules: [
         LittleGrape.Application,
@@ -120,5 +120,4 @@ defmodule LittleGrape.MixProject do
       ]
     ]
   end
-
 end

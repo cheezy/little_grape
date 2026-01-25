@@ -59,9 +59,36 @@ defmodule LittleGrape.Accounts.Profile do
   @hair_color_options ["black", "brown", "blonde", "red", "gray", "white", "other"]
   @looking_for_options ["friendship", "dating", "relationship", "marriage", "not_sure"]
   @country_options [
-    "AL", "XK", "MK", "ME", "RS", "BA", "HR", "SI", "GR", "IT",
-    "AT", "DE", "CH", "BE", "NL", "FR", "GB", "US", "CA", "AU",
-    "SE", "NO", "DK", "FI", "ES", "PT", "TR", "CY", "MT", "other"
+    "AL",
+    "XK",
+    "MK",
+    "ME",
+    "RS",
+    "BA",
+    "HR",
+    "SI",
+    "GR",
+    "IT",
+    "AT",
+    "DE",
+    "CH",
+    "BE",
+    "NL",
+    "FR",
+    "GB",
+    "US",
+    "CA",
+    "AU",
+    "SE",
+    "NO",
+    "DK",
+    "FI",
+    "ES",
+    "PT",
+    "TR",
+    "CY",
+    "MT",
+    "other"
   ]
 
   # Lifestyle options
@@ -76,9 +103,20 @@ defmodule LittleGrape.Accounts.Profile do
 
   # Interest options
   @interest_options [
-    "sports", "music", "travel", "reading", "cooking", "movies",
-    "fitness", "art", "nature", "technology", "gaming", "photography",
-    "dancing", "fashion"
+    "sports",
+    "music",
+    "travel",
+    "reading",
+    "cooking",
+    "movies",
+    "fitness",
+    "art",
+    "nature",
+    "technology",
+    "gaming",
+    "photography",
+    "dancing",
+    "fashion"
   ]
 
   def gender_options, do: @gender_options

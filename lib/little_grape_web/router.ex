@@ -9,10 +9,12 @@ defmodule LittleGrapeWeb.Router do
     plug :fetch_live_flash
     plug :put_root_layout, html: {LittleGrapeWeb.Layouts, :root}
     plug :protect_from_forgery
+
     plug :put_secure_browser_headers, %{
       "content-security-policy" =>
         "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net"
     }
+
     plug :fetch_current_scope_for_user
     plug LittleGrapeWeb.Plugs.Locale
   end

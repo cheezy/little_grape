@@ -6,133 +6,196 @@
   <div class="absolute inset-0 overflow-hidden">
     <div class="absolute -top-40 -right-40 w-80 h-80 bg-red-100/50 rounded-full blur-3xl"></div>
     <div class="absolute top-1/2 -left-20 w-60 h-60 bg-red-50/50 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-20 right-1/4 w-40 h-40 bg-gray-200/50 rounded-full blur-2xl"></div>
+    <div class="absolute bottom-20 right-1/4 w-40 h-40 bg-gray-200/50 rounded-full blur-2xl">
+    </div>
   </div>
-
-  <!-- Navigation -->
+  
+<!-- Navigation -->
   <nav class="relative z-10 px-6 py-4 lg:px-12 bg-white/80 backdrop-blur-sm border-b border-gray-100">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
       <div class="flex items-center gap-3">
         <!-- Heart Icon for Zemra Ime -->
         <svg viewBox="0 0 100 100" class="h-12 w-12" fill="none">
-          <circle cx="50" cy="50" r="48" fill="black" stroke="white" stroke-width="2"/>
-          <path d="M50 75 L25 50 C15 40 15 25 30 20 C40 17 50 25 50 35 C50 25 60 17 70 20 C85 25 85 40 75 50 Z" fill="#CC0000" stroke="white" stroke-width="2"/>
+          <circle cx="50" cy="50" r="48" fill="black" stroke="white" stroke-width="2" />
+          <path
+            d="M50 75 L25 50 C15 40 15 25 30 20 C40 17 50 25 50 35 C50 25 60 17 70 20 C85 25 85 40 75 50 Z"
+            fill="#CC0000"
+            stroke="white"
+            stroke-width="2"
+          />
         </svg>
         <span class="text-gray-900 text-2xl font-bold tracking-tight">Zemra Ime</span>
       </div>
       <div class="hidden md:flex items-center gap-6 ml-auto">
-<%= if @current_scope && @current_scope.user do %>
-          <span class="text-gray-500 text-sm bg-gray-100 px-3 py-1 rounded-full">{@current_scope.user.email}</span>
-          <.link href={~p"/users/profile"} class="text-gray-600 hover:text-red-600 transition font-medium">
+        <%= if @current_scope && @current_scope.user do %>
+          <span class="text-gray-500 text-sm bg-gray-100 px-3 py-1 rounded-full">
+            {@current_scope.user.email}
+          </span>
+          <.link
+            href={~p"/users/profile"}
+            class="text-gray-600 hover:text-red-600 transition font-medium"
+          >
             {gettext("Profile")}
           </.link>
         <% end %>
-        <a href="#features" class="text-gray-600 hover:text-red-600 transition">{gettext("Features")}</a>
-        <a href="#" class="text-gray-600 hover:text-red-600 transition">{gettext("Success Stories")}</a>
-        <a href="#about" class="text-gray-600 hover:text-red-600 transition">{gettext("About")}</a>
+        <a href="#features" class="text-gray-600 hover:text-red-600 transition">
+          {gettext("Features")}
+        </a>
+        <a href="#" class="text-gray-600 hover:text-red-600 transition">
+          {gettext("Success Stories")}
+        </a>
+        <a href="#about" class="text-gray-600 hover:text-red-600 transition">
+          {gettext("About")}
+        </a>
         <div class="flex items-center gap-4">
-<%= if @current_scope && @current_scope.user do %>
-          <.link href={~p"/users/log-out"} method="delete" class="bg-red-600 text-white px-6 py-2.5 rounded-full font-semibold hover:bg-red-700 transition shadow-lg">
-            {gettext("Log out")}
-          </.link>
-        <% else %>
-          <.link href={~p"/users/log-in"} class="text-gray-700 hover:text-red-600 transition font-medium">
-            {gettext("Log In")}
-          </.link>
-          <.link href={~p"/users/register"} class="bg-red-600 text-white px-6 py-2.5 rounded-full font-semibold hover:bg-red-700 transition shadow-lg">
-            {gettext("Sign Up")}
-          </.link>
-        <% end %>
-        <!-- Language Switcher -->
-        <div class="flex items-center gap-2">
-          <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
-          </svg>
-          <select
-            onchange="window.location.href='/?locale=' + this.value"
-            class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
-          >
-            <option value="sq" selected={@locale == "sq"}>Shqip</option>
-            <option value="en" selected={@locale == "en"}>English</option>
-          </select>
-        </div>
+          <%= if @current_scope && @current_scope.user do %>
+            <.link
+              href={~p"/users/log-out"}
+              method="delete"
+              class="bg-red-600 text-white px-6 py-2.5 rounded-full font-semibold hover:bg-red-700 transition shadow-lg"
+            >
+              {gettext("Log out")}
+            </.link>
+          <% else %>
+            <.link
+              href={~p"/users/log-in"}
+              class="text-gray-700 hover:text-red-600 transition font-medium"
+            >
+              {gettext("Log In")}
+            </.link>
+            <.link
+              href={~p"/users/register"}
+              class="bg-red-600 text-white px-6 py-2.5 rounded-full font-semibold hover:bg-red-700 transition shadow-lg"
+            >
+              {gettext("Sign Up")}
+            </.link>
+          <% end %>
+          <!-- Language Switcher -->
+          <div class="flex items-center gap-2">
+            <svg
+              class="w-4 h-4 text-gray-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
+              />
+            </svg>
+            <select
+              onchange="window.location.href='/?locale=' + this.value"
+              class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
+            >
+              <option value="sq" selected={@locale == "sq"}>Shqip</option>
+              <option value="en" selected={@locale == "en"}>English</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
   </nav>
-
-  <!-- Hero Content -->
+  
+<!-- Hero Content -->
   <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 pt-16 pb-24 lg:pt-24">
     <div class="grid lg:grid-cols-2 gap-12 items-center">
       <div>
         <div class="inline-flex items-center gap-2 bg-red-50 border border-red-100 px-4 py-2 rounded-full mb-6">
           <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-          <span class="text-red-700 text-sm font-medium">{gettext("Join 50,000+ Albanians worldwide")}</span>
+          <span class="text-red-700 text-sm font-medium">
+            {gettext("Join 50,000+ Albanians worldwide")}
+          </span>
         </div>
 
         <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
           {gettext("Find Your")}
-          <span class="text-red-600"> {gettext("Albanian")} </span>
+          <span class="text-red-600">{gettext("Albanian")}</span>
           {gettext("Soulmate")}
         </h1>
 
         <p class="text-gray-600 text-lg md:text-xl mb-8 max-w-xl leading-relaxed">
-          {gettext("Connect with Albanians from around the world. Whether you're in Tirana, New York, London, or anywhere else — your perfect match is waiting.")}
+          {gettext(
+            "Connect with Albanians from around the world. Whether you're in Tirana, New York, London, or anywhere else — your perfect match is waiting."
+          )}
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 mb-12">
-          <.link href={~p"/users/register"} class="bg-red-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-red-700 transition shadow-xl text-center">
+          <.link
+            href={~p"/users/register"}
+            class="bg-red-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-red-700 transition shadow-xl text-center"
+          >
             {gettext("Start Free Today")}
           </.link>
-          <a href="#features" class="bg-white text-gray-700 px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-50 transition border border-gray-200 shadow-sm text-center">
+          <a
+            href="#features"
+            class="bg-white text-gray-700 px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-50 transition border border-gray-200 shadow-sm text-center"
+          >
             {gettext("How It Works")}
           </a>
         </div>
-
-        <!-- Trust Badges -->
+        
+<!-- Trust Badges -->
         <div class="flex flex-wrap items-center gap-6 text-gray-500">
           <div class="flex items-center gap-2">
             <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clip-rule="evenodd"
+              />
             </svg>
             <span class="text-sm">{gettext("Verified Profiles")}</span>
           </div>
           <div class="flex items-center gap-2">
             <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+              <path
+                fill-rule="evenodd"
+                d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                clip-rule="evenodd"
+              />
             </svg>
             <span class="text-sm">{gettext("100% Private")}</span>
           </div>
           <div class="flex items-center gap-2">
             <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
             </svg>
             <span class="text-sm">{gettext("4.8 Star Rating")}</span>
           </div>
         </div>
       </div>
-
-      <!-- Hero Image/Card -->
+      
+<!-- Hero Image/Card -->
       <div class="hidden lg:block">
         <div class="relative">
           <!-- Decorative cards behind -->
-          <div class="absolute -left-4 top-8 w-72 h-96 bg-red-100/50 rounded-3xl transform -rotate-6"></div>
-          <div class="absolute -right-4 top-4 w-72 h-96 bg-gray-200/50 rounded-3xl transform rotate-6"></div>
-
-          <!-- Main card -->
+          <div class="absolute -left-4 top-8 w-72 h-96 bg-red-100/50 rounded-3xl transform -rotate-6">
+          </div>
+          <div class="absolute -right-4 top-4 w-72 h-96 bg-gray-200/50 rounded-3xl transform rotate-6">
+          </div>
+          
+<!-- Main card -->
           <div class="relative bg-white rounded-3xl p-6 shadow-2xl transform hover:scale-105 transition-transform duration-300 border border-gray-100">
             <div class="aspect-[3/4] bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl mb-4 flex items-center justify-center overflow-hidden">
               <div class="text-center p-8">
                 <div class="w-32 h-32 mx-auto bg-gradient-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center mb-4 shadow-lg">
                   <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                    <path
+                      fill-rule="evenodd"
+                      d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                      clip-rule="evenodd"
+                    />
                   </svg>
                 </div>
                 <p class="text-gray-600 font-medium">{gettext("Your match awaits")}</p>
               </div>
             </div>
             <div class="text-center">
-              <h3 class="text-gray-900 font-bold text-xl">{gettext("Find Your Perfect Match")}</h3>
+              <h3 class="text-gray-900 font-bold text-xl">
+                {gettext("Find Your Perfect Match")}
+              </h3>
               <p class="text-gray-500 mt-1">{gettext("Based on culture & compatibility")}</p>
               <div class="flex justify-center gap-1 mt-3">
                 <span class="w-8 h-1 bg-red-600 rounded-full"></span>
@@ -155,7 +218,9 @@
         {gettext("Why Choose Zemra Ime?")}
       </h2>
       <p class="text-gray-600 text-lg max-w-2xl mx-auto">
-        {gettext("Built by Albanians, for Albanians. We understand our culture, traditions, and what matters in finding a life partner.")}
+        {gettext(
+          "Built by Albanians, for Albanians. We understand our culture, traditions, and what matters in finding a life partner."
+        )}
       </p>
     </div>
 
@@ -164,38 +229,61 @@
       <div class="bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-shadow border border-gray-100">
         <div class="w-14 h-14 bg-red-600 rounded-xl flex items-center justify-center mb-6">
           <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
         </div>
-        <h3 class="text-xl font-bold text-gray-900 mb-3">{gettext("Global Albanian Community")}</h3>
+        <h3 class="text-xl font-bold text-gray-900 mb-3">
+          {gettext("Global Albanian Community")}
+        </h3>
         <p class="text-gray-600 leading-relaxed">
-          {gettext("Connect with Albanians from Kosovo, Albania, North Macedonia, Montenegro, and diaspora communities worldwide.")}
+          {gettext(
+            "Connect with Albanians from Kosovo, Albania, North Macedonia, Montenegro, and diaspora communities worldwide."
+          )}
         </p>
       </div>
-
-      <!-- Feature 2 -->
+      
+<!-- Feature 2 -->
       <div class="bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-shadow border border-gray-100">
         <div class="w-14 h-14 bg-black rounded-xl flex items-center justify-center mb-6">
           <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+            />
           </svg>
         </div>
         <h3 class="text-xl font-bold text-gray-900 mb-3">{gettext("Verified & Safe")}</h3>
         <p class="text-gray-600 leading-relaxed">
-          {gettext("Every profile is verified. Your privacy and security are our top priority with advanced safety features.")}
+          {gettext(
+            "Every profile is verified. Your privacy and security are our top priority with advanced safety features."
+          )}
         </p>
       </div>
-
-      <!-- Feature 3 -->
+      
+<!-- Feature 3 -->
       <div class="bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-shadow border border-gray-100">
         <div class="w-14 h-14 bg-red-600 rounded-xl flex items-center justify-center mb-6">
           <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+            />
           </svg>
         </div>
         <h3 class="text-xl font-bold text-gray-900 mb-3">{gettext("Smart Matching")}</h3>
         <p class="text-gray-600 leading-relaxed">
-          {gettext("Our algorithm considers cultural values, family traditions, and personal preferences for meaningful connections.")}
+          {gettext(
+            "Our algorithm considers cultural values, family traditions, and personal preferences for meaningful connections."
+          )}
         </p>
       </div>
     </div>
@@ -236,10 +324,14 @@
           <span class="text-red-600">{gettext("A Cultural Connection")}</span>
         </h2>
         <p class="text-gray-600 text-lg mb-6 leading-relaxed">
-          {gettext("Zemra Ime (meaning \"My Heart\" in Albanian) captures the essence of what we're all searching for — that special connection. We created this platform because we understand that for Albanians, finding a partner is about more than just compatibility — it's about shared values, family, and cultural understanding.")}
+          {gettext(
+            "Zemra Ime (meaning \"My Heart\" in Albanian) captures the essence of what we're all searching for — that special connection. We created this platform because we understand that for Albanians, finding a partner is about more than just compatibility — it's about shared values, family, and cultural understanding."
+          )}
         </p>
         <p class="text-gray-600 text-lg mb-8 leading-relaxed">
-          {gettext("Whether you're looking for someone who appreciates our traditions, speaks the language, or simply shares your Albanian heritage, you'll find them here.")}
+          {gettext(
+            "Whether you're looking for someone who appreciates our traditions, speaks the language, or simply shares your Albanian heritage, you'll find them here."
+          )}
         </p>
         <div class="flex flex-wrap gap-4">
           <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
@@ -277,7 +369,11 @@
           <div class="flex items-center gap-4">
             <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
               <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                <path
+                  fill-rule="evenodd"
+                  d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </div>
             <div>
@@ -303,13 +399,21 @@
       {gettext("Ready to Find Your Albanian Match?")}
     </h2>
     <p class="text-gray-300 text-lg md:text-xl mb-10 max-w-2xl mx-auto">
-      {gettext("Join thousands of Albanians who have found love, friendship, and meaningful connections on Zemra Ime.")}
+      {gettext(
+        "Join thousands of Albanians who have found love, friendship, and meaningful connections on Zemra Ime."
+      )}
     </p>
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <.link href={~p"/users/register"} class="bg-red-600 text-white px-10 py-4 rounded-full font-semibold text-lg hover:bg-red-700 transition shadow-xl">
+      <.link
+        href={~p"/users/register"}
+        class="bg-red-600 text-white px-10 py-4 rounded-full font-semibold text-lg hover:bg-red-700 transition shadow-xl"
+      >
         {gettext("Create Free Account")}
       </.link>
-      <a href="#about" class="bg-white text-gray-900 px-10 py-4 rounded-full font-semibold text-lg hover:bg-gray-100 transition shadow-xl">
+      <a
+        href="#about"
+        class="bg-white text-gray-900 px-10 py-4 rounded-full font-semibold text-lg hover:bg-gray-100 transition shadow-xl"
+      >
         {gettext("Learn More")}
       </a>
     </div>
@@ -323,13 +427,18 @@
       <div>
         <div class="flex items-center gap-3 mb-6">
           <svg viewBox="0 0 100 100" class="h-10 w-10" fill="none">
-            <circle cx="50" cy="50" r="48" fill="#CC0000" stroke="white" stroke-width="2"/>
-            <path d="M50 75 L25 50 C15 40 15 25 30 20 C40 17 50 25 50 35 C50 25 60 17 70 20 C85 25 85 40 75 50 Z" fill="white"/>
+            <circle cx="50" cy="50" r="48" fill="#CC0000" stroke="white" stroke-width="2" />
+            <path
+              d="M50 75 L25 50 C15 40 15 25 30 20 C40 17 50 25 50 35 C50 25 60 17 70 20 C85 25 85 40 75 50 Z"
+              fill="white"
+            />
           </svg>
           <span class="text-xl font-bold">Zemra Ime</span>
         </div>
         <p class="text-gray-400 leading-relaxed">
-          {gettext("Connecting Albanians worldwide. Find love, build relationships, honor traditions.")}
+          {gettext(
+            "Connecting Albanians worldwide. Find love, build relationships, honor traditions."
+          )}
         </p>
       </div>
 
@@ -348,17 +457,29 @@
         <ul class="space-y-3 text-gray-400">
           <li><a href="#" class="hover:text-red-400 transition">{gettext("Help Center")}</a></li>
           <li><a href="#" class="hover:text-red-400 transition">{gettext("Safety Tips")}</a></li>
-          <li><a href="#" class="hover:text-red-400 transition">{gettext("Community Guidelines")}</a></li>
-          <li><a href="#" class="hover:text-red-400 transition">{gettext("Report an Issue")}</a></li>
+          <li>
+            <a href="#" class="hover:text-red-400 transition">
+              {gettext("Community Guidelines")}
+            </a>
+          </li>
+          <li>
+            <a href="#" class="hover:text-red-400 transition">{gettext("Report an Issue")}</a>
+          </li>
         </ul>
       </div>
 
       <div>
         <h4 class="font-semibold mb-4">{gettext("Legal")}</h4>
         <ul class="space-y-3 text-gray-400">
-          <li><a href="#" class="hover:text-red-400 transition">{gettext("Privacy Policy")}</a></li>
-          <li><a href="#" class="hover:text-red-400 transition">{gettext("Terms of Service")}</a></li>
-          <li><a href="#" class="hover:text-red-400 transition">{gettext("Cookie Policy")}</a></li>
+          <li>
+            <a href="#" class="hover:text-red-400 transition">{gettext("Privacy Policy")}</a>
+          </li>
+          <li>
+            <a href="#" class="hover:text-red-400 transition">{gettext("Terms of Service")}</a>
+          </li>
+          <li>
+            <a href="#" class="hover:text-red-400 transition">{gettext("Cookie Policy")}</a>
+          </li>
         </ul>
       </div>
     </div>
@@ -370,17 +491,17 @@
       <div class="flex gap-6">
         <a href="#" class="text-gray-400 hover:text-red-400 transition">
           <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
           </svg>
         </a>
         <a href="#" class="text-gray-400 hover:text-red-400 transition">
           <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
           </svg>
         </a>
         <a href="#" class="text-gray-400 hover:text-red-400 transition">
           <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
           </svg>
         </a>
       </div>

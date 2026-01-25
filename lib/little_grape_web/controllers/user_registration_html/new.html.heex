@@ -4,19 +4,26 @@
     <div class="text-center mb-8">
       <a href="/" class="inline-flex items-center gap-3">
         <svg viewBox="0 0 100 100" class="h-16 w-16" fill="none">
-          <circle cx="50" cy="50" r="48" fill="black" stroke="white" stroke-width="2"/>
-          <path d="M50 75 L25 50 C15 40 15 25 30 20 C40 17 50 25 50 35 C50 25 60 17 70 20 C85 25 85 40 75 50 Z" fill="#CC0000" stroke="white" stroke-width="2"/>
+          <circle cx="50" cy="50" r="48" fill="black" stroke="white" stroke-width="2" />
+          <path
+            d="M50 75 L25 50 C15 40 15 25 30 20 C40 17 50 25 50 35 C50 25 60 17 70 20 C85 25 85 40 75 50 Z"
+            fill="#CC0000"
+            stroke="white"
+            stroke-width="2"
+          />
         </svg>
         <span class="text-gray-900 text-3xl font-bold">Zemra Ime</span>
       </a>
     </div>
-
-    <!-- Card Container -->
+    
+<!-- Card Container -->
     <div class="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
       <Layouts.flash_group flash={@flash} />
 
       <div class="text-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-900 mb-2">{gettext("Register for an account")}</h1>
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">
+          {gettext("Register for an account")}
+        </h1>
         <p class="text-gray-600">
           {gettext("Already registered?")}
           <.link navigate={~p"/users/log-in"} class="text-red-600 font-semibold hover:underline">
@@ -40,20 +47,29 @@
           <.error :for={msg <- f[:email].errors}>{translate_error(msg)}</.error>
         </div>
 
-        <button type="submit" class="w-full bg-red-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-red-700 transition shadow-lg">
+        <button
+          type="submit"
+          class="w-full bg-red-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-red-700 transition shadow-lg"
+        >
           {gettext("Create an account")}
         </button>
       </.form>
     </div>
-
-    <!-- Language Switcher -->
+    
+<!-- Language Switcher -->
     <div class="mt-6 text-center">
       <div class="inline-flex items-center gap-2">
-        <a href="?locale=sq" class={"px-3 py-1.5 text-sm font-medium rounded-full transition #{if Gettext.get_locale(LittleGrapeWeb.Gettext) == "sq", do: "bg-red-600 text-white", else: "text-gray-500 hover:bg-red-50"}"}>
+        <a
+          href="?locale=sq"
+          class={"px-3 py-1.5 text-sm font-medium rounded-full transition #{if Gettext.get_locale(LittleGrapeWeb.Gettext) == "sq", do: "bg-red-600 text-white", else: "text-gray-500 hover:bg-red-50"}"}
+        >
           SQ
         </a>
         <span class="text-gray-300">|</span>
-        <a href="?locale=en" class={"px-3 py-1.5 text-sm font-medium rounded-full transition #{if Gettext.get_locale(LittleGrapeWeb.Gettext) == "en", do: "bg-red-600 text-white", else: "text-gray-500 hover:bg-red-50"}"}>
+        <a
+          href="?locale=en"
+          class={"px-3 py-1.5 text-sm font-medium rounded-full transition #{if Gettext.get_locale(LittleGrapeWeb.Gettext) == "en", do: "bg-red-600 text-white", else: "text-gray-500 hover:bg-red-50"}"}
+        >
           EN
         </a>
       </div>
