@@ -33,6 +33,7 @@ defmodule LittleGrapeWeb.ConnCase do
 
   setup tags do
     LittleGrape.DataCase.setup_sandbox(tags)
+    LittleGrape.DataCase.setup_upload_cleanup()
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 

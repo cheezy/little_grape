@@ -29,6 +29,7 @@ defmodule LittleGrape.DataCase do
 
   setup tags do
     LittleGrape.DataCase.setup_sandbox(tags)
+    LittleGrape.DataCase.setup_upload_cleanup()
     :ok
   end
 
@@ -38,6 +39,32 @@ defmodule LittleGrape.DataCase do
   def setup_sandbox(tags) do
     pid = Ecto.Adapters.SQL.Sandbox.start_owner!(LittleGrape.Repo, shared: not tags[:async])
     on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+  end
+
+  @doc """
+  Sets up cleanup for uploaded files created during tests.
+  Takes a snapshot of existing files before the test and removes any new files after.
+  """
+  def setup_upload_cleanup do
+    uploads_dir = Path.join([:code.priv_dir(:little_grape), "static", "uploads", "profile_pictures"])
+
+    existing_files =
+      if File.exists?(uploads_dir) do
+        File.ls!(uploads_dir) |> MapSet.new()
+      else
+        MapSet.new()
+      end
+
+    on_exit(fn ->
+      if File.exists?(uploads_dir) do
+        current_files = File.ls!(uploads_dir) |> MapSet.new()
+        new_files = MapSet.difference(current_files, existing_files)
+
+        Enum.each(new_files, fn file ->
+          File.rm(Path.join(uploads_dir, file))
+        end)
+      end
+    end)
   end
 
   @doc """
