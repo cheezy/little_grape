@@ -16,7 +16,12 @@ defmodule LittleGrape.ConversationsTest do
         [user_a_id, user_b_id, DateTime.utc_now(), DateTime.utc_now(), DateTime.utc_now()]
       )
 
-    result = Repo.query!("SELECT id FROM matches WHERE user_a_id = $1 AND user_b_id = $2", [user_a_id, user_b_id])
+    result =
+      Repo.query!("SELECT id FROM matches WHERE user_a_id = $1 AND user_b_id = $2", [
+        user_a_id,
+        user_b_id
+      ])
+
     [[match_id]] = result.rows
     {match_id, user_a_id, user_b_id}
   end
