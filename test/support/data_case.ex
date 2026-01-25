@@ -46,7 +46,8 @@ defmodule LittleGrape.DataCase do
   Takes a snapshot of existing files before the test and removes any new files after.
   """
   def setup_upload_cleanup do
-    uploads_dir = Path.join([:code.priv_dir(:little_grape), "static", "uploads", "profile_pictures"])
+    uploads_dir =
+      Path.join([:code.priv_dir(:little_grape), "static", "uploads", "profile_pictures"])
 
     existing_files =
       if File.exists?(uploads_dir) do
