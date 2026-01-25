@@ -3,6 +3,119 @@ defmodule LittleGrape.SwipesTest do
 
   import LittleGrape.AccountsFixtures
 
+  alias LittleGrape.Swipes
+  alias LittleGrape.Swipes.Swipe
+
+  describe "create_swipe/3" do
+    test "creates a swipe with valid data" do
+      user = user_fixture()
+      target = user_fixture()
+
+      assert {:ok, %Swipe{} = swipe} = Swipes.create_swipe(user, target.id, "like")
+      assert swipe.user_id == user.id
+      assert swipe.target_user_id == target.id
+      assert swipe.action == "like"
+    end
+
+    test "creates a pass swipe" do
+      user = user_fixture()
+      target = user_fixture()
+
+      assert {:ok, %Swipe{} = swipe} = Swipes.create_swipe(user, target.id, "pass")
+      assert swipe.action == "pass"
+    end
+
+    test "returns error for invalid action" do
+      user = user_fixture()
+      target = user_fixture()
+
+      assert {:error, changeset} = Swipes.create_swipe(user, target.id, "invalid")
+      assert "must be 'like' or 'pass'" in errors_on(changeset).action
+    end
+
+    test "returns error for duplicate swipe" do
+      user = user_fixture()
+      target = user_fixture()
+
+      assert {:ok, _swipe} = Swipes.create_swipe(user, target.id, "like")
+      assert {:error, changeset} = Swipes.create_swipe(user, target.id, "pass")
+      assert "has already been taken" in errors_on(changeset).user_id
+    end
+
+    test "returns error when target user does not exist" do
+      user = user_fixture()
+      non_existent_id = 999_999
+
+      assert {:error, changeset} = Swipes.create_swipe(user, non_existent_id, "like")
+      assert "does not exist" in errors_on(changeset).target_user_id
+    end
+
+    test "allows same target to be swiped by different users" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      target = user_fixture()
+
+      assert {:ok, _swipe1} = Swipes.create_swipe(user1, target.id, "like")
+      assert {:ok, _swipe2} = Swipes.create_swipe(user2, target.id, "like")
+    end
+
+    test "allows user to swipe on multiple targets" do
+      user = user_fixture()
+      target1 = user_fixture()
+      target2 = user_fixture()
+
+      assert {:ok, _swipe1} = Swipes.create_swipe(user, target1.id, "like")
+      assert {:ok, _swipe2} = Swipes.create_swipe(user, target2.id, "pass")
+    end
+  end
+
+  describe "get_swipe/2" do
+    test "returns swipe when it exists" do
+      user = user_fixture()
+      target = user_fixture()
+
+      {:ok, created_swipe} = Swipes.create_swipe(user, target.id, "like")
+
+      fetched_swipe = Swipes.get_swipe(user.id, target.id)
+      assert fetched_swipe.id == created_swipe.id
+    end
+
+    test "returns nil when swipe does not exist" do
+      user = user_fixture()
+      target = user_fixture()
+
+      assert Swipes.get_swipe(user.id, target.id) == nil
+    end
+  end
+
+  describe "has_swiped?/2" do
+    test "returns true when user has swiped on target" do
+      user = user_fixture()
+      target = user_fixture()
+
+      {:ok, _swipe} = Swipes.create_swipe(user, target.id, "like")
+
+      assert Swipes.has_swiped?(user.id, target.id) == true
+    end
+
+    test "returns false when user has not swiped on target" do
+      user = user_fixture()
+      target = user_fixture()
+
+      assert Swipes.has_swiped?(user.id, target.id) == false
+    end
+
+    test "returns false for reverse direction" do
+      user = user_fixture()
+      target = user_fixture()
+
+      {:ok, _swipe} = Swipes.create_swipe(user, target.id, "like")
+
+      # User swiped on target, but target has not swiped on user
+      assert Swipes.has_swiped?(target.id, user.id) == false
+    end
+  end
+
   describe "swipes table migration" do
     test "creates table with correct columns" do
       user1 = user_fixture()
