@@ -3,12 +3,14 @@ defmodule LittleGrape.Matches.Match do
   import Ecto.Changeset
 
   alias LittleGrape.Accounts.User
+  alias LittleGrape.Messaging.Conversation
 
   schema "matches" do
     field :matched_at, :utc_datetime
 
     belongs_to :user_a, User
     belongs_to :user_b, User
+    has_one :conversation, Conversation
 
     timestamps(type: :utc_datetime)
   end
