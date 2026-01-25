@@ -116,6 +116,66 @@ defmodule LittleGrape.SwipesTest do
     end
   end
 
+  describe "check_for_match/2" do
+    test "returns true when target has liked user back" do
+      user = user_fixture()
+      target = user_fixture()
+
+      # User likes target
+      {:ok, _swipe1} = Swipes.create_swipe(user, target.id, "like")
+      # Target likes user back
+      {:ok, _swipe2} = Swipes.create_swipe(target, user.id, "like")
+
+      # Check from user's perspective - target has liked them back
+      assert Swipes.check_for_match(user.id, target.id) == true
+    end
+
+    test "returns false when no reciprocal like exists" do
+      user = user_fixture()
+      target = user_fixture()
+
+      # Only user likes target
+      {:ok, _swipe} = Swipes.create_swipe(user, target.id, "like")
+
+      # Target has not liked user back
+      assert Swipes.check_for_match(user.id, target.id) == false
+    end
+
+    test "returns false when target passed instead of liked" do
+      user = user_fixture()
+      target = user_fixture()
+
+      # User likes target
+      {:ok, _swipe1} = Swipes.create_swipe(user, target.id, "like")
+      # Target passes on user (not a like)
+      {:ok, _swipe2} = Swipes.create_swipe(target, user.id, "pass")
+
+      # Pass doesn't count as a match
+      assert Swipes.check_for_match(user.id, target.id) == false
+    end
+
+    test "returns false when no swipes exist" do
+      user = user_fixture()
+      target = user_fixture()
+
+      # No swipes at all
+      assert Swipes.check_for_match(user.id, target.id) == false
+    end
+
+    test "is directional - checks if target liked user" do
+      user = user_fixture()
+      target = user_fixture()
+
+      # Target likes user
+      {:ok, _swipe} = Swipes.create_swipe(target, user.id, "like")
+
+      # From user's perspective, target has liked them
+      assert Swipes.check_for_match(user.id, target.id) == true
+      # From target's perspective, user has NOT liked them
+      assert Swipes.check_for_match(target.id, user.id) == false
+    end
+  end
+
   describe "swipes table migration" do
     test "creates table with correct columns" do
       user1 = user_fixture()

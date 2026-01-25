@@ -80,4 +80,30 @@ defmodule LittleGrape.Swipes do
 
     Repo.exists?(query)
   end
+
+  @doc """
+  Checks if the target user has liked the current user back (reciprocal like).
+
+  This is used to detect matches - when both users have liked each other.
+  Only considers 'like' actions, not 'pass'.
+
+  ## Examples
+
+      iex> check_for_match(user_id, target_user_id)
+      true  # Target has liked user back
+
+      iex> check_for_match(user_id, target_who_passed)
+      false  # Target passed, not liked
+
+  """
+  def check_for_match(user_id, target_user_id) do
+    query =
+      from s in Swipe,
+        where:
+          s.user_id == ^target_user_id and
+            s.target_user_id == ^user_id and
+            s.action == "like"
+
+    Repo.exists?(query)
+  end
 end
