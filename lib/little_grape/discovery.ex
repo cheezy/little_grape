@@ -3,12 +3,25 @@ defmodule LittleGrape.Discovery do
   The Discovery context.
 
   Provides composable query functions for filtering users in the discovery feed.
+
+  ## Hard Filters
   These "hard filters" exclude users who should never appear in a user's feed:
   - Users already swiped on
   - The user themselves
   - Blocked users (both directions)
   - Users with incomplete profiles
   - Users who don't match gender preferences (bidirectional)
+
+  ## Soft Scoring
+  After hard filtering, candidates are scored based on compatibility factors:
+  - Age range match: 30%
+  - Country match: 20%
+  - Shared interests: 20%
+  - Shared languages: 10%
+  - Religion alignment: 10%
+  - Profile freshness: 5%
+  - Liked-you boost: 5%
+  - Randomization: +/-10% variance
   """
 
   import Ecto.Query, warn: false
@@ -16,7 +29,18 @@ defmodule LittleGrape.Discovery do
   alias LittleGrape.Accounts.Profile
   alias LittleGrape.Accounts.User
   alias LittleGrape.Blocks.Block
+  alias LittleGrape.Repo
   alias LittleGrape.Swipes.Swipe
+
+  # Scoring weights
+  @age_weight 0.30
+  @country_weight 0.20
+  @interests_weight 0.20
+  @languages_weight 0.10
+  @religion_weight 0.10
+  @freshness_weight 0.05
+  @liked_you_weight 0.05
+  @randomization_variance 0.10
 
   @doc """
   Returns a base query for users that can be filtered further.
@@ -191,5 +215,298 @@ defmodule LittleGrape.Discovery do
     |> exclude_blocked(user_id)
     |> require_complete_profile()
     |> filter_by_mutual_gender_preferences(user_gender, user_preferred_gender)
+  end
+
+  # ============================================================================
+  # Soft Scoring Functions
+  # ============================================================================
+
+  @doc """
+  Calculates the age score based on how well the candidate's age matches
+  the user's preferred age range.
+
+  Returns a score between 0.0 and 1.0:
+  - 1.0 if candidate's age is within the user's preferred range
+  - 0.5-1.0 if within 5 years of the range
+  - 0.0-0.5 if further away
+
+  If the user has no age preference (nil), returns 1.0 (no penalty).
+
+  ## Parameters
+    * `candidate_birthdate` - The candidate's birthdate
+    * `preferred_age_min` - User's minimum preferred age (nil means no minimum)
+    * `preferred_age_max` - User's maximum preferred age (nil means no maximum)
+  """
+  def score_age(nil, _min, _max), do: 0.0
+
+  def score_age(candidate_birthdate, preferred_age_min, preferred_age_max) do
+    candidate_age = calculate_age(candidate_birthdate)
+
+    min_age = preferred_age_min || 18
+    max_age = preferred_age_max || 100
+
+    cond do
+      candidate_age >= min_age and candidate_age <= max_age ->
+        1.0
+
+      candidate_age < min_age ->
+        diff = min_age - candidate_age
+        max(0.0, 1.0 - diff * 0.1)
+
+      candidate_age > max_age ->
+        diff = candidate_age - max_age
+        max(0.0, 1.0 - diff * 0.1)
+    end
+  end
+
+  @doc """
+  Calculates the country match score.
+
+  Returns 1.0 if countries match, 0.0 otherwise.
+  If either country is nil, returns 0.5 (neutral).
+  """
+  def score_country(nil, _), do: 0.5
+  def score_country(_, nil), do: 0.5
+
+  def score_country(user_country, candidate_country) when user_country == candidate_country,
+    do: 1.0
+
+  def score_country(_, _), do: 0.0
+
+  @doc """
+  Calculates the shared interests score.
+
+  Returns a score between 0.0 and 1.0 based on the proportion
+  of interests that are shared between user and candidate.
+
+  If either has no interests, returns 0.5 (neutral).
+  """
+  def score_interests(nil, _), do: 0.5
+  def score_interests(_, nil), do: 0.5
+  def score_interests([], _), do: 0.5
+  def score_interests(_, []), do: 0.5
+
+  def score_interests(user_interests, candidate_interests) do
+    user_set = MapSet.new(user_interests)
+    candidate_set = MapSet.new(candidate_interests)
+
+    shared_count = MapSet.intersection(user_set, candidate_set) |> MapSet.size()
+    total_unique = MapSet.union(user_set, candidate_set) |> MapSet.size()
+
+    if total_unique == 0 do
+      0.5
+    else
+      shared_count / total_unique
+    end
+  end
+
+  @doc """
+  Calculates the shared languages score.
+
+  Returns a score between 0.0 and 1.0 based on whether users share
+  any common languages.
+
+  If either has no languages, returns 0.5 (neutral).
+  """
+  def score_languages(nil, _), do: 0.5
+  def score_languages(_, nil), do: 0.5
+  def score_languages([], _), do: 0.5
+  def score_languages(_, []), do: 0.5
+
+  def score_languages(user_languages, candidate_languages) do
+    user_set = MapSet.new(user_languages)
+    candidate_set = MapSet.new(candidate_languages)
+
+    shared = MapSet.intersection(user_set, candidate_set)
+
+    cond do
+      MapSet.size(shared) >= 2 -> 1.0
+      MapSet.size(shared) == 1 -> 0.75
+      true -> 0.0
+    end
+  end
+
+  @doc """
+  Calculates the religion alignment score.
+
+  Returns a score between 0.0 and 1.0:
+  - 1.0 if religions match
+  - 0.5 if either party prefers not to say (neutral)
+  - 0.0 if religions don't match
+  """
+  def score_religion(nil, _), do: 0.5
+  def score_religion(_, nil), do: 0.5
+  def score_religion("prefer_not_to_say", _), do: 0.5
+  def score_religion(_, "prefer_not_to_say"), do: 0.5
+
+  def score_religion(user_religion, candidate_religion) when user_religion == candidate_religion,
+    do: 1.0
+
+  def score_religion(_, _), do: 0.0
+
+  @doc """
+  Calculates the profile freshness score.
+
+  Returns a score between 0.0 and 1.0 based on how recently
+  the candidate's profile was updated.
+
+  - 1.0 if updated within the last day
+  - Decays linearly over 30 days
+  - 0.0 if not updated in 30+ days
+  """
+  def score_freshness(nil), do: 0.5
+
+  def score_freshness(updated_at) do
+    now = DateTime.utc_now()
+    days_old = DateTime.diff(now, updated_at, :day)
+
+    cond do
+      days_old <= 1 -> 1.0
+      days_old >= 30 -> 0.0
+      true -> 1.0 - days_old / 30.0
+    end
+  end
+
+  @doc """
+  Calculates the liked-you boost score.
+
+  Returns 1.0 if the candidate has liked the user, 0.0 otherwise.
+  This encourages showing users who have already expressed interest.
+  """
+  def score_liked_you(has_liked_you) when is_boolean(has_liked_you) do
+    if has_liked_you, do: 1.0, else: 0.0
+  end
+
+  def score_liked_you(_), do: 0.0
+
+  @doc """
+  Adds randomization to prevent deterministic ordering.
+
+  Returns a random value between -@randomization_variance and +@randomization_variance.
+  """
+  def random_variance do
+    (:rand.uniform() - 0.5) * 2 * @randomization_variance
+  end
+
+  @doc """
+  Calculates the composite compatibility score for a candidate.
+
+  ## Parameters
+    * `user_profile` - The current user's profile
+    * `candidate_profile` - The candidate's profile
+    * `has_liked_user` - Boolean indicating if candidate has liked the user
+
+  ## Returns
+    A score between 0.0 and 1.0 (plus/minus randomization variance)
+  """
+  def calculate_score(user_profile, candidate_profile, has_liked_user \\ false) do
+    age_score =
+      score_age(
+        candidate_profile.birthdate,
+        user_profile.preferred_age_min,
+        user_profile.preferred_age_max
+      )
+
+    country_score = score_country(user_profile.country, candidate_profile.country)
+    interests_score = score_interests(user_profile.interests, candidate_profile.interests)
+    languages_score = score_languages(user_profile.languages, candidate_profile.languages)
+    religion_score = score_religion(user_profile.religion, candidate_profile.religion)
+    freshness_score = score_freshness(candidate_profile.updated_at)
+    liked_you_score = score_liked_you(has_liked_user)
+
+    base_score =
+      age_score * @age_weight +
+        country_score * @country_weight +
+        interests_score * @interests_weight +
+        languages_score * @languages_weight +
+        religion_score * @religion_weight +
+        freshness_score * @freshness_weight +
+        liked_you_score * @liked_you_weight
+
+    # Add randomization and clamp to [0, 1]
+    (base_score + random_variance())
+    |> max(0.0)
+    |> min(1.0)
+  end
+
+  @doc """
+  Scores and ranks candidates for a user's discovery feed.
+
+  Takes a query of filtered candidates and returns them sorted by compatibility score.
+
+  ## Parameters
+    * `user` - The current user with profile preloaded
+    * `query` - A query of filtered candidates (usually from apply_hard_filters/1)
+
+  ## Returns
+    A list of `{user, score}` tuples sorted by score descending
+  """
+  def score_and_rank(%User{id: user_id, profile: user_profile}, query) do
+    # Get all candidate users with their profiles
+    candidates =
+      query
+      |> Repo.all()
+      |> Repo.preload(:profile)
+
+    # Get the set of users who have liked the current user
+    liked_user_ids =
+      from(s in Swipe,
+        where: s.target_user_id == ^user_id and s.action == "like",
+        select: s.user_id
+      )
+      |> Repo.all()
+      |> MapSet.new()
+
+    # Score each candidate
+    candidates
+    |> Enum.map(fn candidate ->
+      has_liked_user = MapSet.member?(liked_user_ids, candidate.id)
+      score = calculate_score(user_profile, candidate.profile, has_liked_user)
+      {candidate, score}
+    end)
+    |> Enum.sort_by(fn {_candidate, score} -> score end, :desc)
+  end
+
+  @doc """
+  Returns the discovery feed for a user.
+
+  Applies hard filters, scores candidates, and returns them ranked
+  by compatibility score.
+
+  ## Parameters
+    * `user` - The current user with profile preloaded
+
+  ## Options
+    * `:limit` - Maximum number of candidates to return (default: 50)
+
+  ## Returns
+    A list of user structs sorted by compatibility score
+  """
+  def get_discovery_feed(%User{} = user, opts \\ []) do
+    limit = Keyword.get(opts, :limit, 50)
+
+    query = apply_hard_filters(user)
+
+    user
+    |> score_and_rank(query)
+    |> Enum.take(limit)
+    |> Enum.map(fn {candidate, _score} -> candidate end)
+  end
+
+  # ============================================================================
+  # Private Helper Functions
+  # ============================================================================
+
+  defp calculate_age(birthdate) do
+    today = Date.utc_today()
+    years = today.year - birthdate.year
+
+    # Check if birthday hasn't occurred yet this year
+    birthday_this_year = Date.new!(today.year, birthdate.month, birthdate.day)
+
+    case Date.compare(birthday_this_year, today) do
+      :gt -> years - 1
+      _ -> years
+    end
   end
 end

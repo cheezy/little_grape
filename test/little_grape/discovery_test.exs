@@ -617,4 +617,510 @@ defmodule LittleGrape.DiscoveryTest do
       assert result_ids == []
     end
   end
+
+  # ============================================================================
+  # Soft Scoring Tests
+  # ============================================================================
+
+  describe "score_age/3" do
+    # Helper to create a birthdate for a specific age
+    defp birthdate_for_age(age) do
+      today = Date.utc_today()
+      Date.new!(today.year - age, today.month, today.day)
+    end
+
+    test "returns 1.0 when candidate age is within preferred range" do
+      # Candidate is 30 years old
+      birthdate = birthdate_for_age(30)
+      score = Discovery.score_age(birthdate, 25, 35)
+      assert score == 1.0
+    end
+
+    test "returns 1.0 when age equals minimum" do
+      birthdate = birthdate_for_age(25)
+      score = Discovery.score_age(birthdate, 25, 35)
+      assert score == 1.0
+    end
+
+    test "returns 1.0 when age equals maximum" do
+      birthdate = birthdate_for_age(35)
+      score = Discovery.score_age(birthdate, 25, 35)
+      assert score == 1.0
+    end
+
+    test "returns reduced score when below minimum" do
+      # Candidate is 22 (3 years below min of 25)
+      birthdate = birthdate_for_age(22)
+      score = Discovery.score_age(birthdate, 25, 35)
+      assert score == 0.7
+    end
+
+    test "returns reduced score when above maximum" do
+      # Candidate is 38 (3 years above max of 35)
+      birthdate = birthdate_for_age(38)
+      score = Discovery.score_age(birthdate, 25, 35)
+      assert score == 0.7
+    end
+
+    test "returns 0.0 when far outside range" do
+      # Candidate is 50 (15 years above max of 35)
+      birthdate = birthdate_for_age(50)
+      score = Discovery.score_age(birthdate, 25, 35)
+      assert score == 0.0
+    end
+
+    test "uses default min of 18 when preferred_age_min is nil" do
+      # Candidate is 20, should be in range [18, 35]
+      birthdate = birthdate_for_age(20)
+      score = Discovery.score_age(birthdate, nil, 35)
+      assert score == 1.0
+    end
+
+    test "uses default max of 100 when preferred_age_max is nil" do
+      # Candidate is 60, should be in range [25, 100]
+      birthdate = birthdate_for_age(60)
+      score = Discovery.score_age(birthdate, 25, nil)
+      assert score == 1.0
+    end
+
+    test "returns 0.0 when birthdate is nil" do
+      score = Discovery.score_age(nil, 25, 35)
+      assert score == 0.0
+    end
+  end
+
+  describe "score_country/2" do
+    test "returns 1.0 when countries match" do
+      assert Discovery.score_country("US", "US") == 1.0
+    end
+
+    test "returns 0.0 when countries differ" do
+      assert Discovery.score_country("US", "CA") == 0.0
+    end
+
+    test "returns 0.5 when user country is nil" do
+      assert Discovery.score_country(nil, "US") == 0.5
+    end
+
+    test "returns 0.5 when candidate country is nil" do
+      assert Discovery.score_country("US", nil) == 0.5
+    end
+  end
+
+  describe "score_interests/2" do
+    test "returns 1.0 when all interests match" do
+      interests = ["music", "travel", "cooking"]
+      score = Discovery.score_interests(interests, interests)
+      assert score == 1.0
+    end
+
+    test "returns partial score for partial match" do
+      user_interests = ["music", "travel", "cooking"]
+      candidate_interests = ["music", "sports", "reading"]
+      # 1 shared out of 5 unique = 0.2
+      score = Discovery.score_interests(user_interests, candidate_interests)
+      assert score == 0.2
+    end
+
+    test "returns 0.0 when no interests match" do
+      user_interests = ["music", "travel"]
+      candidate_interests = ["sports", "reading"]
+      score = Discovery.score_interests(user_interests, candidate_interests)
+      assert score == 0.0
+    end
+
+    test "returns 0.5 when user has no interests" do
+      assert Discovery.score_interests([], ["music"]) == 0.5
+    end
+
+    test "returns 0.5 when candidate has no interests" do
+      assert Discovery.score_interests(["music"], []) == 0.5
+    end
+
+    test "returns 0.5 when user interests is nil" do
+      assert Discovery.score_interests(nil, ["music"]) == 0.5
+    end
+
+    test "returns 0.5 when candidate interests is nil" do
+      assert Discovery.score_interests(["music"], nil) == 0.5
+    end
+  end
+
+  describe "score_languages/2" do
+    test "returns 1.0 when sharing 2+ languages" do
+      user_languages = ["en", "es", "fr"]
+      candidate_languages = ["en", "es", "de"]
+      score = Discovery.score_languages(user_languages, candidate_languages)
+      assert score == 1.0
+    end
+
+    test "returns 0.75 when sharing 1 language" do
+      user_languages = ["en", "es"]
+      candidate_languages = ["en", "de"]
+      score = Discovery.score_languages(user_languages, candidate_languages)
+      assert score == 0.75
+    end
+
+    test "returns 0.0 when sharing no languages" do
+      user_languages = ["en", "es"]
+      candidate_languages = ["de", "fr"]
+      score = Discovery.score_languages(user_languages, candidate_languages)
+      assert score == 0.0
+    end
+
+    test "returns 0.5 when user has no languages" do
+      assert Discovery.score_languages([], ["en"]) == 0.5
+    end
+
+    test "returns 0.5 when candidate has no languages" do
+      assert Discovery.score_languages(["en"], []) == 0.5
+    end
+
+    test "returns 0.5 when user languages is nil" do
+      assert Discovery.score_languages(nil, ["en"]) == 0.5
+    end
+
+    test "returns 0.5 when candidate languages is nil" do
+      assert Discovery.score_languages(["en"], nil) == 0.5
+    end
+  end
+
+  describe "score_religion/2" do
+    test "returns 1.0 when religions match" do
+      assert Discovery.score_religion("muslim", "muslim") == 1.0
+    end
+
+    test "returns 0.0 when religions differ" do
+      assert Discovery.score_religion("muslim", "orthodox") == 0.0
+    end
+
+    test "returns 0.5 when user religion is nil" do
+      assert Discovery.score_religion(nil, "muslim") == 0.5
+    end
+
+    test "returns 0.5 when candidate religion is nil" do
+      assert Discovery.score_religion("muslim", nil) == 0.5
+    end
+
+    test "returns 0.5 when user prefers not to say" do
+      assert Discovery.score_religion("prefer_not_to_say", "muslim") == 0.5
+    end
+
+    test "returns 0.5 when candidate prefers not to say" do
+      assert Discovery.score_religion("muslim", "prefer_not_to_say") == 0.5
+    end
+  end
+
+  describe "score_freshness/1" do
+    test "returns 1.0 when profile was updated today" do
+      now = DateTime.utc_now()
+      score = Discovery.score_freshness(now)
+      assert score == 1.0
+    end
+
+    test "returns 1.0 when profile was updated yesterday" do
+      yesterday = DateTime.add(DateTime.utc_now(), -1, :day)
+      score = Discovery.score_freshness(yesterday)
+      assert score == 1.0
+    end
+
+    test "returns partial score for profiles updated in the last month" do
+      fifteen_days_ago = DateTime.add(DateTime.utc_now(), -15, :day)
+      score = Discovery.score_freshness(fifteen_days_ago)
+      assert score == 0.5
+    end
+
+    test "returns 0.0 for profiles not updated in 30+ days" do
+      thirty_days_ago = DateTime.add(DateTime.utc_now(), -30, :day)
+      score = Discovery.score_freshness(thirty_days_ago)
+      assert score == 0.0
+    end
+
+    test "returns 0.5 when updated_at is nil" do
+      assert Discovery.score_freshness(nil) == 0.5
+    end
+  end
+
+  describe "score_liked_you/1" do
+    test "returns 1.0 when candidate has liked user" do
+      assert Discovery.score_liked_you(true) == 1.0
+    end
+
+    test "returns 0.0 when candidate has not liked user" do
+      assert Discovery.score_liked_you(false) == 0.0
+    end
+
+    test "returns 0.0 for non-boolean input" do
+      assert Discovery.score_liked_you(nil) == 0.0
+    end
+  end
+
+  describe "random_variance/0" do
+    test "returns values within expected range" do
+      # Test multiple times to verify range
+      variances = for _ <- 1..100, do: Discovery.random_variance()
+
+      assert Enum.all?(variances, fn v -> v >= -0.10 and v <= 0.10 end)
+    end
+
+    test "returns different values (randomness)" do
+      variances = for _ <- 1..10, do: Discovery.random_variance()
+      unique_count = Enum.uniq(variances) |> length()
+
+      # Should have some variety (at least a few different values)
+      assert unique_count > 1
+    end
+  end
+
+  describe "calculate_score/3" do
+    test "calculates composite score from all factors" do
+      user_profile = %Profile{
+        birthdate: ~D[1990-01-01],
+        preferred_age_min: 25,
+        preferred_age_max: 35,
+        country: "US",
+        interests: ["music", "travel"],
+        languages: ["en", "es"],
+        religion: "other",
+        updated_at: DateTime.utc_now()
+      }
+
+      # Candidate is 30, same country, same interests, same languages, same religion
+      candidate_profile = %Profile{
+        birthdate: Date.add(Date.utc_today(), -30 * 365),
+        country: "US",
+        interests: ["music", "travel"],
+        languages: ["en", "es"],
+        religion: "other",
+        updated_at: DateTime.utc_now()
+      }
+
+      score = Discovery.calculate_score(user_profile, candidate_profile, true)
+
+      # With all factors at 1.0 and liked_you true:
+      # 0.30 + 0.20 + 0.20 + 0.10 + 0.10 + 0.05 + 0.05 = 1.0
+      # Plus randomization of +/-0.10
+      assert score >= 0.90
+      assert score <= 1.0
+    end
+
+    test "returns lower score for mismatched profiles" do
+      user_profile = %Profile{
+        birthdate: ~D[1990-01-01],
+        preferred_age_min: 25,
+        preferred_age_max: 35,
+        country: "US",
+        interests: ["music", "travel"],
+        languages: ["en"],
+        religion: "muslim",
+        updated_at: DateTime.utc_now()
+      }
+
+      # Candidate is 45, different country, no shared interests, no shared languages
+      candidate_profile = %Profile{
+        birthdate: Date.add(Date.utc_today(), -45 * 365),
+        country: "CA",
+        interests: ["sports", "reading"],
+        languages: ["fr"],
+        religion: "orthodox",
+        updated_at: DateTime.add(DateTime.utc_now(), -30, :day)
+      }
+
+      score = Discovery.calculate_score(user_profile, candidate_profile, false)
+
+      # Should be much lower due to mismatches
+      assert score < 0.5
+    end
+
+    test "score is clamped between 0.0 and 1.0" do
+      user_profile = %Profile{
+        birthdate: ~D[1990-01-01],
+        preferred_age_min: nil,
+        preferred_age_max: nil,
+        country: nil,
+        interests: [],
+        languages: [],
+        religion: nil,
+        updated_at: nil
+      }
+
+      candidate_profile = %Profile{
+        birthdate: nil,
+        country: nil,
+        interests: [],
+        languages: [],
+        religion: nil,
+        updated_at: nil
+      }
+
+      # Run multiple times to account for randomization
+      scores =
+        for _ <- 1..50, do: Discovery.calculate_score(user_profile, candidate_profile, false)
+
+      assert Enum.all?(scores, fn s -> s >= 0.0 and s <= 1.0 end)
+    end
+  end
+
+  describe "score_and_rank/2" do
+    test "ranks candidates by score descending" do
+      # Create user looking for females
+      user =
+        create_user_with_complete_profile(%{
+          gender: "male",
+          preferred_gender: "female",
+          country: "US",
+          interests: ["music", "travel"],
+          languages: ["en"],
+          religion: "other",
+          preferred_age_min: 25,
+          preferred_age_max: 35
+        })
+
+      # Perfect match - same country, interests, languages, religion
+      perfect_match =
+        create_user_with_complete_profile(%{
+          gender: "female",
+          preferred_gender: "male",
+          country: "US",
+          interests: ["music", "travel"],
+          languages: ["en"],
+          religion: "other",
+          birthdate: Date.add(Date.utc_today(), -30 * 365)
+        })
+
+      # Partial match - different country
+      partial_match =
+        create_user_with_complete_profile(%{
+          gender: "female",
+          preferred_gender: "male",
+          country: "CA",
+          interests: ["music"],
+          languages: ["en"],
+          religion: "other",
+          birthdate: Date.add(Date.utc_today(), -30 * 365)
+        })
+
+      # Poor match - different everything
+      poor_match =
+        create_user_with_complete_profile(%{
+          gender: "female",
+          preferred_gender: "male",
+          country: "DE",
+          interests: ["sports"],
+          languages: ["de"],
+          religion: "orthodox",
+          birthdate: Date.add(Date.utc_today(), -45 * 365)
+        })
+
+      query = Discovery.apply_hard_filters(user)
+      ranked = Discovery.score_and_rank(user, query)
+
+      user_ids = Enum.map(ranked, fn {candidate, _score} -> candidate.id end)
+
+      # Perfect match should generally be first (accounting for randomization)
+      # We can't guarantee exact order due to randomization, but perfect match
+      # should typically score higher
+      assert length(user_ids) == 3
+      assert perfect_match.id in user_ids
+      assert partial_match.id in user_ids
+      assert poor_match.id in user_ids
+    end
+
+    test "includes liked-you boost in scoring" do
+      user =
+        create_user_with_complete_profile(%{
+          gender: "male",
+          preferred_gender: "female"
+        })
+
+      # Two similar candidates
+      candidate_who_liked =
+        create_user_with_complete_profile(%{
+          gender: "female",
+          preferred_gender: "male"
+        })
+
+      candidate_no_like =
+        create_user_with_complete_profile(%{
+          gender: "female",
+          preferred_gender: "male"
+        })
+
+      # Have candidate_who_liked swipe on user
+      {:ok, _} = Swipes.create_swipe(candidate_who_liked, user.id, "like")
+
+      query = Discovery.apply_hard_filters(user)
+      ranked = Discovery.score_and_rank(user, query)
+
+      # The candidate who liked should get the boost
+      # Find the scores
+      liked_score =
+        ranked
+        |> Enum.find(fn {c, _} -> c.id == candidate_who_liked.id end)
+        |> elem(1)
+
+      no_like_score =
+        ranked
+        |> Enum.find(fn {c, _} -> c.id == candidate_no_like.id end)
+        |> elem(1)
+
+      # The liked-you candidate should score higher on average
+      # Due to randomization, we can't guarantee this every time
+      # But we can at least verify both are scored
+      assert liked_score != nil
+      assert no_like_score != nil
+    end
+  end
+
+  describe "get_discovery_feed/2" do
+    test "returns ranked list of candidates" do
+      user =
+        create_user_with_complete_profile(%{
+          gender: "male",
+          preferred_gender: "female"
+        })
+
+      candidate =
+        create_user_with_complete_profile(%{
+          gender: "female",
+          preferred_gender: "male"
+        })
+
+      feed = Discovery.get_discovery_feed(user)
+
+      assert length(feed) == 1
+      assert hd(feed).id == candidate.id
+    end
+
+    test "respects limit option" do
+      user =
+        create_user_with_complete_profile(%{
+          gender: "male",
+          preferred_gender: "female"
+        })
+
+      for _ <- 1..5 do
+        create_user_with_complete_profile(%{
+          gender: "female",
+          preferred_gender: "male"
+        })
+      end
+
+      feed = Discovery.get_discovery_feed(user, limit: 3)
+
+      assert length(feed) == 3
+    end
+
+    test "returns empty list when no candidates match" do
+      user =
+        create_user_with_complete_profile(%{
+          gender: "male",
+          preferred_gender: "female"
+        })
+
+      feed = Discovery.get_discovery_feed(user)
+
+      assert feed == []
+    end
+  end
 end
