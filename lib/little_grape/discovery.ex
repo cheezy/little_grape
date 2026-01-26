@@ -493,6 +493,39 @@ defmodule LittleGrape.Discovery do
     |> Enum.map(fn {candidate, _score} -> candidate end)
   end
 
+  @doc """
+  Returns ranked candidate profiles for a user's discovery feed.
+
+  This is the main public API for discovery. It combines hard filters,
+  soft scoring, and returns profiles ordered by compatibility.
+
+  ## Parameters
+    * `user` - The current user with profile preloaded
+    * `limit` - Maximum number of profiles to return (default: 20)
+
+  ## Returns
+    A list of Profile structs sorted by compatibility score descending.
+    Returns an empty list when no candidates are available.
+
+  ## Examples
+
+      iex> user = %User{id: 1, profile: %Profile{gender: "male", preferred_gender: "female"}}
+      iex> get_candidates(user)
+      [%Profile{}, %Profile{}, ...]
+
+      iex> get_candidates(user, 10)
+      [%Profile{}, ...]
+
+  """
+  def get_candidates(%User{} = user, limit \\ 20) do
+    query = apply_hard_filters(user)
+
+    user
+    |> score_and_rank(query)
+    |> Enum.take(limit)
+    |> Enum.map(fn {candidate, _score} -> candidate.profile end)
+  end
+
   # ============================================================================
   # Private Helper Functions
   # ============================================================================
