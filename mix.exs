@@ -102,10 +102,11 @@ defmodule LittleGrape.MixProject do
   defp test_coverage do
     [
       ignore_modules: [
+        LittleGrape.AccountsFixtures,
         LittleGrape.Application,
         LittleGrape.Release,
         LittleGrape.Repo,
-        LittleGrape.AccountsFixtures,
+        LittleGrape.TestLogFilter,
         LittleGrapeWeb.ConnCase,
         LittleGrapeWeb.CoreComponents,
         LittleGrapeWeb.ErrorHTML,

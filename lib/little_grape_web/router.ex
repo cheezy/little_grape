@@ -73,9 +73,12 @@ defmodule LittleGrapeWeb.Router do
     put "/users/profile", UserProfileController, :update
     delete "/users/profile/picture", UserProfileController, :delete_picture
 
-    live "/discover", DiscoverLive
-    live "/matches", MatchesLive
-    live "/chat/:match_id", ChatLive
+    live_session :authenticated_app,
+      layout: {LittleGrapeWeb.Layouts, :app} do
+      live "/discover", DiscoverLive
+      live "/matches", MatchesLive
+      live "/chat/:match_id", ChatLive
+    end
   end
 
   scope "/", LittleGrapeWeb do

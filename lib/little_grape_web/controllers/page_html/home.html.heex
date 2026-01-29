@@ -32,6 +32,18 @@
             {@current_scope.user.email}
           </span>
           <.link
+            href={~p"/discover"}
+            class="text-gray-600 hover:text-red-600 transition font-medium"
+          >
+            {gettext("Discover")}
+          </.link>
+          <.link
+            href={~p"/matches"}
+            class="text-gray-600 hover:text-red-600 transition font-medium"
+          >
+            {gettext("Matches")}
+          </.link>
+          <.link
             href={~p"/users/profile"}
             class="text-gray-600 hover:text-red-600 transition font-medium"
           >

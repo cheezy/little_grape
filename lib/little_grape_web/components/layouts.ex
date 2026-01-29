@@ -25,21 +25,27 @@ defmodule LittleGrapeWeb.Layouts do
       </Layouts.app>
 
   """
-  attr :flash, :map, required: true, doc: "the map of flash messages"
+  attr :flash, :map, default: %{}, doc: "the map of flash messages"
 
   attr :current_scope, :map,
     default: nil,
     doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
 
   attr :unread_count, :integer, default: 0, doc: "total unread message count for badge"
+  attr :inner_content, :any, default: nil, doc: "the inner content for live_session layouts"
+  attr :rest, :global
 
-  slot :inner_block, required: true
+  slot :inner_block
 
   def app(assigns) do
     ~H"""
     <div class="min-h-screen flex flex-col">
       <main class="flex-1 pb-16">
-        {render_slot(@inner_block)}
+        <%= if @inner_content do %>
+          {@inner_content}
+        <% else %>
+          {render_slot(@inner_block)}
+        <% end %>
       </main>
 
       <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 safe-area-inset-bottom">
