@@ -422,5 +422,95 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       html = render(view)
       assert html =~ "PubSub test message"
     end
+
+    test "marks messages as read on mount", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      # Create another user with profile
+      other_user = user_fixture()
+      profile_fixture(other_user) |> set_profile_picture()
+
+      # Create a match and messages from other user
+      {:ok, %{match: match, conversation: conversation}} =
+        Matches.create_match(user.id, other_user.id)
+
+      {:ok, _msg1} = Messaging.create_message(conversation.id, other_user.id, "Unread message 1")
+      {:ok, _msg2} = Messaging.create_message(conversation.id, other_user.id, "Unread message 2")
+
+      # Verify messages are unread before mounting
+      assert Messaging.unread_count(conversation.id, user.id) == 2
+
+      # Mount the live view (this should mark messages as read)
+      {:ok, _view, _html} = live(conn, ~p"/chat/#{match.id}")
+
+      # Messages should now be marked as read
+      assert Messaging.unread_count(conversation.id, user.id) == 0
+    end
+
+    test "clicking header shows profile modal", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      # Create another user with profile
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "ClickableProfile"}) |> set_profile_picture()
+
+      # Create a match
+      {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
+
+      {:ok, view, html} = live(conn, ~p"/chat/#{match.id}")
+
+      # Profile modal should not be visible initially (no close button)
+      refute html =~ "phx-click=\"close_profile\""
+
+      # Click the header button to show profile
+      html = view |> element("button[phx-click=show_profile]") |> render_click()
+
+      # Profile modal should now be visible
+      assert html =~ "phx-click=\"close_profile\""
+      assert html =~ "ClickableProfile"
+    end
+
+    test "profile modal can be closed", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      # Create another user with profile
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "ClosableProfile"}) |> set_profile_picture()
+
+      # Create a match
+      {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
+
+      {:ok, view, _html} = live(conn, ~p"/chat/#{match.id}")
+
+      # Open the profile modal
+      view |> element("button[phx-click=show_profile]") |> render_click()
+
+      # Close the profile modal
+      html = view |> element("button[phx-click=close_profile]") |> render_click()
+
+      # Modal should be closed
+      refute html =~ "w-32 h-32 rounded-full"
+    end
+
+    test "header photo and name are clickable", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      # Create another user with profile
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "TappableUser"}) |> set_profile_picture()
+
+      # Create a match
+      {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
+
+      {:ok, _view, html} = live(conn, ~p"/chat/#{match.id}")
+
+      # Header should have clickable button with phx-click
+      assert html =~ "phx-click=\"show_profile\""
+      assert html =~ "TappableUser"
+    end
   end
 end

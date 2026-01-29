@@ -29,6 +29,8 @@ defmodule LittleGrapeWeb.ChatLive do
   defp setup_chat_socket(socket, user, {match, conversation, messages, other_user, other_profile}) do
     if connected?(socket) do
       Phoenix.PubSub.subscribe(LittleGrape.PubSub, "conversation:#{conversation.id}")
+      # Mark messages as read when viewing the conversation
+      Messaging.mark_as_read(user, conversation.id)
     end
 
     socket
@@ -39,6 +41,7 @@ defmodule LittleGrapeWeb.ChatLive do
     |> assign(:other_user, other_user)
     |> assign(:other_profile, other_profile)
     |> assign(:message_form, to_form(%{"content" => ""}))
+    |> assign(:show_profile, false)
   end
 
   defp redirect_not_found(socket) do
@@ -104,6 +107,16 @@ defmodule LittleGrapeWeb.ChatLive do
   end
 
   @impl true
+  def handle_event("show_profile", _params, socket) do
+    {:noreply, assign(socket, :show_profile, true)}
+  end
+
+  @impl true
+  def handle_event("close_profile", _params, socket) do
+    {:noreply, assign(socket, :show_profile, false)}
+  end
+
+  @impl true
   def handle_info({:new_message, message}, socket) do
     {:noreply,
      socket
@@ -128,6 +141,48 @@ defmodule LittleGrapeWeb.ChatLive do
       </div>
 
       <.message_input form={@message_form} />
+
+      <%= if @show_profile do %>
+        <.profile_modal other_profile={@other_profile} />
+      <% end %>
+    </div>
+    """
+  end
+
+  defp profile_modal(assigns) do
+    ~H"""
+    <div
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      phx-click="close_profile"
+    >
+      <div
+        class="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-xl"
+        phx-click-away="close_profile"
+      >
+        <div class="text-center">
+          <%= if @other_profile && @other_profile.profile_picture do %>
+            <img
+              src={@other_profile.profile_picture}
+              alt={"#{@other_profile.first_name}'s photo"}
+              class="w-32 h-32 rounded-full object-cover mx-auto mb-4"
+            />
+          <% else %>
+            <div class="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-4">
+              <span class="text-gray-400 text-5xl">👤</span>
+            </div>
+          <% end %>
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">{display_name(@other_profile)}</h2>
+          <%= if @other_profile && @other_profile.bio do %>
+            <p class="text-gray-600">{@other_profile.bio}</p>
+          <% end %>
+        </div>
+        <button
+          phx-click="close_profile"
+          class="mt-6 w-full py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
+        >
+          Close
+        </button>
+      </div>
     </div>
     """
   end
@@ -176,18 +231,20 @@ defmodule LittleGrapeWeb.ChatLive do
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
       </.link>
-      <%= if @other_profile && @other_profile.profile_picture do %>
-        <img
-          src={@other_profile.profile_picture}
-          alt={"#{@other_profile.first_name}'s photo"}
-          class="w-10 h-10 rounded-full object-cover"
-        />
-      <% else %>
-        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-          <span class="text-gray-400 text-lg">👤</span>
-        </div>
-      <% end %>
-      <h1 class="font-semibold text-gray-900">{display_name(@other_profile)}</h1>
+      <button phx-click="show_profile" class="flex items-center gap-3 flex-1 text-left">
+        <%= if @other_profile && @other_profile.profile_picture do %>
+          <img
+            src={@other_profile.profile_picture}
+            alt={"#{@other_profile.first_name}'s photo"}
+            class="w-10 h-10 rounded-full object-cover"
+          />
+        <% else %>
+          <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+            <span class="text-gray-400 text-lg">👤</span>
+          </div>
+        <% end %>
+        <h1 class="font-semibold text-gray-900">{display_name(@other_profile)}</h1>
+      </button>
     </div>
     """
   end
