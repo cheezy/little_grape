@@ -280,5 +280,147 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       assert html =~ "UserA"
       assert html =~ "From UserA"
     end
+
+    test "displays message input form", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      # Create another user with profile
+      other_user = user_fixture()
+      profile_fixture(other_user) |> set_profile_picture()
+
+      # Create a match
+      {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
+
+      {:ok, _view, html} = live(conn, ~p"/chat/#{match.id}")
+
+      # Should show message input form
+      assert html =~ "Type a message..."
+      assert html =~ "phx-submit=\"send_message\""
+    end
+
+    test "sends message when form is submitted", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      # Create another user with profile
+      other_user = user_fixture()
+      profile_fixture(other_user) |> set_profile_picture()
+
+      # Create a match
+      {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
+
+      {:ok, view, _html} = live(conn, ~p"/chat/#{match.id}")
+
+      # Submit a message
+      view
+      |> form("form", %{content: "Hello from test!"})
+      |> render_submit()
+
+      # Message should appear in the view
+      html = render(view)
+      assert html =~ "Hello from test!"
+    end
+
+    test "does not send empty message", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      # Create another user with profile
+      other_user = user_fixture()
+      profile_fixture(other_user) |> set_profile_picture()
+
+      # Create a match
+      {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
+
+      {:ok, view, _html} = live(conn, ~p"/chat/#{match.id}")
+
+      # Submit an empty message
+      view
+      |> form("form", %{content: ""})
+      |> render_submit()
+
+      # Should still show empty state (no message sent)
+      html = render(view)
+      assert html =~ "No messages yet"
+    end
+
+    test "does not send whitespace-only message", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      # Create another user with profile
+      other_user = user_fixture()
+      profile_fixture(other_user) |> set_profile_picture()
+
+      # Create a match
+      {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
+
+      {:ok, view, _html} = live(conn, ~p"/chat/#{match.id}")
+
+      # Submit whitespace-only message
+      view
+      |> form("form", %{content: "   "})
+      |> render_submit()
+
+      # Should still show empty state (no message sent)
+      html = render(view)
+      assert html =~ "No messages yet"
+    end
+
+    test "receives new messages in real-time via PubSub", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      # Create another user with profile
+      other_user = user_fixture()
+      profile_fixture(other_user) |> set_profile_picture()
+
+      # Create a match
+      {:ok, %{match: match, conversation: conversation}} =
+        Matches.create_match(user.id, other_user.id)
+
+      {:ok, view, html} = live(conn, ~p"/chat/#{match.id}")
+
+      # Initially empty
+      assert html =~ "No messages yet"
+
+      # Other user sends a message (simulating real-time)
+      {:ok, _message} = Messaging.send_message(other_user, conversation.id, "Real-time message!")
+
+      # Should appear in the view
+      html = render(view)
+      assert html =~ "Real-time message!"
+    end
+
+    test "subscribes to conversation topic on mount", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      # Create another user with profile
+      other_user = user_fixture()
+      profile_fixture(other_user) |> set_profile_picture()
+
+      # Create a match
+      {:ok, %{match: match, conversation: conversation}} =
+        Matches.create_match(user.id, other_user.id)
+
+      {:ok, view, _html} = live(conn, ~p"/chat/#{match.id}")
+
+      # Simulate incoming message via PubSub
+      message = %{
+        id: 999,
+        content: "PubSub test message",
+        sender_id: other_user.id,
+        conversation_id: conversation.id,
+        inserted_at: DateTime.utc_now()
+      }
+
+      send(view.pid, {:new_message, message})
+
+      # Should appear in the view
+      html = render(view)
+      assert html =~ "PubSub test message"
+    end
   end
 end

@@ -18,12 +18,19 @@ defmodule LittleGrapeWeb.ChatLive do
 
   defp mount_for_user(socket, user, match_id) do
     case authorize_and_load(user, match_id) do
-      {:ok, chat_data} -> {:ok, assign_chat_data(socket, user, chat_data)}
-      {:error, :not_found} -> {:ok, redirect_not_found(socket)}
+      {:ok, chat_data} ->
+        {:ok, setup_chat_socket(socket, user, chat_data)}
+
+      {:error, :not_found} ->
+        {:ok, redirect_not_found(socket)}
     end
   end
 
-  defp assign_chat_data(socket, user, {match, conversation, messages, other_user, other_profile}) do
+  defp setup_chat_socket(socket, user, {match, conversation, messages, other_user, other_profile}) do
+    if connected?(socket) do
+      Phoenix.PubSub.subscribe(LittleGrape.PubSub, "conversation:#{conversation.id}")
+    end
+
     socket
     |> assign(:user, user)
     |> assign(:match, match)
@@ -31,6 +38,7 @@ defmodule LittleGrapeWeb.ChatLive do
     |> assign(:messages, messages)
     |> assign(:other_user, other_user)
     |> assign(:other_profile, other_profile)
+    |> assign(:message_form, to_form(%{"content" => ""}))
   end
 
   defp redirect_not_found(socket) do
@@ -77,12 +85,39 @@ defmodule LittleGrapeWeb.ChatLive do
   end
 
   @impl true
+  def handle_event("send_message", %{"content" => content}, socket) do
+    content = String.trim(content)
+
+    if content == "" do
+      {:noreply, socket}
+    else
+      case Messaging.send_message(socket.assigns.user, socket.assigns.conversation.id, content) do
+        {:ok, _message} ->
+          {:noreply,
+           socket
+           |> assign(:message_form, to_form(%{"content" => ""}))}
+
+        {:error, _changeset} ->
+          {:noreply, socket}
+      end
+    end
+  end
+
+  @impl true
+  def handle_info({:new_message, message}, socket) do
+    {:noreply,
+     socket
+     |> assign(:messages, socket.assigns.messages ++ [message])
+     |> push_event("scroll_to_bottom", %{})}
+  end
+
+  @impl true
   def render(assigns) do
     ~H"""
-    <div class="flex flex-col h-screen max-w-lg mx-auto">
+    <div class="flex flex-col h-screen max-w-lg mx-auto" id="chat-container" phx-hook="ScrollToBottom">
       <.chat_header other_profile={@other_profile} />
 
-      <div class="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-gray-50">
+      <div id="messages-container" class="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-gray-50">
         <%= if @messages == [] do %>
           <.empty_state other_profile={@other_profile} />
         <% else %>
@@ -91,6 +126,38 @@ defmodule LittleGrapeWeb.ChatLive do
           <% end %>
         <% end %>
       </div>
+
+      <.message_input form={@message_form} />
+    </div>
+    """
+  end
+
+  defp message_input(assigns) do
+    ~H"""
+    <div class="px-4 py-3 bg-white border-t">
+      <form phx-submit="send_message" class="flex gap-2">
+        <input
+          type="text"
+          name="content"
+          value={@form["content"].value}
+          placeholder="Type a message..."
+          autocomplete="off"
+          class="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+        />
+        <button
+          type="submit"
+          class="px-4 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition-colors"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+          </svg>
+        </button>
+      </form>
     </div>
     """
   end

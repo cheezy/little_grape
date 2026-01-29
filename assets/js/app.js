@@ -26,10 +26,29 @@ import {hooks as colocatedHooks} from "phoenix-colocated/little_grape"
 import topbar from "../vendor/topbar"
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+
+const Hooks = {
+  ScrollToBottom: {
+    mounted() {
+      this.scrollToBottom()
+      this.handleEvent("scroll_to_bottom", () => {
+        this.scrollToBottom()
+      })
+    },
+    scrollToBottom() {
+      const container = document.getElementById("messages-container")
+      if (container) {
+        container.scrollTop = container.scrollHeight
+      }
+    }
+  },
+  ...colocatedHooks
+}
+
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks},
+  hooks: Hooks,
 })
 
 // Show progress bar on live navigation and form submits
