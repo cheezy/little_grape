@@ -106,4 +106,115 @@ defmodule LittleGrape.MatchesTest do
       assert Repo.get(Conversation, conversation.id) != nil
     end
   end
+
+  describe "list_matches/1" do
+    test "returns matches where user is user_a" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+
+      {:ok, %{match: match, conversation: _conversation}} =
+        Matches.create_match(user1.id, user2.id)
+
+      {user_a, _user_b} = if user1.id < user2.id, do: {user1, user2}, else: {user2, user1}
+
+      matches = Matches.list_matches(user_a)
+      assert length(matches) == 1
+      assert hd(matches).id == match.id
+    end
+
+    test "returns matches where user is user_b" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+
+      {:ok, %{match: match, conversation: _conversation}} =
+        Matches.create_match(user1.id, user2.id)
+
+      {_user_a, user_b} = if user1.id < user2.id, do: {user1, user2}, else: {user2, user1}
+
+      matches = Matches.list_matches(user_b)
+      assert length(matches) == 1
+      assert hd(matches).id == match.id
+    end
+
+    test "returns empty list when user has no matches" do
+      user = user_fixture()
+
+      assert Matches.list_matches(user) == []
+    end
+
+    test "returns multiple matches for same user" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      user3 = user_fixture()
+
+      {:ok, %{match: match1, conversation: _}} = Matches.create_match(user1.id, user2.id)
+      {:ok, %{match: match2, conversation: _}} = Matches.create_match(user1.id, user3.id)
+
+      matches = Matches.list_matches(user1)
+      assert length(matches) == 2
+      match_ids = Enum.map(matches, & &1.id)
+      assert match1.id in match_ids
+      assert match2.id in match_ids
+    end
+
+    test "does not return other users' matches" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      user3 = user_fixture()
+      user4 = user_fixture()
+
+      # Match between user1 and user2
+      {:ok, _} = Matches.create_match(user1.id, user2.id)
+      # Match between user3 and user4
+      {:ok, _} = Matches.create_match(user3.id, user4.id)
+
+      # user1 should only see their match, not user3/user4's match
+      matches = Matches.list_matches(user1)
+      assert length(matches) == 1
+    end
+  end
+
+  describe "get_match/2" do
+    test "returns match when user is participant (user_a)" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+
+      {:ok, %{match: match, conversation: _}} = Matches.create_match(user1.id, user2.id)
+
+      {user_a, _user_b} = if user1.id < user2.id, do: {user1, user2}, else: {user2, user1}
+
+      fetched_match = Matches.get_match(user_a, match.id)
+      assert fetched_match.id == match.id
+    end
+
+    test "returns match when user is participant (user_b)" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+
+      {:ok, %{match: match, conversation: _}} = Matches.create_match(user1.id, user2.id)
+
+      {_user_a, user_b} = if user1.id < user2.id, do: {user1, user2}, else: {user2, user1}
+
+      fetched_match = Matches.get_match(user_b, match.id)
+      assert fetched_match.id == match.id
+    end
+
+    test "returns nil when user is not a participant" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      user3 = user_fixture()
+
+      {:ok, %{match: match, conversation: _}} = Matches.create_match(user1.id, user2.id)
+
+      # user3 is not a participant in the match
+      assert Matches.get_match(user3, match.id) == nil
+    end
+
+    test "returns nil for non-existent match" do
+      user = user_fixture()
+      non_existent_id = 999_999
+
+      assert Matches.get_match(user, non_existent_id) == nil
+    end
+  end
 end
