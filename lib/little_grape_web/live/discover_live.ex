@@ -29,7 +29,8 @@ defmodule LittleGrapeWeb.DiscoverLive do
            |> assign(:current_candidate, current_candidate)
            |> assign(:swiping, false)
            |> assign(:show_match_modal, false)
-           |> assign(:matched_profile, nil)}
+           |> assign(:matched_profile, nil)
+           |> assign(:expanded, false)}
         else
           {:ok,
            socket
@@ -66,6 +67,11 @@ defmodule LittleGrapeWeb.DiscoverLive do
     {:noreply, assign(socket, :show_match_modal, false)}
   end
 
+  @impl true
+  def handle_event("toggle_expanded", _params, socket) do
+    {:noreply, assign(socket, :expanded, !socket.assigns.expanded)}
+  end
+
   defp handle_swipe_success(socket, action, user_id, candidate) do
     if action == "like" and Swipes.check_for_match(user_id, candidate.user_id) do
       # It's a match! Create the match record
@@ -88,6 +94,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
     |> assign(:candidates, remaining)
     |> assign(:current_candidate, List.first(remaining))
     |> assign(:swiping, false)
+    |> assign(:expanded, false)
   end
 
   defp assign_current_user(socket, session) do
@@ -133,7 +140,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
       <h1 class="text-2xl font-bold text-center mb-8">Discover</h1>
 
       <%= if @current_candidate do %>
-        <.profile_card profile={@current_candidate} swiping={@swiping} />
+        <.profile_card profile={@current_candidate} swiping={@swiping} expanded={@expanded} />
       <% else %>
         <div class="text-center py-12">
           <div class="text-6xl mb-4">🔍</div>
@@ -160,7 +167,13 @@ defmodule LittleGrapeWeb.DiscoverLive do
 
     ~H"""
     <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-      <div class="aspect-[3/4] relative">
+      <div
+        class={[
+          "relative cursor-pointer transition-all",
+          if(@expanded, do: "aspect-[3/5]", else: "aspect-[3/4]")
+        ]}
+        phx-click="toggle_expanded"
+      >
         <%= if @profile.profile_picture do %>
           <img
             src={@profile.profile_picture}
@@ -185,8 +198,15 @@ defmodule LittleGrapeWeb.DiscoverLive do
               {[@profile.city, @profile.country] |> Enum.filter(& &1) |> Enum.join(", ")}
             </p>
           <% end %>
+          <%= unless @expanded do %>
+            <p class="text-white/60 text-sm mt-2">Tap to see more</p>
+          <% end %>
         </div>
       </div>
+
+      <%= if @expanded do %>
+        <.expanded_profile_details profile={@profile} />
+      <% end %>
 
       <div class="flex justify-center gap-8 py-6">
         <button
@@ -209,6 +229,119 @@ defmodule LittleGrapeWeb.DiscoverLive do
     </div>
     """
   end
+
+  defp expanded_profile_details(assigns) do
+    ~H"""
+    <div class="p-6 space-y-4 border-t border-gray-100 max-h-96 overflow-y-auto">
+      <%= if @profile.bio do %>
+        <div>
+          <h3 class="font-semibold text-gray-700 mb-1">About Me</h3>
+          <p class="text-gray-600">{@profile.bio}</p>
+        </div>
+      <% end %>
+
+      <%= if @profile.interests && @profile.interests != [] do %>
+        <div>
+          <h3 class="font-semibold text-gray-700 mb-2">Interests</h3>
+          <div class="flex flex-wrap gap-2">
+            <%= for interest <- @profile.interests do %>
+              <span class="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-sm">
+                {format_value(interest)}
+              </span>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <%= if @profile.occupation do %>
+        <div>
+          <h3 class="font-semibold text-gray-700 mb-1">Occupation</h3>
+          <p class="text-gray-600">{@profile.occupation}</p>
+        </div>
+      <% end %>
+
+      <%= if @profile.looking_for do %>
+        <div>
+          <h3 class="font-semibold text-gray-700 mb-1">Looking For</h3>
+          <p class="text-gray-600">{format_value(@profile.looking_for)}</p>
+        </div>
+      <% end %>
+
+      <div class="grid grid-cols-2 gap-4">
+        <%= if @profile.height_cm do %>
+          <div>
+            <h3 class="font-semibold text-gray-700 mb-1">Height</h3>
+            <p class="text-gray-600">{@profile.height_cm} cm</p>
+          </div>
+        <% end %>
+
+        <%= if @profile.body_type do %>
+          <div>
+            <h3 class="font-semibold text-gray-700 mb-1">Body Type</h3>
+            <p class="text-gray-600">{format_value(@profile.body_type)}</p>
+          </div>
+        <% end %>
+
+        <%= if @profile.education do %>
+          <div>
+            <h3 class="font-semibold text-gray-700 mb-1">Education</h3>
+            <p class="text-gray-600">{format_value(@profile.education)}</p>
+          </div>
+        <% end %>
+
+        <%= if @profile.religion do %>
+          <div>
+            <h3 class="font-semibold text-gray-700 mb-1">Religion</h3>
+            <p class="text-gray-600">{format_value(@profile.religion)}</p>
+          </div>
+        <% end %>
+
+        <%= if @profile.smoking do %>
+          <div>
+            <h3 class="font-semibold text-gray-700 mb-1">Smoking</h3>
+            <p class="text-gray-600">{format_value(@profile.smoking)}</p>
+          </div>
+        <% end %>
+
+        <%= if @profile.drinking do %>
+          <div>
+            <h3 class="font-semibold text-gray-700 mb-1">Drinking</h3>
+            <p class="text-gray-600">{format_value(@profile.drinking)}</p>
+          </div>
+        <% end %>
+      </div>
+
+      <%= if @profile.languages && @profile.languages != [] do %>
+        <div>
+          <h3 class="font-semibold text-gray-700 mb-1">Languages</h3>
+          <p class="text-gray-600">
+            {Enum.map(@profile.languages, &format_language/1) |> Enum.join(", ")}
+          </p>
+        </div>
+      <% end %>
+
+      <p class="text-center text-gray-400 text-sm pt-2">Tap photo to collapse</p>
+    </div>
+    """
+  end
+
+  defp format_value(value) when is_binary(value) do
+    value
+    |> String.replace("_", " ")
+    |> String.split(" ")
+    |> Enum.map_join(" ", &String.capitalize/1)
+  end
+
+  defp format_language("sq"), do: "Albanian"
+  defp format_language("en"), do: "English"
+  defp format_language("it"), do: "Italian"
+  defp format_language("de"), do: "German"
+  defp format_language("fr"), do: "French"
+  defp format_language("sr"), do: "Serbian"
+  defp format_language("mk"), do: "Macedonian"
+  defp format_language("tr"), do: "Turkish"
+  defp format_language("other"), do: "Other"
+  defp format_language(code), do: code
 
   defp match_modal(assigns) do
     ~H"""

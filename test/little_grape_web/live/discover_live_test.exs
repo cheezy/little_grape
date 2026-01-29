@@ -299,5 +299,155 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       html = view |> element("button", "Keep Swiping") |> render_click()
       refute html =~ "a Match"
     end
+
+    test "tapping card expands to show full profile details", %{conn: conn, user: user} do
+      # Create complete profile for current user
+      profile_fixture(user, %{gender: "male", preferred_gender: "female"})
+      |> set_profile_picture()
+
+      # Create a candidate with full profile details
+      candidate = user_fixture()
+
+      profile_fixture(candidate, %{
+        first_name: "ExpandCandidate",
+        gender: "female",
+        preferred_gender: "male",
+        bio: "I love hiking and photography",
+        interests: ["travel", "photography", "nature"],
+        occupation: "Software Engineer",
+        looking_for: "relationship",
+        height_cm: 165,
+        education: "masters",
+        smoking: "non_smoker",
+        drinking: "social"
+      })
+      |> set_profile_picture()
+
+      {:ok, view, html} = live(conn, ~p"/discover")
+
+      # Initially should show "Tap to see more" hint
+      assert html =~ "Tap to see more"
+      # Should not show expanded details yet
+      refute html =~ "About Me"
+      refute html =~ "I love hiking"
+
+      # Click the card to expand
+      html = view |> element("div[phx-click=toggle_expanded]") |> render_click()
+
+      # Should now show expanded profile details
+      assert html =~ "About Me"
+      assert html =~ "I love hiking and photography"
+      assert html =~ "Interests"
+      assert html =~ "Travel"
+      assert html =~ "Photography"
+      assert html =~ "Software Engineer"
+      assert html =~ "Relationship"
+      assert html =~ "165 cm"
+      assert html =~ "Masters"
+      assert html =~ "Non Smoker"
+      assert html =~ "Social"
+      assert html =~ "Tap photo to collapse"
+    end
+
+    test "tapping expanded card collapses back to card view", %{conn: conn, user: user} do
+      # Create complete profile for current user
+      profile_fixture(user, %{gender: "male", preferred_gender: "female"})
+      |> set_profile_picture()
+
+      # Create a candidate with bio
+      candidate = user_fixture()
+
+      profile_fixture(candidate, %{
+        first_name: "CollapseCandidate",
+        gender: "female",
+        preferred_gender: "male",
+        bio: "Hello world"
+      })
+      |> set_profile_picture()
+
+      {:ok, view, _html} = live(conn, ~p"/discover")
+
+      # Expand the card
+      html = view |> element("div[phx-click=toggle_expanded]") |> render_click()
+      assert html =~ "About Me"
+      assert html =~ "Hello world"
+
+      # Collapse the card
+      html = view |> element("div[phx-click=toggle_expanded]") |> render_click()
+
+      # Should no longer show expanded details
+      refute html =~ "About Me"
+      assert html =~ "Tap to see more"
+    end
+
+    test "like/pass buttons remain visible when expanded", %{conn: conn, user: user} do
+      # Create complete profile for current user
+      profile_fixture(user, %{gender: "male", preferred_gender: "female"})
+      |> set_profile_picture()
+
+      # Create a candidate
+      candidate = user_fixture()
+
+      profile_fixture(candidate, %{
+        first_name: "ButtonsCandidate",
+        gender: "female",
+        preferred_gender: "male",
+        bio: "Test bio"
+      })
+      |> set_profile_picture()
+
+      {:ok, view, html} = live(conn, ~p"/discover")
+
+      # Buttons visible before expansion
+      assert html =~ "phx-value-action=\"like\""
+      assert html =~ "phx-value-action=\"pass\""
+
+      # Expand the card
+      html = view |> element("div[phx-click=toggle_expanded]") |> render_click()
+
+      # Buttons still visible after expansion
+      assert html =~ "phx-value-action=\"like\""
+      assert html =~ "phx-value-action=\"pass\""
+    end
+
+    test "expansion resets when advancing to next candidate", %{conn: conn, user: user} do
+      # Create complete profile for current user
+      profile_fixture(user, %{gender: "male", preferred_gender: "female"})
+      |> set_profile_picture()
+
+      # Create two candidates
+      candidate1 = user_fixture()
+
+      profile_fixture(candidate1, %{
+        first_name: "ResetFirst",
+        gender: "female",
+        preferred_gender: "male",
+        bio: "First bio"
+      })
+      |> set_profile_picture()
+
+      candidate2 = user_fixture()
+
+      profile_fixture(candidate2, %{
+        first_name: "ResetSecond",
+        gender: "female",
+        preferred_gender: "male",
+        bio: "Second bio"
+      })
+      |> set_profile_picture()
+
+      {:ok, view, _html} = live(conn, ~p"/discover")
+
+      # Expand the first card
+      html = view |> element("div[phx-click=toggle_expanded]") |> render_click()
+      assert html =~ "About Me"
+
+      # Swipe to advance to next candidate
+      html = view |> element("button[phx-value-action=pass]") |> render_click()
+
+      # Next card should not be expanded
+      assert html =~ "Tap to see more"
+      refute html =~ "About Me"
+    end
   end
 end
