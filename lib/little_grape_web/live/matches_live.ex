@@ -3,6 +3,7 @@ defmodule LittleGrapeWeb.MatchesLive do
 
   alias LittleGrape.Accounts
   alias LittleGrape.Matches
+  alias LittleGrape.Messaging
 
   @impl true
   def mount(_params, session, socket) do
@@ -18,24 +19,42 @@ defmodule LittleGrapeWeb.MatchesLive do
         end
 
         matches = Matches.list_matches_with_details(user)
+        unread_count = Messaging.total_unread_count(user)
 
         {:ok,
          socket
          |> assign(:user, user)
-         |> assign(:matches, matches)}
+         |> assign(:matches, matches)
+         |> assign(:unread_count, unread_count)}
     end
   end
 
   @impl true
   def handle_info({:new_match, _match}, socket) do
     matches = Matches.list_matches_with_details(socket.assigns.user)
-    {:noreply, assign(socket, :matches, matches)}
+    unread_count = Messaging.total_unread_count(socket.assigns.user)
+
+    {:noreply,
+     socket
+     |> assign(:matches, matches)
+     |> assign(:unread_count, unread_count)}
   end
 
   @impl true
   def handle_info({:new_message, _message}, socket) do
     matches = Matches.list_matches_with_details(socket.assigns.user)
-    {:noreply, assign(socket, :matches, matches)}
+    unread_count = Messaging.total_unread_count(socket.assigns.user)
+
+    {:noreply,
+     socket
+     |> assign(:matches, matches)
+     |> assign(:unread_count, unread_count)}
+  end
+
+  @impl true
+  def handle_info({:messages_read, _payload}, socket) do
+    unread_count = Messaging.total_unread_count(socket.assigns.user)
+    {:noreply, assign(socket, :unread_count, unread_count)}
   end
 
   defp assign_current_user(socket, session) do

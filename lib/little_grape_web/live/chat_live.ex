@@ -29,9 +29,12 @@ defmodule LittleGrapeWeb.ChatLive do
   defp setup_chat_socket(socket, user, {match, conversation, messages, other_user, other_profile}) do
     if connected?(socket) do
       Phoenix.PubSub.subscribe(LittleGrape.PubSub, "conversation:#{conversation.id}")
+      Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user.id}")
       # Mark messages as read when viewing the conversation
       Messaging.mark_as_read(user, conversation.id)
     end
+
+    unread_count = Messaging.total_unread_count(user)
 
     socket
     |> assign(:user, user)
@@ -42,6 +45,7 @@ defmodule LittleGrapeWeb.ChatLive do
     |> assign(:other_profile, other_profile)
     |> assign(:message_form, to_form(%{"content" => ""}))
     |> assign(:show_profile, false)
+    |> assign(:unread_count, unread_count)
   end
 
   defp redirect_not_found(socket) do
@@ -118,10 +122,33 @@ defmodule LittleGrapeWeb.ChatLive do
 
   @impl true
   def handle_info({:new_message, message}, socket) do
+    # If message is from other user in this conversation, mark as read immediately
+    # since we're viewing the conversation
+    if message.conversation_id == socket.assigns.conversation.id and
+         message.sender_id != socket.assigns.user.id do
+      Messaging.mark_as_read(socket.assigns.user, socket.assigns.conversation.id)
+    end
+
+    unread_count = Messaging.total_unread_count(socket.assigns.user)
+
     {:noreply,
      socket
      |> assign(:messages, socket.assigns.messages ++ [message])
+     |> assign(:unread_count, unread_count)
      |> push_event("scroll_to_bottom", %{})}
+  end
+
+  @impl true
+  def handle_info({:messages_read, _payload}, socket) do
+    unread_count = Messaging.total_unread_count(socket.assigns.user)
+    {:noreply, assign(socket, :unread_count, unread_count)}
+  end
+
+  @impl true
+  def handle_info({:new_match, _match}, socket) do
+    # Just update unread count for nav badge
+    unread_count = Messaging.total_unread_count(socket.assigns.user)
+    {:noreply, assign(socket, :unread_count, unread_count)}
   end
 
   @impl true

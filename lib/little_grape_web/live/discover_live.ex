@@ -4,6 +4,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
   alias LittleGrape.Accounts
   alias LittleGrape.Discovery
   alias LittleGrape.Matches
+  alias LittleGrape.Messaging
   alias LittleGrape.Repo
   alias LittleGrape.Swipes
 
@@ -19,8 +20,13 @@ defmodule LittleGrapeWeb.DiscoverLive do
         user = Repo.preload(user, :profile)
 
         if profile_complete?(user.profile) do
+          if connected?(socket) do
+            Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user.id}")
+          end
+
           candidates = Discovery.get_candidates(user)
           current_candidate = List.first(candidates)
+          unread_count = Messaging.total_unread_count(user)
 
           {:ok,
            socket
@@ -30,7 +36,8 @@ defmodule LittleGrapeWeb.DiscoverLive do
            |> assign(:swiping, false)
            |> assign(:show_match_modal, false)
            |> assign(:matched_profile, nil)
-           |> assign(:expanded, false)}
+           |> assign(:expanded, false)
+           |> assign(:unread_count, unread_count)}
         else
           {:ok,
            socket
@@ -70,6 +77,25 @@ defmodule LittleGrapeWeb.DiscoverLive do
   @impl true
   def handle_event("toggle_expanded", _params, socket) do
     {:noreply, assign(socket, :expanded, !socket.assigns.expanded)}
+  end
+
+  @impl true
+  def handle_info({:new_message, _message}, socket) do
+    unread_count = Messaging.total_unread_count(socket.assigns.user)
+    {:noreply, assign(socket, :unread_count, unread_count)}
+  end
+
+  @impl true
+  def handle_info({:messages_read, _payload}, socket) do
+    unread_count = Messaging.total_unread_count(socket.assigns.user)
+    {:noreply, assign(socket, :unread_count, unread_count)}
+  end
+
+  @impl true
+  def handle_info({:new_match, _match}, socket) do
+    # Just update unread count, don't need to do anything else for discovery
+    unread_count = Messaging.total_unread_count(socket.assigns.user)
+    {:noreply, assign(socket, :unread_count, unread_count)}
   end
 
   defp handle_swipe_success(socket, action, user_id, candidate) do
