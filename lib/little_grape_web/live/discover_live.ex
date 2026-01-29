@@ -75,11 +75,10 @@ defmodule LittleGrapeWeb.DiscoverLive do
   defp handle_swipe_success(socket, action, user_id, candidate) do
     if action == "like" and Swipes.check_for_match(user_id, candidate.user_id) do
       # It's a match! Create the match record
-      {:ok, %{match: match}} = Matches.create_match(user_id, candidate.user_id)
+      {:ok, _result} = Matches.create_match(user_id, candidate.user_id)
 
       socket
       |> assign(:matched_profile, candidate)
-      |> assign(:match_id, match.id)
       |> assign(:show_match_modal, true)
       |> advance_to_next_candidate()
     else
@@ -156,7 +155,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
       <% end %>
 
       <%= if @show_match_modal do %>
-        <.match_modal profile={@matched_profile} match_id={@match_id} />
+        <.match_modal profile={@matched_profile} />
       <% end %>
     </div>
     """
@@ -367,20 +366,12 @@ defmodule LittleGrapeWeb.DiscoverLive do
           You and {@profile.first_name} liked each other!
         </p>
 
-        <div class="space-y-3">
-          <.link
-            navigate={~p"/matches/#{@match_id}/messages"}
-            class="block w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-6 rounded-full transition-colors text-center"
-          >
-            Send Message
-          </.link>
-          <button
-            phx-click="close_match_modal"
-            class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-full transition-colors"
-          >
-            Keep Swiping
-          </button>
-        </div>
+        <button
+          phx-click="close_match_modal"
+          class="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-6 rounded-full transition-colors"
+        >
+          Keep Swiping
+        </button>
       </div>
     </div>
     """

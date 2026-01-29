@@ -74,6 +74,7 @@ defmodule LittleGrapeWeb.Router do
     delete "/users/profile/picture", UserProfileController, :delete_picture
 
     live "/discover", DiscoverLive
+    live "/matches", MatchesLive
   end
 
   scope "/", LittleGrapeWeb do

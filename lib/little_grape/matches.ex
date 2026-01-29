@@ -161,4 +161,80 @@ defmodule LittleGrape.Matches do
         :ok
     end
   end
+
+  @doc """
+  Lists all matches for a user with details needed for display.
+
+  Returns matches with preloaded user profiles and last message preview.
+  Results are ordered by most recent activity (last message or match date).
+
+  ## Parameters
+
+    * `user` - The user struct with an id
+
+  ## Returns
+
+    * List of maps with `:match`, `:other_user`, `:other_profile`, and `:last_message` keys
+
+  ## Examples
+
+      iex> list_matches_with_details(user)
+      [
+        %{
+          match: %Match{},
+          other_user: %User{},
+          other_profile: %Profile{},
+          last_message: %Message{} | nil
+        }
+      ]
+
+  """
+  def list_matches_with_details(%User{id: user_id}) do
+    # Query matches with preloads
+    matches =
+      from(m in Match,
+        where: m.user_a_id == ^user_id or m.user_b_id == ^user_id,
+        preload: [
+          :user_a,
+          :user_b,
+          conversation: ^from(c in Conversation, preload: [:messages])
+        ],
+        order_by: [desc: m.matched_at]
+      )
+      |> Repo.all()
+
+    # Transform matches into display-friendly format
+    matches
+    |> Enum.map(fn match ->
+      other_user =
+        if match.user_a_id == user_id do
+          match.user_b
+        else
+          match.user_a
+        end
+
+      other_profile = Repo.preload(other_user, :profile).profile
+
+      last_message =
+        if match.conversation && match.conversation.messages do
+          match.conversation.messages
+          |> Enum.sort_by(& &1.inserted_at, {:desc, DateTime})
+          |> List.first()
+        end
+
+      %{
+        match: match,
+        other_user: other_user,
+        other_profile: other_profile,
+        last_message: last_message
+      }
+    end)
+    |> Enum.sort_by(
+      fn %{match: match, last_message: last_message} ->
+        # Sort by last message time, or match time if no messages
+        (last_message && last_message.inserted_at) || match.matched_at
+      end,
+      {:desc, DateTime}
+    )
+  end
 end
