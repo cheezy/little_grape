@@ -38,4 +38,41 @@ defmodule LittleGrape.Notifications do
 
     :ok
   end
+
+  @doc """
+  Notifies the recipient of a new message.
+
+  Broadcasts a {:new_message, message} to the recipient's notification topic.
+  Does not notify if the recipient is the sender (to avoid self-notifications).
+
+  ## Parameters
+
+    * `recipient_id` - The ID of the user to notify
+    * `message` - The message struct containing sender_id
+
+  ## Returns
+
+    * `:ok` - Notification sent (or skipped if recipient is sender)
+
+  ## Examples
+
+      iex> notify_message(recipient_id, message)
+      :ok
+
+  """
+  def notify_message(recipient_id, %{sender_id: sender_id} = _message)
+      when recipient_id == sender_id do
+    # Don't notify user of their own message
+    :ok
+  end
+
+  def notify_message(recipient_id, message) do
+    Phoenix.PubSub.broadcast(
+      LittleGrape.PubSub,
+      "user:#{recipient_id}",
+      {:new_message, message}
+    )
+
+    :ok
+  end
 end
