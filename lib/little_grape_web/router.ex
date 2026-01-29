@@ -72,6 +72,8 @@ defmodule LittleGrapeWeb.Router do
     get "/users/profile", UserProfileController, :edit
     put "/users/profile", UserProfileController, :update
     delete "/users/profile/picture", UserProfileController, :delete_picture
+
+    live "/discover", DiscoverLive
   end
 
   scope "/", LittleGrapeWeb do

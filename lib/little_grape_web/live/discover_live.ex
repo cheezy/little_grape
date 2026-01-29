@@ -1,0 +1,126 @@
+defmodule LittleGrapeWeb.DiscoverLive do
+  use LittleGrapeWeb, :live_view
+
+  alias LittleGrape.Accounts
+  alias LittleGrape.Discovery
+  alias LittleGrape.Repo
+
+  @impl true
+  def mount(_params, session, socket) do
+    socket = assign_current_user(socket, session)
+
+    case socket.assigns[:current_user] do
+      nil ->
+        {:ok, redirect(socket, to: ~p"/users/log-in")}
+
+      user ->
+        user = Repo.preload(user, :profile)
+
+        if profile_complete?(user.profile) do
+          candidates = Discovery.get_candidates(user)
+          current_candidate = List.first(candidates)
+
+          {:ok,
+           socket
+           |> assign(:user, user)
+           |> assign(:candidates, candidates)
+           |> assign(:current_candidate, current_candidate)}
+        else
+          {:ok,
+           socket
+           |> put_flash(:error, "Please complete your profile before discovering matches.")
+           |> redirect(to: ~p"/users/profile")}
+        end
+    end
+  end
+
+  defp assign_current_user(socket, session) do
+    case session["user_token"] do
+      nil ->
+        assign(socket, :current_user, nil)
+
+      token ->
+        case Accounts.get_user_by_session_token(token) do
+          {user, _token_inserted_at} -> assign(socket, :current_user, user)
+          nil -> assign(socket, :current_user, nil)
+        end
+    end
+  end
+
+  defp profile_complete?(nil), do: false
+
+  defp profile_complete?(profile) do
+    profile.profile_picture != nil and
+      profile.first_name != nil and
+      profile.birthdate != nil and
+      profile.gender != nil
+  end
+
+  defp calculate_age(nil), do: nil
+
+  defp calculate_age(birthdate) do
+    today = Date.utc_today()
+    years = today.year - birthdate.year
+
+    birthday_this_year = Date.new!(today.year, birthdate.month, birthdate.day)
+
+    case Date.compare(birthday_this_year, today) do
+      :gt -> years - 1
+      _ -> years
+    end
+  end
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <div class="max-w-lg mx-auto px-4 py-8">
+      <h1 class="text-2xl font-bold text-center mb-8">Discover</h1>
+
+      <%= if @current_candidate do %>
+        <.profile_card profile={@current_candidate} />
+      <% else %>
+        <div class="text-center py-12">
+          <p class="text-gray-500 text-lg">No more profiles to show.</p>
+          <p class="text-gray-400 mt-2">Check back later for new matches!</p>
+        </div>
+      <% end %>
+    </div>
+    """
+  end
+
+  defp profile_card(assigns) do
+    assigns = assign(assigns, :age, calculate_age(assigns.profile.birthdate))
+
+    ~H"""
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+      <div class="aspect-[3/4] relative">
+        <%= if @profile.profile_picture do %>
+          <img
+            src={@profile.profile_picture}
+            alt={"#{@profile.first_name}'s photo"}
+            class="w-full h-full object-cover"
+          />
+        <% else %>
+          <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+            <span class="text-gray-400 text-6xl">👤</span>
+          </div>
+        <% end %>
+
+        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+          <h2 class="text-white text-2xl font-bold">
+            {@profile.first_name}
+            <%= if @age do %>
+              , {@age}
+            <% end %>
+          </h2>
+          <%= if @profile.city || @profile.country do %>
+            <p class="text-white/80 text-lg">
+              {[@profile.city, @profile.country] |> Enum.filter(& &1) |> Enum.join(", ")}
+            </p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    """
+  end
+end
