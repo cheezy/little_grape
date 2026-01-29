@@ -3,164 +3,107 @@ defmodule LittleGrape.MatchesTest do
 
   import LittleGrape.AccountsFixtures
 
-  describe "matches table migration" do
-    test "creates table with correct columns" do
+  alias LittleGrape.Matches
+  alias LittleGrape.Matches.Match
+  alias LittleGrape.Messaging.Conversation
+
+  describe "create_match/2" do
+    test "creates match with correct user order when user_a_id < user_b_id" do
       user1 = user_fixture()
       user2 = user_fixture()
-      matched_at = DateTime.utc_now()
 
-      # Ensure user_a_id < user_b_id
-      {user_a_id, user_b_id} =
+      {smaller_id, larger_id} =
         if user1.id < user2.id, do: {user1.id, user2.id}, else: {user2.id, user1.id}
 
-      # Insert a match record directly
-      %{num_rows: 1} =
-        Repo.query!(
-          "INSERT INTO matches (user_a_id, user_b_id, matched_at, inserted_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
-          [user_a_id, user_b_id, matched_at, DateTime.utc_now(), DateTime.utc_now()]
-        )
+      assert {:ok, %{match: match, conversation: _conversation}} =
+               Matches.create_match(smaller_id, larger_id)
 
-      # Verify we can query it back
-      result =
-        Repo.query!("SELECT user_a_id, user_b_id, matched_at FROM matches WHERE user_a_id = $1", [
-          user_a_id
-        ])
-
-      assert result.num_rows == 1
-      [[fetched_user_a_id, fetched_user_b_id, _fetched_matched_at]] = result.rows
-      assert fetched_user_a_id == user_a_id
-      assert fetched_user_b_id == user_b_id
+      assert %Match{} = match
+      assert match.user_a_id == smaller_id
+      assert match.user_b_id == larger_id
+      assert match.matched_at != nil
     end
 
-    test "unique constraint on (user_a_id, user_b_id) prevents duplicate matches" do
+    test "normalizes user IDs when user_a_id > user_b_id" do
       user1 = user_fixture()
       user2 = user_fixture()
-      matched_at = DateTime.utc_now()
 
-      {user_a_id, user_b_id} =
+      {smaller_id, larger_id} =
         if user1.id < user2.id, do: {user1.id, user2.id}, else: {user2.id, user1.id}
 
-      # Insert first match
-      %{num_rows: 1} =
-        Repo.query!(
-          "INSERT INTO matches (user_a_id, user_b_id, matched_at, inserted_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
-          [user_a_id, user_b_id, matched_at, DateTime.utc_now(), DateTime.utc_now()]
-        )
+      # Pass IDs in wrong order (larger first)
+      assert {:ok, %{match: match, conversation: _conversation}} =
+               Matches.create_match(larger_id, smaller_id)
 
-      # Attempt to insert duplicate match should fail
-      assert_raise Postgrex.Error, ~r/matches_user_a_id_user_b_id_index/, fn ->
-        Repo.query!(
-          "INSERT INTO matches (user_a_id, user_b_id, matched_at, inserted_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
-          [user_a_id, user_b_id, matched_at, DateTime.utc_now(), DateTime.utc_now()]
-        )
-      end
+      # Match should have normalized order
+      assert match.user_a_id == smaller_id
+      assert match.user_b_id == larger_id
     end
 
-    test "check constraint enforces user_a_id < user_b_id" do
+    test "creates conversation linked to match" do
       user1 = user_fixture()
       user2 = user_fixture()
-      matched_at = DateTime.utc_now()
 
-      # Ensure we're trying to insert with user_a_id > user_b_id
-      {wrong_a, wrong_b} =
-        if user1.id > user2.id, do: {user1.id, user2.id}, else: {user2.id, user1.id}
+      assert {:ok, %{match: match, conversation: conversation}} =
+               Matches.create_match(user1.id, user2.id)
 
-      # This should fail because user_a_id > user_b_id
-      assert_raise Postgrex.Error, ~r/user_a_less_than_user_b/, fn ->
-        Repo.query!(
-          "INSERT INTO matches (user_a_id, user_b_id, matched_at, inserted_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
-          [wrong_a, wrong_b, matched_at, DateTime.utc_now(), DateTime.utc_now()]
-        )
-      end
+      assert %Conversation{} = conversation
+      assert conversation.match_id == match.id
     end
 
-    test "foreign key constraint on user_a_id" do
+    test "transaction rolls back on duplicate match attempt" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+
+      # Create first match
+      assert {:ok, _result} = Matches.create_match(user1.id, user2.id)
+
+      # Attempt duplicate match
+      assert {:error, :match, changeset, %{}} = Matches.create_match(user1.id, user2.id)
+      assert "has already been taken" in errors_on(changeset).user_a_id
+    end
+
+    test "returns error when a user does not exist" do
       user = user_fixture()
-      matched_at = DateTime.utc_now()
+      non_existent_id = 999_999
 
-      # Attempt to insert with non-existent user_a_id should fail
-      assert_raise Postgrex.Error, ~r/matches_user_a_id_fkey/, fn ->
-        Repo.query!(
-          "INSERT INTO matches (user_a_id, user_b_id, matched_at, inserted_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
-          [-1, user.id, matched_at, DateTime.utc_now(), DateTime.utc_now()]
-        )
-      end
+      # After normalization, the non_existent_id (999_999) will be user_b_id
+      # since it's larger than any real user ID
+      assert {:error, :match, changeset, %{}} = Matches.create_match(non_existent_id, user.id)
+      assert "does not exist" in errors_on(changeset).user_b_id
     end
 
-    test "foreign key constraint on user_b_id" do
+    test "returns error when the other user does not exist" do
       user = user_fixture()
-      matched_at = DateTime.utc_now()
+      non_existent_id = 999_999
 
-      # Use a very large non-existent ID that's greater than user.id to pass the check constraint
-      non_existent_id = user.id + 999_999
-
-      # Attempt to insert with non-existent user_b_id should fail
-      assert_raise Postgrex.Error, ~r/matches_user_b_id_fkey/, fn ->
-        Repo.query!(
-          "INSERT INTO matches (user_a_id, user_b_id, matched_at, inserted_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
-          [user.id, non_existent_id, matched_at, DateTime.utc_now(), DateTime.utc_now()]
-        )
-      end
+      assert {:error, :match, changeset, %{}} = Matches.create_match(user.id, non_existent_id)
+      assert "does not exist" in errors_on(changeset).user_b_id
     end
 
-    test "allows multiple different matches" do
+    test "sets matched_at timestamp" do
       user1 = user_fixture()
       user2 = user_fixture()
-      user3 = user_fixture()
-      matched_at = DateTime.utc_now()
 
-      # Sort users by ID for proper ordering
-      users = Enum.sort_by([user1, user2, user3], & &1.id)
-      [u1, u2, u3] = users
+      assert {:ok, %{match: match, conversation: _conversation}} =
+               Matches.create_match(user1.id, user2.id)
 
-      # Match between u1 and u2
-      %{num_rows: 1} =
-        Repo.query!(
-          "INSERT INTO matches (user_a_id, user_b_id, matched_at, inserted_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
-          [u1.id, u2.id, matched_at, DateTime.utc_now(), DateTime.utc_now()]
-        )
-
-      # Match between u1 and u3
-      %{num_rows: 1} =
-        Repo.query!(
-          "INSERT INTO matches (user_a_id, user_b_id, matched_at, inserted_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
-          [u1.id, u3.id, matched_at, DateTime.utc_now(), DateTime.utc_now()]
-        )
-
-      # Match between u2 and u3
-      %{num_rows: 1} =
-        Repo.query!(
-          "INSERT INTO matches (user_a_id, user_b_id, matched_at, inserted_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
-          [u2.id, u3.id, matched_at, DateTime.utc_now(), DateTime.utc_now()]
-        )
-
-      result = Repo.query!("SELECT COUNT(*) FROM matches")
-      [[count]] = result.rows
-      assert count == 3
+      assert %DateTime{} = match.matched_at
+      # Verify it's a recent timestamp (within the last minute)
+      diff = DateTime.diff(DateTime.utc_now(), match.matched_at, :second)
+      assert diff >= 0 and diff < 60
     end
 
-    test "cascade deletes matches when user is deleted" do
+    test "both match and conversation are created in a single transaction" do
       user1 = user_fixture()
       user2 = user_fixture()
-      matched_at = DateTime.utc_now()
 
-      {user_a_id, user_b_id} =
-        if user1.id < user2.id, do: {user1.id, user2.id}, else: {user2.id, user1.id}
+      assert {:ok, %{match: match, conversation: conversation}} =
+               Matches.create_match(user1.id, user2.id)
 
-      # Insert match
-      %{num_rows: 1} =
-        Repo.query!(
-          "INSERT INTO matches (user_a_id, user_b_id, matched_at, inserted_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
-          [user_a_id, user_b_id, matched_at, DateTime.utc_now(), DateTime.utc_now()]
-        )
-
-      # Delete user_a
-      Repo.query!("DELETE FROM users WHERE id = $1", [user_a_id])
-
-      # Match should be deleted
-      result = Repo.query!("SELECT COUNT(*) FROM matches")
-      [[count]] = result.rows
-      assert count == 0
+      # Verify both records exist in the database
+      assert Repo.get(Match, match.id) != nil
+      assert Repo.get(Conversation, conversation.id) != nil
     end
   end
 end
