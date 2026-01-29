@@ -75,6 +75,7 @@ defmodule LittleGrapeWeb.Router do
 
     live "/discover", DiscoverLive
     live "/matches", MatchesLive
+    live "/chat/:match_id", ChatLive
   end
 
   scope "/", LittleGrapeWeb do
