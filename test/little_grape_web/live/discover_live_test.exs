@@ -5,7 +5,9 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
   import LittleGrape.AccountsFixtures
 
   alias LittleGrape.Accounts.Profile
+  alias LittleGrape.Matches
   alias LittleGrape.Repo
+  alias LittleGrape.Swipes
 
   # Helper to set profile_picture (required for complete profile)
   defp set_profile_picture(profile) do
@@ -101,6 +103,195 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       result = get(conn, ~p"/discover")
 
       assert redirected_to(result) == ~p"/users/log-in"
+    end
+
+    test "clicking like records swipe and advances to next card", %{conn: conn, user: user} do
+      # Create complete profile for current user
+      profile_fixture(user, %{gender: "male", preferred_gender: "female"})
+      |> set_profile_picture()
+
+      # Create two candidates with unique names
+      candidate1 = user_fixture()
+
+      profile_fixture(candidate1, %{
+        first_name: "FirstCandidate",
+        gender: "female",
+        preferred_gender: "male"
+      })
+      |> set_profile_picture()
+
+      candidate2 = user_fixture()
+
+      profile_fixture(candidate2, %{
+        first_name: "SecondCandidate",
+        gender: "female",
+        preferred_gender: "male"
+      })
+      |> set_profile_picture()
+
+      {:ok, view, html} = live(conn, ~p"/discover")
+
+      # Find which candidate is shown first
+      {first_candidate, second_candidate} =
+        if html =~ "FirstCandidate" do
+          {candidate1, candidate2}
+        else
+          {candidate2, candidate1}
+        end
+
+      first_name = if first_candidate == candidate1, do: "FirstCandidate", else: "SecondCandidate"
+
+      second_name =
+        if second_candidate == candidate1, do: "FirstCandidate", else: "SecondCandidate"
+
+      assert html =~ first_name
+
+      # Click like
+      html = view |> element("button[phx-value-action=like]") |> render_click()
+
+      # Should have recorded the swipe
+      assert Swipes.has_swiped?(user.id, first_candidate.id)
+
+      # Should advance to next candidate
+      assert html =~ second_name
+      refute html =~ first_name
+    end
+
+    test "clicking pass records swipe and advances to next card", %{conn: conn, user: user} do
+      # Create complete profile for current user
+      profile_fixture(user, %{gender: "male", preferred_gender: "female"})
+      |> set_profile_picture()
+
+      # Create two candidates with unique names
+      candidate1 = user_fixture()
+
+      profile_fixture(candidate1, %{
+        first_name: "PassFirst",
+        gender: "female",
+        preferred_gender: "male"
+      })
+      |> set_profile_picture()
+
+      candidate2 = user_fixture()
+
+      profile_fixture(candidate2, %{
+        first_name: "PassSecond",
+        gender: "female",
+        preferred_gender: "male"
+      })
+      |> set_profile_picture()
+
+      {:ok, view, html} = live(conn, ~p"/discover")
+
+      # Find which candidate is shown first
+      {first_candidate, _second_candidate} =
+        if html =~ "PassFirst" do
+          {candidate1, candidate2}
+        else
+          {candidate2, candidate1}
+        end
+
+      first_name = if first_candidate == candidate1, do: "PassFirst", else: "PassSecond"
+      second_name = if first_candidate == candidate1, do: "PassSecond", else: "PassFirst"
+
+      assert html =~ first_name
+
+      # Click pass
+      html = view |> element("button[phx-value-action=pass]") |> render_click()
+
+      # Should have recorded the swipe as pass
+      swipe = Swipes.get_swipe(user.id, first_candidate.id)
+      assert swipe.action == "pass"
+
+      # Should advance to next candidate
+      assert html =~ second_name
+      refute html =~ first_name
+    end
+
+    test "mutual like creates match and shows modal", %{conn: conn, user: user} do
+      # Create complete profile for current user
+      profile_fixture(user, %{gender: "male", preferred_gender: "female"})
+      |> set_profile_picture()
+
+      # Create a candidate who already liked the current user
+      candidate = user_fixture()
+
+      profile_fixture(candidate, %{
+        first_name: "MatchCandidate",
+        gender: "female",
+        preferred_gender: "male"
+      })
+      |> set_profile_picture()
+
+      # Candidate already liked the user
+      {:ok, _swipe} = Swipes.create_swipe(candidate, user.id, "like")
+
+      {:ok, view, _html} = live(conn, ~p"/discover")
+
+      # Click like - should create a match
+      html = view |> element("button[phx-value-action=like]") |> render_click()
+
+      # Should show match modal (check for text without apostrophe due to HTML escaping)
+      assert html =~ "a Match"
+      assert html =~ "MatchCandidate"
+      assert html =~ "liked each other"
+
+      # Should have created a match
+      matches = Matches.list_matches(user)
+      assert length(matches) == 1
+    end
+
+    test "shows no profiles message when last candidate is swiped", %{conn: conn, user: user} do
+      # Create complete profile for current user
+      profile_fixture(user, %{gender: "male", preferred_gender: "female"})
+      |> set_profile_picture()
+
+      # Create only one candidate
+      candidate = user_fixture()
+
+      profile_fixture(candidate, %{
+        first_name: "Jane",
+        gender: "female",
+        preferred_gender: "male"
+      })
+      |> set_profile_picture()
+
+      {:ok, view, _html} = live(conn, ~p"/discover")
+
+      # Click pass on the only candidate
+      html = view |> element("button[phx-value-action=pass]") |> render_click()
+
+      # Should show no profiles message
+      assert html =~ "No more profiles to show"
+    end
+
+    test "close match modal button works", %{conn: conn, user: user} do
+      # Create complete profile for current user
+      profile_fixture(user, %{gender: "male", preferred_gender: "female"})
+      |> set_profile_picture()
+
+      # Create a candidate who already liked the current user
+      candidate = user_fixture()
+
+      profile_fixture(candidate, %{
+        first_name: "CloseModalCandidate",
+        gender: "female",
+        preferred_gender: "male"
+      })
+      |> set_profile_picture()
+
+      # Candidate already liked the user
+      {:ok, _swipe} = Swipes.create_swipe(candidate, user.id, "like")
+
+      {:ok, view, _html} = live(conn, ~p"/discover")
+
+      # Click like to trigger match
+      html = view |> element("button[phx-value-action=like]") |> render_click()
+      assert html =~ "a Match"
+
+      # Close the modal
+      html = view |> element("button", "Keep Swiping") |> render_click()
+      refute html =~ "a Match"
     end
   end
 end

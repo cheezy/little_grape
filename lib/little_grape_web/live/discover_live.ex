@@ -3,7 +3,9 @@ defmodule LittleGrapeWeb.DiscoverLive do
 
   alias LittleGrape.Accounts
   alias LittleGrape.Discovery
+  alias LittleGrape.Matches
   alias LittleGrape.Repo
+  alias LittleGrape.Swipes
 
   @impl true
   def mount(_params, session, socket) do
@@ -24,7 +26,10 @@ defmodule LittleGrapeWeb.DiscoverLive do
            socket
            |> assign(:user, user)
            |> assign(:candidates, candidates)
-           |> assign(:current_candidate, current_candidate)}
+           |> assign(:current_candidate, current_candidate)
+           |> assign(:swiping, false)
+           |> assign(:show_match_modal, false)
+           |> assign(:matched_profile, nil)}
         else
           {:ok,
            socket
@@ -32,6 +37,56 @@ defmodule LittleGrapeWeb.DiscoverLive do
            |> redirect(to: ~p"/users/profile")}
         end
     end
+  end
+
+  @impl true
+  def handle_event("swipe", %{"action" => action}, socket) do
+    if socket.assigns.swiping or is_nil(socket.assigns.current_candidate) do
+      {:noreply, socket}
+    else
+      socket = assign(socket, :swiping, true)
+      user = socket.assigns.user
+      candidate = socket.assigns.current_candidate
+
+      case Swipes.create_swipe(user, candidate.user_id, action) do
+        {:ok, _swipe} ->
+          socket = handle_swipe_success(socket, action, user.id, candidate)
+          {:noreply, socket}
+
+        {:error, _changeset} ->
+          # Swipe already exists or other error - just advance
+          socket = advance_to_next_candidate(socket)
+          {:noreply, socket}
+      end
+    end
+  end
+
+  @impl true
+  def handle_event("close_match_modal", _params, socket) do
+    {:noreply, assign(socket, :show_match_modal, false)}
+  end
+
+  defp handle_swipe_success(socket, action, user_id, candidate) do
+    if action == "like" and Swipes.check_for_match(user_id, candidate.user_id) do
+      # It's a match! Create the match record
+      Matches.create_match(user_id, candidate.user_id)
+
+      socket
+      |> assign(:matched_profile, candidate)
+      |> assign(:show_match_modal, true)
+      |> advance_to_next_candidate()
+    else
+      advance_to_next_candidate(socket)
+    end
+  end
+
+  defp advance_to_next_candidate(socket) do
+    remaining = Enum.drop(socket.assigns.candidates, 1)
+
+    socket
+    |> assign(:candidates, remaining)
+    |> assign(:current_candidate, List.first(remaining))
+    |> assign(:swiping, false)
   end
 
   defp assign_current_user(socket, session) do
@@ -77,12 +132,16 @@ defmodule LittleGrapeWeb.DiscoverLive do
       <h1 class="text-2xl font-bold text-center mb-8">Discover</h1>
 
       <%= if @current_candidate do %>
-        <.profile_card profile={@current_candidate} />
+        <.profile_card profile={@current_candidate} swiping={@swiping} />
       <% else %>
         <div class="text-center py-12">
           <p class="text-gray-500 text-lg">No more profiles to show.</p>
           <p class="text-gray-400 mt-2">Check back later for new matches!</p>
         </div>
+      <% end %>
+
+      <%= if @show_match_modal do %>
+        <.match_modal profile={@matched_profile} />
       <% end %>
     </div>
     """
@@ -119,6 +178,44 @@ defmodule LittleGrapeWeb.DiscoverLive do
             </p>
           <% end %>
         </div>
+      </div>
+
+      <div class="flex justify-center gap-8 py-6">
+        <button
+          phx-click="swipe"
+          phx-value-action="pass"
+          disabled={@swiping}
+          class="w-16 h-16 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-3xl shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          ✕
+        </button>
+        <button
+          phx-click="swipe"
+          phx-value-action="like"
+          disabled={@swiping}
+          class="w-16 h-16 rounded-full bg-pink-500 hover:bg-pink-600 flex items-center justify-center text-3xl text-white shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          ♥
+        </button>
+      </div>
+    </div>
+    """
+  end
+
+  defp match_modal(assigns) do
+    ~H"""
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-2xl p-8 max-w-sm mx-4 text-center shadow-2xl">
+        <h2 class="text-3xl font-bold text-pink-500 mb-4">It's a Match!</h2>
+        <p class="text-gray-600 mb-6">
+          You and {@profile.first_name} liked each other!
+        </p>
+        <button
+          phx-click="close_match_modal"
+          class="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-6 rounded-full transition-colors"
+        >
+          Keep Swiping
+        </button>
       </div>
     </div>
     """
