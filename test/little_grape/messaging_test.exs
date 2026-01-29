@@ -319,4 +319,112 @@ defmodule LittleGrape.MessagingTest do
       assert length(messages) == 50
     end
   end
+
+  describe "send_message/3" do
+    test "creates message successfully for authorized user" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      assert {:ok, message} = Messaging.send_message(user1, conversation.id, "Hello!")
+      assert message.content == "Hello!"
+      assert message.sender_id == user1.id
+      assert message.conversation_id == conversation.id
+    end
+
+    test "both match participants can send messages" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      assert {:ok, msg1} = Messaging.send_message(user1, conversation.id, "From user1")
+      assert {:ok, msg2} = Messaging.send_message(user2, conversation.id, "From user2")
+
+      assert msg1.sender_id == user1.id
+      assert msg2.sender_id == user2.id
+    end
+
+    test "returns error for non-participant" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      non_participant = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      assert {:error, :not_authorized} =
+               Messaging.send_message(non_participant, conversation.id, "Hello!")
+    end
+
+    test "returns error for non-existent conversation" do
+      user = user_fixture()
+
+      assert {:error, :not_authorized} = Messaging.send_message(user, 999_999, "Hello!")
+    end
+
+    test "validates content is not empty" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      assert {:error, changeset} = Messaging.send_message(user1, conversation.id, "")
+      assert "can't be blank" in errors_on(changeset).content
+    end
+
+    test "validates content does not exceed 2000 chars" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      long_content = String.duplicate("a", 2001)
+
+      assert {:error, changeset} = Messaging.send_message(user1, conversation.id, long_content)
+      assert "should be at most 2000 character(s)" in errors_on(changeset).content
+    end
+
+    test "broadcasts to conversation topic" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      # Subscribe to the conversation topic
+      Phoenix.PubSub.subscribe(LittleGrape.PubSub, "conversation:#{conversation.id}")
+
+      {:ok, message} = Messaging.send_message(user1, conversation.id, "Broadcast test")
+
+      # Should receive the broadcast
+      assert_receive {:new_message, received_message}
+      assert received_message.id == message.id
+    end
+
+    test "broadcasts to user topics" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      # Subscribe to user topics
+      Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user1.id}")
+      Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user2.id}")
+
+      {:ok, message} = Messaging.send_message(user1, conversation.id, "User broadcast test")
+
+      # Should receive broadcasts on both user topics
+      assert_receive {:new_message, msg1}
+      assert_receive {:new_message, msg2}
+      assert msg1.id == message.id
+      assert msg2.id == message.id
+    end
+
+    test "does not broadcast on validation error" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      # Subscribe to the conversation topic
+      Phoenix.PubSub.subscribe(LittleGrape.PubSub, "conversation:#{conversation.id}")
+
+      {:error, _changeset} = Messaging.send_message(user1, conversation.id, "")
+
+      # Should NOT receive any broadcast
+      refute_receive {:new_message, _}
+    end
+  end
 end

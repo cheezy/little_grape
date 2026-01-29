@@ -222,4 +222,83 @@ defmodule LittleGrape.Messaging do
     )
     |> Repo.all()
   end
+
+  @doc """
+  Sends a message in a conversation with authorization check.
+
+  Verifies that the user is a participant in the conversation (via match relationship)
+  before creating the message. Broadcasts to both user topics and conversation topic.
+
+  ## Parameters
+
+    * `user` - The user struct sending the message
+    * `conversation_id` - The ID of the conversation
+    * `content` - The message content (1-2000 characters)
+
+  ## Returns
+
+    * `{:ok, %Message{}}` - Successfully sent message
+    * `{:error, :not_authorized}` - User is not a participant in the conversation
+    * `{:error, %Ecto.Changeset{}}` - Validation error
+
+  ## Examples
+
+      iex> send_message(user, conversation_id, "Hello!")
+      {:ok, %Message{}}
+
+      iex> send_message(non_participant, conversation_id, "Hello!")
+      {:error, :not_authorized}
+
+  """
+  def send_message(%User{id: user_id} = _user, conversation_id, content) do
+    case authorize_conversation_access(user_id, conversation_id) do
+      {:ok, _conversation} ->
+        result =
+          %Message{}
+          |> Message.changeset(%{
+            conversation_id: conversation_id,
+            sender_id: user_id,
+            content: content
+          })
+          |> Repo.insert()
+
+        case result do
+          {:ok, message} = success ->
+            broadcast_to_conversation(conversation_id, message)
+            broadcast_new_message(conversation_id, message)
+            success
+
+          error ->
+            error
+        end
+
+      {:error, :not_found} ->
+        {:error, :not_authorized}
+    end
+  end
+
+  defp authorize_conversation_access(user_id, conversation_id) do
+    conversation =
+      from(c in Conversation,
+        join: m in Match,
+        on: c.match_id == m.id,
+        where: c.id == ^conversation_id,
+        where: m.user_a_id == ^user_id or m.user_b_id == ^user_id,
+        select: c
+      )
+      |> Repo.one()
+
+    case conversation do
+      nil -> {:error, :not_found}
+      conv -> {:ok, conv}
+    end
+  end
+
+  defp broadcast_to_conversation(conversation_id, message) do
+    Phoenix.PubSub.broadcast(
+      LittleGrape.PubSub,
+      "conversation:#{conversation_id}",
+      {:new_message, message}
+    )
+  end
 end
