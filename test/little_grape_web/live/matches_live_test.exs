@@ -262,5 +262,130 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       assert html =~ "Unknown"
       assert html =~ "👤"
     end
+
+    test "shows NEW MATCH label for matches with no messages", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      # Create another user with profile
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "NewPerson"}) |> set_profile_picture()
+
+      # Create a match (no messages)
+      {:ok, _result} = Matches.create_match(user.id, other_user.id)
+
+      {:ok, _view, html} = live(conn, ~p"/matches")
+
+      # Should show NEW MATCH label
+      assert html =~ "NEW MATCH"
+    end
+
+    test "does not show NEW MATCH label for matches with messages", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      # Create another user with profile
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "ChattedPerson"}) |> set_profile_picture()
+
+      # Create a match and send a message
+      {:ok, %{conversation: conversation}} = Matches.create_match(user.id, other_user.id)
+      {:ok, _message} = Messaging.create_message(conversation.id, other_user.id, "Hey there!")
+
+      {:ok, _view, html} = live(conn, ~p"/matches")
+
+      # Should NOT show NEW MATCH label
+      refute html =~ "NEW MATCH"
+      assert html =~ "ChattedPerson"
+    end
+
+    test "shows unread count badge for unread messages", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      # Create another user with profile
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "UnreadSender"}) |> set_profile_picture()
+
+      # Create a match and send unread messages from other user
+      {:ok, %{conversation: conversation}} = Matches.create_match(user.id, other_user.id)
+      {:ok, _msg1} = Messaging.create_message(conversation.id, other_user.id, "Message 1")
+      {:ok, _msg2} = Messaging.create_message(conversation.id, other_user.id, "Message 2")
+      {:ok, _msg3} = Messaging.create_message(conversation.id, other_user.id, "Message 3")
+
+      {:ok, _view, html} = live(conn, ~p"/matches")
+
+      # Should show unread count badge
+      assert html =~ "UnreadSender"
+      # The badge should contain the number 3 (with possible whitespace)
+      assert html =~ ~r/>\s*3\s*</
+    end
+
+    test "does not show unread count for messages sent by current user", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      # Create another user with profile
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "SentTo"}) |> set_profile_picture()
+
+      # Create a match and send messages from current user
+      {:ok, %{conversation: conversation}} = Matches.create_match(user.id, other_user.id)
+      {:ok, _msg1} = Messaging.create_message(conversation.id, user.id, "My message 1")
+      {:ok, _msg2} = Messaging.create_message(conversation.id, user.id, "My message 2")
+
+      {:ok, _view, html} = live(conn, ~p"/matches")
+
+      # Should NOT show unread count badge (messages from self don't count)
+      assert html =~ "SentTo"
+      # Should not have a badge with count
+      refute html =~ ~r/>2</
+    end
+
+    test "new matches appear before matches with messages", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      # Create first match with messages (older)
+      other_user1 = user_fixture()
+      profile_fixture(other_user1, %{first_name: "OldMatch"}) |> set_profile_picture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user.id, other_user1.id)
+      {:ok, _msg} = Messaging.create_message(conversation.id, other_user1.id, "Old message")
+
+      # Create second match with no messages (newer, but should appear first)
+      other_user2 = user_fixture()
+      profile_fixture(other_user2, %{first_name: "NewMatch"}) |> set_profile_picture()
+      {:ok, _result} = Matches.create_match(user.id, other_user2.id)
+
+      {:ok, _view, html} = live(conn, ~p"/matches")
+
+      # NewMatch (no messages) should appear before OldMatch (has messages)
+      new_match_pos = :binary.match(html, "NewMatch")
+      old_match_pos = :binary.match(html, "OldMatch")
+
+      assert new_match_pos != :nomatch
+      assert old_match_pos != :nomatch
+
+      {new_pos, _} = new_match_pos
+      {old_pos, _} = old_match_pos
+
+      assert new_pos < old_pos, "New match should appear before match with messages"
+    end
+
+    test "new matches have highlighted styling", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      # Create a new match (no messages)
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "HighlightedMatch"}) |> set_profile_picture()
+      {:ok, _result} = Matches.create_match(user.id, other_user.id)
+
+      {:ok, _view, html} = live(conn, ~p"/matches")
+
+      # Should have highlighted styling (pink background)
+      assert html =~ "bg-pink-50"
+      assert html =~ "border-pink-200"
+    end
   end
 end

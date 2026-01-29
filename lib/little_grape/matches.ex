@@ -165,8 +165,8 @@ defmodule LittleGrape.Matches do
   @doc """
   Lists all matches for a user with details needed for display.
 
-  Returns matches with preloaded user profiles and last message preview.
-  Results are ordered by most recent activity (last message or match date).
+  Returns matches with preloaded user profiles, last message preview, and unread counts.
+  Results are ordered with new matches (no messages) first, then by most recent message.
 
   ## Parameters
 
@@ -174,7 +174,8 @@ defmodule LittleGrape.Matches do
 
   ## Returns
 
-    * List of maps with `:match`, `:other_user`, `:other_profile`, and `:last_message` keys
+    * List of maps with `:match`, `:other_user`, `:other_profile`, `:last_message`,
+      `:unread_count`, and `:is_new_match` keys
 
   ## Examples
 
@@ -184,57 +185,99 @@ defmodule LittleGrape.Matches do
           match: %Match{},
           other_user: %User{},
           other_profile: %Profile{},
-          last_message: %Message{} | nil
+          last_message: %Message{} | nil,
+          unread_count: 3,
+          is_new_match: false
         }
       ]
 
   """
   def list_matches_with_details(%User{id: user_id}) do
-    # Query matches with preloads
-    matches =
-      from(m in Match,
-        where: m.user_a_id == ^user_id or m.user_b_id == ^user_id,
-        preload: [
-          :user_a,
-          :user_b,
-          conversation: ^from(c in Conversation, preload: [:messages])
-        ],
-        order_by: [desc: m.matched_at]
-      )
-      |> Repo.all()
+    matches = fetch_matches_with_preloads(user_id)
+    unread_counts = fetch_unread_counts(matches, user_id)
 
-    # Transform matches into display-friendly format
     matches
-    |> Enum.map(fn match ->
-      other_user =
-        if match.user_a_id == user_id do
-          match.user_b
-        else
-          match.user_a
-        end
+    |> Enum.map(&build_match_details(&1, user_id, unread_counts))
+    |> sort_matches_by_priority()
+  end
 
-      other_profile = Repo.preload(other_user, :profile).profile
-
-      last_message =
-        if match.conversation && match.conversation.messages do
-          match.conversation.messages
-          |> Enum.sort_by(& &1.inserted_at, {:desc, DateTime})
-          |> List.first()
-        end
-
-      %{
-        match: match,
-        other_user: other_user,
-        other_profile: other_profile,
-        last_message: last_message
-      }
-    end)
-    |> Enum.sort_by(
-      fn %{match: match, last_message: last_message} ->
-        # Sort by last message time, or match time if no messages
-        (last_message && last_message.inserted_at) || match.matched_at
-      end,
-      {:desc, DateTime}
+  defp fetch_matches_with_preloads(user_id) do
+    from(m in Match,
+      where: m.user_a_id == ^user_id or m.user_b_id == ^user_id,
+      preload: [
+        :user_a,
+        :user_b,
+        conversation: ^from(c in Conversation, preload: [:messages])
+      ],
+      order_by: [desc: m.matched_at]
     )
+    |> Repo.all()
+  end
+
+  defp fetch_unread_counts(matches, user_id) do
+    alias LittleGrape.Messaging
+
+    conversation_ids =
+      matches
+      |> Enum.map(& &1.conversation)
+      |> Enum.reject(&is_nil/1)
+      |> Enum.map(& &1.id)
+
+    Messaging.unread_counts_for_conversations(conversation_ids, user_id)
+  end
+
+  defp build_match_details(match, user_id, unread_counts) do
+    other_user = get_other_user(match, user_id)
+    other_profile = Repo.preload(other_user, :profile).profile
+    {last_message, is_new_match} = extract_message_info(match)
+    unread_count = get_unread_count(match, unread_counts)
+
+    %{
+      match: match,
+      other_user: other_user,
+      other_profile: other_profile,
+      last_message: last_message,
+      unread_count: unread_count,
+      is_new_match: is_new_match
+    }
+  end
+
+  defp get_other_user(match, user_id) do
+    if match.user_a_id == user_id, do: match.user_b, else: match.user_a
+  end
+
+  defp extract_message_info(%{conversation: nil}), do: {nil, true}
+  defp extract_message_info(%{conversation: %{messages: nil}}), do: {nil, true}
+  defp extract_message_info(%{conversation: %{messages: []}}), do: {nil, true}
+
+  defp extract_message_info(%{conversation: %{messages: messages}}) do
+    last_message =
+      messages
+      |> Enum.sort_by(& &1.inserted_at, {:desc, DateTime})
+      |> List.first()
+
+    {last_message, false}
+  end
+
+  defp get_unread_count(%{conversation: nil}, _unread_counts), do: 0
+  defp get_unread_count(%{conversation: conv}, unread_counts), do: Map.get(unread_counts, conv.id, 0)
+
+  defp sort_matches_by_priority(match_details) do
+    Enum.sort_by(
+      match_details,
+      fn %{is_new_match: is_new_match, match: match, last_message: last_message} ->
+        activity_time = (last_message && last_message.inserted_at) || match.matched_at
+        {not is_new_match, activity_time}
+      end,
+      &compare_match_priority/2
+    )
+  end
+
+  defp compare_match_priority({is_not_new, time}, {is_not_new2, time2}) do
+    if is_not_new == is_not_new2 do
+      DateTime.compare(time2, time) != :lt
+    else
+      not is_not_new
+    end
   end
 end

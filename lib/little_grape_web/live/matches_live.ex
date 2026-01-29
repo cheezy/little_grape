@@ -74,7 +74,10 @@ defmodule LittleGrapeWeb.MatchesLive do
     ~H"""
     <.link
       navigate={~p"/chat/#{@match_data.match.id}"}
-      class="flex items-center gap-4 p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow"
+      class={[
+        "flex items-center gap-4 p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow",
+        if(@match_data.is_new_match, do: "bg-pink-50 border-2 border-pink-200", else: "bg-white")
+      ]}
     >
       <div class="relative">
         <%= if @match_data.other_profile && @match_data.other_profile.profile_picture do %>
@@ -88,13 +91,28 @@ defmodule LittleGrapeWeb.MatchesLive do
             <span class="text-gray-400 text-2xl">👤</span>
           </div>
         <% end %>
+        <%= if @match_data.unread_count > 0 do %>
+          <span class="absolute -top-1 -right-1 bg-pink-500 text-white text-xs font-bold rounded-full h-5 min-w-5 px-1 flex items-center justify-center">
+            {@match_data.unread_count}
+          </span>
+        <% end %>
       </div>
 
       <div class="flex-1 min-w-0">
-        <h3 class="font-semibold text-gray-900 truncate">
-          {display_name(@match_data.other_profile)}
-        </h3>
-        <p class="text-gray-500 text-sm truncate">
+        <div class="flex items-center gap-2">
+          <h3 class="font-semibold text-gray-900 truncate">
+            {display_name(@match_data.other_profile)}
+          </h3>
+          <%= if @match_data.is_new_match do %>
+            <span class="text-xs font-semibold text-pink-500 bg-pink-100 px-2 py-0.5 rounded-full whitespace-nowrap">
+              NEW MATCH
+            </span>
+          <% end %>
+        </div>
+        <p class={[
+          "text-sm truncate",
+          if(@match_data.unread_count > 0, do: "text-gray-900 font-medium", else: "text-gray-500")
+        ]}>
           {message_preview(@match_data.last_message)}
         </p>
       </div>
