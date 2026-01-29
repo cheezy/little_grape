@@ -69,10 +69,11 @@ defmodule LittleGrapeWeb.DiscoverLive do
   defp handle_swipe_success(socket, action, user_id, candidate) do
     if action == "like" and Swipes.check_for_match(user_id, candidate.user_id) do
       # It's a match! Create the match record
-      Matches.create_match(user_id, candidate.user_id)
+      {:ok, %{match: match}} = Matches.create_match(user_id, candidate.user_id)
 
       socket
       |> assign(:matched_profile, candidate)
+      |> assign(:match_id, match.id)
       |> assign(:show_match_modal, true)
       |> advance_to_next_candidate()
     else
@@ -135,13 +136,20 @@ defmodule LittleGrapeWeb.DiscoverLive do
         <.profile_card profile={@current_candidate} swiping={@swiping} />
       <% else %>
         <div class="text-center py-12">
-          <p class="text-gray-500 text-lg">No more profiles to show.</p>
-          <p class="text-gray-400 mt-2">Check back later for new matches!</p>
+          <div class="text-6xl mb-4">🔍</div>
+          <p class="text-gray-500 text-lg font-medium">No more profiles right now</p>
+          <p class="text-gray-400 mt-2">Try broadening your preferences to see more people!</p>
+          <.link
+            navigate={~p"/users/profile"}
+            class="inline-block mt-6 bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-6 rounded-full transition-colors"
+          >
+            Update Preferences
+          </.link>
         </div>
       <% end %>
 
       <%= if @show_match_modal do %>
-        <.match_modal profile={@matched_profile} />
+        <.match_modal profile={@matched_profile} match_id={@match_id} />
       <% end %>
     </div>
     """
@@ -207,15 +215,39 @@ defmodule LittleGrapeWeb.DiscoverLive do
     <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div class="bg-white rounded-2xl p-8 max-w-sm mx-4 text-center shadow-2xl">
         <h2 class="text-3xl font-bold text-pink-500 mb-4">It's a Match!</h2>
+
+        <div class="mb-6">
+          <%= if @profile.profile_picture do %>
+            <img
+              src={@profile.profile_picture}
+              alt={"#{@profile.first_name}'s photo"}
+              class="w-32 h-32 rounded-full object-cover mx-auto border-4 border-pink-500"
+            />
+          <% else %>
+            <div class="w-32 h-32 rounded-full bg-gray-200 mx-auto flex items-center justify-center border-4 border-pink-500">
+              <span class="text-gray-400 text-4xl">👤</span>
+            </div>
+          <% end %>
+        </div>
+
         <p class="text-gray-600 mb-6">
           You and {@profile.first_name} liked each other!
         </p>
-        <button
-          phx-click="close_match_modal"
-          class="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-6 rounded-full transition-colors"
-        >
-          Keep Swiping
-        </button>
+
+        <div class="space-y-3">
+          <.link
+            navigate={~p"/matches/#{@match_id}/messages"}
+            class="block w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-6 rounded-full transition-colors text-center"
+          >
+            Send Message
+          </.link>
+          <button
+            phx-click="close_match_modal"
+            class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-full transition-colors"
+          >
+            Keep Swiping
+          </button>
+        </div>
       </div>
     </div>
     """

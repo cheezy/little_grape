@@ -44,8 +44,9 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
 
       {:ok, _view, html} = live(conn, ~p"/discover")
 
-      assert html =~ "No more profiles to show"
-      assert html =~ "Check back later for new matches"
+      assert html =~ "No more profiles right now"
+      assert html =~ "broadening your preferences"
+      assert html =~ "Update Preferences"
     end
 
     test "displays profile card when candidates exist", %{conn: conn, user: user} do
@@ -231,10 +232,14 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       # Click like - should create a match
       html = view |> element("button[phx-value-action=like]") |> render_click()
 
-      # Should show match modal (check for text without apostrophe due to HTML escaping)
+      # Should show match modal with photo, name, and buttons
       assert html =~ "a Match"
       assert html =~ "MatchCandidate"
       assert html =~ "liked each other"
+      assert html =~ "Send Message"
+      assert html =~ "Keep Swiping"
+      # Modal should include profile photo
+      assert html =~ "/uploads/test.jpg"
 
       # Should have created a match
       matches = Matches.list_matches(user)
@@ -261,8 +266,9 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       # Click pass on the only candidate
       html = view |> element("button[phx-value-action=pass]") |> render_click()
 
-      # Should show no profiles message
-      assert html =~ "No more profiles to show"
+      # Should show no profiles message with suggestion
+      assert html =~ "No more profiles right now"
+      assert html =~ "broadening your preferences"
     end
 
     test "close match modal button works", %{conn: conn, user: user} do
