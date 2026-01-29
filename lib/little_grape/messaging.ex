@@ -5,6 +5,8 @@ defmodule LittleGrape.Messaging do
 
   import Ecto.Query, warn: false
 
+  alias LittleGrape.Accounts.User
+  alias LittleGrape.Matches.Match
   alias LittleGrape.Messaging.Conversation
   alias LittleGrape.Messaging.Message
   alias LittleGrape.Repo
@@ -133,5 +135,91 @@ defmodule LittleGrape.Messaging do
     )
     |> Repo.all()
     |> Map.new()
+  end
+
+  @doc """
+  Gets a conversation for a match, with authorization check.
+
+  Returns the conversation only if the user is a participant in the match
+  (either user_a or user_b).
+
+  ## Parameters
+
+    * `user` - The user struct with an id
+    * `match_id` - The ID of the match to get the conversation for
+
+  ## Returns
+
+    * `{:ok, %Conversation{}}` if found and user is participant
+    * `{:error, :not_found}` if not found or unauthorized
+
+  ## Examples
+
+      iex> get_conversation(participant_user, match_id)
+      {:ok, %Conversation{}}
+
+      iex> get_conversation(non_participant_user, match_id)
+      {:error, :not_found}
+
+  """
+  def get_conversation(%User{id: user_id}, match_id) do
+    conversation =
+      from(c in Conversation,
+        join: m in Match,
+        on: c.match_id == m.id,
+        where: m.id == ^match_id,
+        where: m.user_a_id == ^user_id or m.user_b_id == ^user_id,
+        select: c
+      )
+      |> Repo.one()
+
+    case conversation do
+      nil -> {:error, :not_found}
+      conv -> {:ok, conv}
+    end
+  end
+
+  @doc """
+  Lists messages in a conversation with pagination support.
+
+  Messages are ordered by inserted_at ascending (oldest first).
+
+  ## Parameters
+
+    * `conversation` - The conversation struct or conversation id
+    * `opts` - Keyword list of options:
+      * `:limit` - Maximum number of messages to return (default: 50)
+      * `:offset` - Number of messages to skip (default: 0)
+
+  ## Returns
+
+    * List of `%Message{}` structs ordered by inserted_at ascending
+
+  ## Examples
+
+      iex> list_messages(conversation)
+      [%Message{}, %Message{}]
+
+      iex> list_messages(conversation, limit: 10, offset: 20)
+      [%Message{}, ...]
+
+  """
+  def list_messages(conversation, opts \\ [])
+
+  def list_messages(%Conversation{id: conversation_id}, opts) do
+    list_messages(conversation_id, opts)
+  end
+
+  def list_messages(conversation_id, opts) when is_integer(conversation_id) do
+    limit = Keyword.get(opts, :limit, 50)
+    offset = Keyword.get(opts, :offset, 0)
+
+    from(m in Message,
+      where: m.conversation_id == ^conversation_id,
+      order_by: [asc: m.inserted_at],
+      limit: ^limit,
+      offset: ^offset
+    )
+    |> Repo.all()
   end
 end

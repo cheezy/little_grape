@@ -164,4 +164,159 @@ defmodule LittleGrape.MessagingTest do
       refute Map.has_key?(counts, conv2.id)
     end
   end
+
+  describe "get_conversation/2" do
+    test "returns conversation for match participant" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+
+      {:ok, %{match: match, conversation: conversation}} =
+        Matches.create_match(user1.id, user2.id)
+
+      assert {:ok, fetched_conv} = Messaging.get_conversation(user1, match.id)
+      assert fetched_conv.id == conversation.id
+    end
+
+    test "returns conversation for both participants" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+
+      {:ok, %{match: match, conversation: conversation}} =
+        Matches.create_match(user1.id, user2.id)
+
+      # user1 can access
+      assert {:ok, conv1} = Messaging.get_conversation(user1, match.id)
+      assert conv1.id == conversation.id
+
+      # user2 can also access
+      assert {:ok, conv2} = Messaging.get_conversation(user2, match.id)
+      assert conv2.id == conversation.id
+    end
+
+    test "returns error for non-participant" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      non_participant = user_fixture()
+      {:ok, %{match: match}} = Matches.create_match(user1.id, user2.id)
+
+      assert {:error, :not_found} = Messaging.get_conversation(non_participant, match.id)
+    end
+
+    test "returns error for non-existent match" do
+      user = user_fixture()
+      assert {:error, :not_found} = Messaging.get_conversation(user, 999_999)
+    end
+  end
+
+  describe "list_messages/2" do
+    test "returns empty list for conversation with no messages" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      assert Messaging.list_messages(conversation) == []
+    end
+
+    test "returns messages ordered by inserted_at ascending" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      {:ok, msg1} = Messaging.create_message(conversation.id, user1.id, "First")
+      {:ok, msg2} = Messaging.create_message(conversation.id, user2.id, "Second")
+      {:ok, msg3} = Messaging.create_message(conversation.id, user1.id, "Third")
+
+      messages = Messaging.list_messages(conversation)
+
+      assert length(messages) == 3
+      assert Enum.at(messages, 0).id == msg1.id
+      assert Enum.at(messages, 1).id == msg2.id
+      assert Enum.at(messages, 2).id == msg3.id
+    end
+
+    test "respects limit option" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      # Create 5 messages
+      for i <- 1..5 do
+        {:ok, _} = Messaging.create_message(conversation.id, user1.id, "Message #{i}")
+      end
+
+      messages = Messaging.list_messages(conversation, limit: 3)
+
+      assert length(messages) == 3
+      # Should get the first 3 messages (oldest first)
+      assert Enum.at(messages, 0).content == "Message 1"
+      assert Enum.at(messages, 1).content == "Message 2"
+      assert Enum.at(messages, 2).content == "Message 3"
+    end
+
+    test "respects offset option" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      # Create 5 messages
+      for i <- 1..5 do
+        {:ok, _} = Messaging.create_message(conversation.id, user1.id, "Message #{i}")
+      end
+
+      messages = Messaging.list_messages(conversation, offset: 2)
+
+      assert length(messages) == 3
+      # Should skip first 2, get messages 3-5
+      assert Enum.at(messages, 0).content == "Message 3"
+      assert Enum.at(messages, 1).content == "Message 4"
+      assert Enum.at(messages, 2).content == "Message 5"
+    end
+
+    test "respects both limit and offset options" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      # Create 10 messages
+      for i <- 1..10 do
+        {:ok, _} = Messaging.create_message(conversation.id, user1.id, "Message #{i}")
+      end
+
+      messages = Messaging.list_messages(conversation, limit: 3, offset: 4)
+
+      assert length(messages) == 3
+      # Should skip first 4, get messages 5-7
+      assert Enum.at(messages, 0).content == "Message 5"
+      assert Enum.at(messages, 1).content == "Message 6"
+      assert Enum.at(messages, 2).content == "Message 7"
+    end
+
+    test "accepts conversation id directly" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      {:ok, _} = Messaging.create_message(conversation.id, user1.id, "Test message")
+
+      messages = Messaging.list_messages(conversation.id)
+
+      assert length(messages) == 1
+      assert Enum.at(messages, 0).content == "Test message"
+    end
+
+    test "uses default limit of 50" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      # Create 60 messages
+      for i <- 1..60 do
+        {:ok, _} = Messaging.create_message(conversation.id, user1.id, "Message #{i}")
+      end
+
+      messages = Messaging.list_messages(conversation)
+
+      assert length(messages) == 50
+    end
+  end
 end
