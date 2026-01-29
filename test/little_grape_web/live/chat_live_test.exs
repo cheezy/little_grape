@@ -16,6 +16,13 @@ defmodule LittleGrapeWeb.ChatLiveTest do
     |> Repo.update!()
   end
 
+  # Helper to mount and wait for async loading to complete
+  defp mount_and_render(conn, path) do
+    {:ok, view, _html} = live(conn, path)
+    html = render(view)
+    {:ok, view, html}
+  end
+
   describe "ChatLive" do
     setup :register_and_log_in_user
 
@@ -67,7 +74,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       # Create a match
       {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, _view, html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Should show the chat partner's name
       assert html =~ "ChatPartner"
@@ -84,7 +91,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       # Create a match (no messages)
       {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, _view, html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Should show empty state
       assert html =~ "No messages yet"
@@ -108,7 +115,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       {:ok, _msg2} = Messaging.create_message(conversation.id, user.id, "Hi! How are you?")
       {:ok, _msg3} = Messaging.create_message(conversation.id, other_user.id, "Doing great!")
 
-      {:ok, _view, html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # All messages should be displayed
       assert html =~ "Hello there!"
@@ -131,7 +138,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       # Create a message from the current user
       {:ok, _msg} = Messaging.create_message(conversation.id, user.id, "My own message")
 
-      {:ok, _view, html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Own messages should have pink background and right alignment
       assert html =~ "My own message"
@@ -154,7 +161,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       # Create a message from the other user
       {:ok, _msg} = Messaging.create_message(conversation.id, other_user.id, "Their message")
 
-      {:ok, _view, html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Other's messages should have white background and left alignment
       assert html =~ "Their message"
@@ -177,7 +184,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       # Create a message
       {:ok, _msg} = Messaging.create_message(conversation.id, user.id, "Timestamped message")
 
-      {:ok, _view, html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Should contain time format (e.g., "12:34 PM" or "1:23 AM")
       assert html =~ ~r/\d{1,2}:\d{2}\s*[AP]M/i
@@ -194,7 +201,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       # Create a match
       {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, _view, html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Should have a link back to matches
       assert html =~ ~s(href="/matches")
@@ -211,7 +218,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       # Create a match
       {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, _view, html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Should show the profile picture
       assert html =~ "/uploads/test.jpg"
@@ -236,7 +243,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       # Create a match
       {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, _view, html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Should show placeholder
       assert html =~ "👤"
@@ -253,7 +260,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       # Create a match
       {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, _view, html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Should show Unknown
       assert html =~ "Unknown"
@@ -274,7 +281,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       # Send a message
       {:ok, _msg} = Messaging.create_message(conversation.id, other_user.id, "From UserA")
 
-      {:ok, _view, html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Should work correctly regardless of which position user is in
       assert html =~ "UserA"
@@ -292,7 +299,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       # Create a match
       {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, _view, html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Should show message input form
       assert html =~ "Type a message..."
@@ -310,7 +317,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       # Create a match
       {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, view, _html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, view, _html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Submit a message
       view
@@ -333,7 +340,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       # Create a match
       {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, view, _html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, view, _html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Submit an empty message
       view
@@ -356,7 +363,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       # Create a match
       {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, view, _html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, view, _html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Submit whitespace-only message
       view
@@ -380,7 +387,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       {:ok, %{match: match, conversation: conversation}} =
         Matches.create_match(user.id, other_user.id)
 
-      {:ok, view, html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Initially empty
       assert html =~ "No messages yet"
@@ -405,7 +412,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       {:ok, %{match: match, conversation: conversation}} =
         Matches.create_match(user.id, other_user.id)
 
-      {:ok, view, _html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, view, _html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Simulate incoming message via PubSub
       message = %{
@@ -442,7 +449,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       assert Messaging.unread_count(conversation.id, user.id) == 2
 
       # Mount the live view (this should mark messages as read)
-      {:ok, _view, _html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, _view, _html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Messages should now be marked as read
       assert Messaging.unread_count(conversation.id, user.id) == 0
@@ -459,7 +466,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       # Create a match
       {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, view, html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Profile modal should not be visible initially (no close button)
       refute html =~ "phx-click=\"close_profile\""
@@ -483,7 +490,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       # Create a match
       {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, view, _html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, view, _html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Open the profile modal
       view |> element("button[phx-click=show_profile]") |> render_click()
@@ -506,7 +513,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       # Create a match
       {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, _view, html} = live(conn, ~p"/chat/#{match.id}")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Header should have clickable button with phx-click
       assert html =~ "phx-click=\"show_profile\""

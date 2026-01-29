@@ -22,22 +22,20 @@ defmodule LittleGrapeWeb.DiscoverLive do
         if Accounts.profile_complete?(user.profile) do
           if connected?(socket) do
             Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user.id}")
+            send(self(), :load_candidates)
           end
-
-          candidates = Discovery.get_candidates(user)
-          current_candidate = List.first(candidates)
-          unread_count = Messaging.total_unread_count(user)
 
           {:ok,
            socket
            |> assign(:user, user)
-           |> assign(:candidates, candidates)
-           |> assign(:current_candidate, current_candidate)
+           |> assign(:loading, true)
+           |> assign(:candidates, [])
+           |> assign(:current_candidate, nil)
            |> assign(:swiping, false)
            |> assign(:show_match_modal, false)
            |> assign(:matched_profile, nil)
            |> assign(:expanded, false)
-           |> assign(:unread_count, unread_count)}
+           |> assign(:unread_count, 0)}
         else
           missing = Accounts.missing_profile_fields(user.profile)
 
@@ -103,6 +101,20 @@ defmodule LittleGrapeWeb.DiscoverLive do
     {:noreply, assign(socket, :unread_count, unread_count)}
   end
 
+  @impl true
+  def handle_info(:load_candidates, socket) do
+    candidates = Discovery.get_candidates(socket.assigns.user)
+    current_candidate = List.first(candidates)
+    unread_count = Messaging.total_unread_count(socket.assigns.user)
+
+    {:noreply,
+     socket
+     |> assign(:loading, false)
+     |> assign(:candidates, candidates)
+     |> assign(:current_candidate, current_candidate)
+     |> assign(:unread_count, unread_count)}
+  end
+
   defp handle_swipe_success(socket, action, user_id, candidate) do
     if action == "like" and Swipes.check_for_match(user_id, candidate.user_id) do
       # It's a match! Create the match record
@@ -160,25 +172,39 @@ defmodule LittleGrapeWeb.DiscoverLive do
     <div class="max-w-lg mx-auto px-4 py-8">
       <h1 class="text-2xl font-bold text-center mb-8">Discover</h1>
 
-      <%= if @current_candidate do %>
-        <.profile_card profile={@current_candidate} swiping={@swiping} expanded={@expanded} />
+      <%= if @loading do %>
+        <.loading_spinner />
       <% else %>
-        <div class="text-center py-12">
-          <div class="text-6xl mb-4">🔍</div>
-          <p class="text-gray-500 text-lg font-medium">No more profiles right now</p>
-          <p class="text-gray-400 mt-2">Try broadening your preferences to see more people!</p>
-          <.link
-            navigate={~p"/users/profile"}
-            class="inline-block mt-6 bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-6 rounded-full transition-colors"
-          >
-            Update Preferences
-          </.link>
-        </div>
+        <%= if @current_candidate do %>
+          <.profile_card profile={@current_candidate} swiping={@swiping} expanded={@expanded} />
+        <% else %>
+          <div class="text-center py-12">
+            <div class="text-6xl mb-4">🔍</div>
+            <p class="text-gray-500 text-lg font-medium">No more profiles right now</p>
+            <p class="text-gray-400 mt-2">Try broadening your preferences to see more people!</p>
+            <.link
+              navigate={~p"/users/profile"}
+              class="inline-block mt-6 bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-6 rounded-full transition-colors"
+            >
+              Update Preferences
+            </.link>
+          </div>
+        <% end %>
       <% end %>
 
       <%= if @show_match_modal do %>
         <.match_modal profile={@matched_profile} />
       <% end %>
+    </div>
+    """
+  end
+
+  defp loading_spinner(assigns) do
+    ~H"""
+    <div class="flex flex-col items-center justify-center py-20">
+      <div class="w-12 h-12 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin">
+      </div>
+      <p class="text-gray-500 mt-4">Finding people near you...</p>
     </div>
     """
   end

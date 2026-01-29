@@ -11,59 +11,41 @@ defmodule LittleGrapeWeb.ChatLive do
     socket = assign_current_user(socket, session)
 
     case socket.assigns[:current_user] do
-      nil -> {:ok, redirect(socket, to: ~p"/users/log-in")}
-      user -> mount_for_user(socket, user, match_id)
+      nil ->
+        {:ok, redirect(socket, to: ~p"/users/log-in")}
+
+      user ->
+        # Check authorization synchronously to return proper redirect
+        case Matches.get_match(user, match_id) do
+          nil ->
+            {:ok, redirect_not_found(socket)}
+
+          match ->
+            if connected?(socket) do
+              send(self(), {:load_conversation, match_id, match})
+            end
+
+            {:ok,
+             socket
+             |> assign(:user, user)
+             |> assign(:match_id, match_id)
+             |> assign(:loading, true)
+             |> assign(:match, nil)
+             |> assign(:conversation, nil)
+             |> assign(:messages, [])
+             |> assign(:other_user, nil)
+             |> assign(:other_profile, nil)
+             |> assign(:message_form, to_form(%{"content" => ""}))
+             |> assign(:show_profile, false)
+             |> assign(:unread_count, 0)}
+        end
     end
-  end
-
-  defp mount_for_user(socket, user, match_id) do
-    case authorize_and_load(user, match_id) do
-      {:ok, chat_data} ->
-        {:ok, setup_chat_socket(socket, user, chat_data)}
-
-      {:error, :not_found} ->
-        {:ok, redirect_not_found(socket)}
-    end
-  end
-
-  defp setup_chat_socket(socket, user, {match, conversation, messages, other_user, other_profile}) do
-    if connected?(socket) do
-      Phoenix.PubSub.subscribe(LittleGrape.PubSub, "conversation:#{conversation.id}")
-      Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user.id}")
-      # Mark messages as read when viewing the conversation
-      Messaging.mark_as_read(user, conversation.id)
-    end
-
-    unread_count = Messaging.total_unread_count(user)
-
-    socket
-    |> assign(:user, user)
-    |> assign(:match, match)
-    |> assign(:conversation, conversation)
-    |> assign(:messages, messages)
-    |> assign(:other_user, other_user)
-    |> assign(:other_profile, other_profile)
-    |> assign(:message_form, to_form(%{"content" => ""}))
-    |> assign(:show_profile, false)
-    |> assign(:unread_count, unread_count)
   end
 
   defp redirect_not_found(socket) do
     socket
     |> put_flash(:error, "Conversation not found")
     |> redirect(to: ~p"/matches")
-  end
-
-  defp authorize_and_load(user, match_id) do
-    with match when not is_nil(match) <- Matches.get_match(user, match_id),
-         {:ok, conversation} <- Messaging.get_conversation(user, match_id) do
-      messages = Messaging.list_messages(conversation)
-      {other_user, other_profile} = get_other_participant(match, user.id)
-      {:ok, {match, conversation, messages, other_user, other_profile}}
-    else
-      nil -> {:error, :not_found}
-      {:error, :not_found} -> {:error, :not_found}
-    end
   end
 
   defp get_other_participant(match, user_id) do
@@ -152,26 +134,98 @@ defmodule LittleGrapeWeb.ChatLive do
   end
 
   @impl true
+  def handle_info({:load_conversation, match_id, match}, socket) do
+    user = socket.assigns.user
+
+    case Messaging.get_conversation(user, match_id) do
+      {:ok, conversation} ->
+        messages = Messaging.list_messages(conversation)
+        {other_user, other_profile} = get_other_participant(match, user.id)
+
+        Phoenix.PubSub.subscribe(LittleGrape.PubSub, "conversation:#{conversation.id}")
+        Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user.id}")
+        Messaging.mark_as_read(user, conversation.id)
+        unread_count = Messaging.total_unread_count(user)
+
+        {:noreply,
+         socket
+         |> assign(:loading, false)
+         |> assign(:match, match)
+         |> assign(:conversation, conversation)
+         |> assign(:messages, messages)
+         |> assign(:other_user, other_user)
+         |> assign(:other_profile, other_profile)
+         |> assign(:unread_count, unread_count)}
+
+      {:error, :not_found} ->
+        {:noreply, redirect_not_found(socket)}
+    end
+  end
+
+  @impl true
   def render(assigns) do
     ~H"""
-    <div class="flex flex-col h-screen max-w-lg mx-auto" id="chat-container" phx-hook="ScrollToBottom">
-      <.chat_header other_profile={@other_profile} />
+    <%= if @loading do %>
+      <div class="flex flex-col h-screen max-w-lg mx-auto">
+        <.loading_header />
+        <.loading_spinner />
+      </div>
+    <% else %>
+      <div
+        class="flex flex-col h-screen max-w-lg mx-auto"
+        id="chat-container"
+        phx-hook="ScrollToBottom"
+      >
+        <.chat_header other_profile={@other_profile} />
 
-      <div id="messages-container" class="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-gray-50">
-        <%= if @messages == [] do %>
-          <.empty_state other_profile={@other_profile} />
-        <% else %>
-          <%= for message <- @messages do %>
-            <.message_bubble message={message} current_user_id={@user.id} />
+        <div id="messages-container" class="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-gray-50">
+          <%= if @messages == [] do %>
+            <.empty_state other_profile={@other_profile} />
+          <% else %>
+            <%= for message <- @messages do %>
+              <.message_bubble message={message} current_user_id={@user.id} />
+            <% end %>
           <% end %>
+        </div>
+
+        <.message_input form={@message_form} />
+
+        <%= if @show_profile do %>
+          <.profile_modal other_profile={@other_profile} />
         <% end %>
       </div>
+    <% end %>
+    """
+  end
 
-      <.message_input form={@message_form} />
+  defp loading_header(assigns) do
+    ~H"""
+    <div class="flex items-center gap-3 px-4 py-3 bg-white border-b shadow-sm">
+      <.link navigate={~p"/matches"} class="text-gray-500 hover:text-gray-700">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      </.link>
+      <div class="flex items-center gap-3 flex-1">
+        <div class="w-10 h-10 rounded-full bg-gray-200 animate-pulse"></div>
+        <div class="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+      </div>
+    </div>
+    """
+  end
 
-      <%= if @show_profile do %>
-        <.profile_modal other_profile={@other_profile} />
-      <% end %>
+  defp loading_spinner(assigns) do
+    ~H"""
+    <div class="flex-1 flex flex-col items-center justify-center bg-gray-50">
+      <div class="w-12 h-12 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin">
+      </div>
+      <p class="text-gray-500 mt-4">Loading messages...</p>
     </div>
     """
   end

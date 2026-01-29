@@ -16,6 +16,13 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
     |> Repo.update!()
   end
 
+  # Helper to mount and wait for async loading to complete
+  defp mount_and_render(conn, path) do
+    {:ok, view, _html} = live(conn, path)
+    html = render(view)
+    {:ok, view, html}
+  end
+
   describe "DiscoverLive" do
     setup :register_and_log_in_user
 
@@ -34,7 +41,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       # Create a complete profile with picture
       profile_fixture(user) |> set_profile_picture()
 
-      {:ok, _view, html} = live(conn, ~p"/discover")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/discover")
 
       assert html =~ "Discover"
     end
@@ -43,7 +50,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       # Create a complete profile with picture
       profile_fixture(user) |> set_profile_picture()
 
-      {:ok, _view, html} = live(conn, ~p"/discover")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/discover")
 
       assert html =~ "No more profiles right now"
       assert html =~ "broadening your preferences"
@@ -67,7 +74,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       })
       |> set_profile_picture()
 
-      {:ok, _view, html} = live(conn, ~p"/discover")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/discover")
 
       assert html =~ "Jane"
       assert html =~ "Tirana"
@@ -91,7 +98,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       })
       |> set_profile_picture()
 
-      {:ok, _view, html} = live(conn, ~p"/discover")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/discover")
 
       assert html =~ "Jane"
       # Age should be approximately 25 (could be 24 or 25 depending on day)
@@ -131,7 +138,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       })
       |> set_profile_picture()
 
-      {:ok, view, html} = live(conn, ~p"/discover")
+      {:ok, view, html} = mount_and_render(conn, ~p"/discover")
 
       # Find which candidate is shown first
       {first_candidate, second_candidate} =
@@ -183,7 +190,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       })
       |> set_profile_picture()
 
-      {:ok, view, html} = live(conn, ~p"/discover")
+      {:ok, view, html} = mount_and_render(conn, ~p"/discover")
 
       # Find which candidate is shown first
       {first_candidate, _second_candidate} =
@@ -228,7 +235,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       # Candidate already liked the user
       {:ok, _swipe} = Swipes.create_swipe(candidate, user.id, "like")
 
-      {:ok, view, _html} = live(conn, ~p"/discover")
+      {:ok, view, _html} = mount_and_render(conn, ~p"/discover")
 
       # Click like - should create a match
       html = view |> element("button[phx-value-action=like]") |> render_click()
@@ -261,7 +268,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       })
       |> set_profile_picture()
 
-      {:ok, view, _html} = live(conn, ~p"/discover")
+      {:ok, view, _html} = mount_and_render(conn, ~p"/discover")
 
       # Click pass on the only candidate
       html = view |> element("button[phx-value-action=pass]") |> render_click()
@@ -289,7 +296,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       # Candidate already liked the user
       {:ok, _swipe} = Swipes.create_swipe(candidate, user.id, "like")
 
-      {:ok, view, _html} = live(conn, ~p"/discover")
+      {:ok, view, _html} = mount_and_render(conn, ~p"/discover")
 
       # Click like to trigger match
       html = view |> element("button[phx-value-action=like]") |> render_click()
@@ -323,7 +330,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       })
       |> set_profile_picture()
 
-      {:ok, view, html} = live(conn, ~p"/discover")
+      {:ok, view, html} = mount_and_render(conn, ~p"/discover")
 
       # Initially should show "Tap to see more" hint
       assert html =~ "Tap to see more"
@@ -365,7 +372,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       })
       |> set_profile_picture()
 
-      {:ok, view, _html} = live(conn, ~p"/discover")
+      {:ok, view, _html} = mount_and_render(conn, ~p"/discover")
 
       # Expand the card
       html = view |> element("div[phx-click=toggle_expanded]") |> render_click()
@@ -396,7 +403,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       })
       |> set_profile_picture()
 
-      {:ok, view, html} = live(conn, ~p"/discover")
+      {:ok, view, html} = mount_and_render(conn, ~p"/discover")
 
       # Buttons visible before expansion
       assert html =~ "phx-value-action=\"like\""
@@ -436,7 +443,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       })
       |> set_profile_picture()
 
-      {:ok, view, _html} = live(conn, ~p"/discover")
+      {:ok, view, _html} = mount_and_render(conn, ~p"/discover")
 
       # Expand the first card
       html = view |> element("div[phx-click=toggle_expanded]") |> render_click()
@@ -466,7 +473,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       })
       |> set_profile_picture()
 
-      {:ok, view, _html} = live(conn, ~p"/discover")
+      {:ok, view, _html} = mount_and_render(conn, ~p"/discover")
 
       # Expand the card to see languages
       html = view |> element("div[phx-click=toggle_expanded]") |> render_click()
@@ -501,7 +508,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       })
       |> set_profile_picture()
 
-      {:ok, view, _html} = live(conn, ~p"/discover")
+      {:ok, view, _html} = mount_and_render(conn, ~p"/discover")
 
       # Expand the card
       html = view |> element("div[phx-click=toggle_expanded]") |> render_click()
@@ -530,7 +537,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       })
       |> set_profile_picture()
 
-      {:ok, _view, html} = live(conn, ~p"/discover")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/discover")
 
       # Should show the name
       assert html =~ "NoLocationCandidate"
@@ -555,7 +562,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       })
       |> set_profile_picture()
 
-      {:ok, _view, html} = live(conn, ~p"/discover")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/discover")
 
       # Should show the name and city
       assert html =~ "CityOnlyCandidate"
@@ -577,7 +584,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       })
       |> set_profile_picture()
 
-      {:ok, view, _html} = live(conn, ~p"/discover")
+      {:ok, view, _html} = mount_and_render(conn, ~p"/discover")
 
       # This test verifies the swiping guard clause works
       # The guard prevents duplicate swipes while processing
@@ -597,7 +604,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       |> set_profile_picture()
 
       # No candidates created, so current_candidate will be nil
-      {:ok, view, html} = live(conn, ~p"/discover")
+      {:ok, view, html} = mount_and_render(conn, ~p"/discover")
 
       # Verify no candidates
       assert html =~ "No more profiles right now"
@@ -635,7 +642,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       })
       |> set_profile_picture()
 
-      {:ok, view, html} = live(conn, ~p"/discover")
+      {:ok, view, html} = mount_and_render(conn, ~p"/discover")
 
       # Find which candidate is shown first
       {first_candidate, _second_candidate} =

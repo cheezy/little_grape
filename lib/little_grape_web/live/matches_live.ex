@@ -16,17 +16,28 @@ defmodule LittleGrapeWeb.MatchesLive do
       user ->
         if connected?(socket) do
           Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user.id}")
+          send(self(), :load_matches)
         end
-
-        matches = Matches.list_matches_with_details(user)
-        unread_count = Messaging.total_unread_count(user)
 
         {:ok,
          socket
          |> assign(:user, user)
-         |> assign(:matches, matches)
-         |> assign(:unread_count, unread_count)}
+         |> assign(:loading, true)
+         |> assign(:matches, [])
+         |> assign(:unread_count, 0)}
     end
+  end
+
+  @impl true
+  def handle_info(:load_matches, socket) do
+    matches = Matches.list_matches_with_details(socket.assigns.user)
+    unread_count = Messaging.total_unread_count(socket.assigns.user)
+
+    {:noreply,
+     socket
+     |> assign(:loading, false)
+     |> assign(:matches, matches)
+     |> assign(:unread_count, unread_count)}
   end
 
   @impl true
@@ -76,15 +87,29 @@ defmodule LittleGrapeWeb.MatchesLive do
     <div class="max-w-lg mx-auto px-4 py-8">
       <h1 class="text-2xl font-bold text-center mb-8">Matches</h1>
 
-      <%= if @matches == [] do %>
-        <.empty_state />
+      <%= if @loading do %>
+        <.loading_spinner />
       <% else %>
-        <div class="space-y-3">
-          <%= for match_data <- @matches do %>
-            <.match_card match_data={match_data} />
-          <% end %>
-        </div>
+        <%= if @matches == [] do %>
+          <.empty_state />
+        <% else %>
+          <div class="space-y-3">
+            <%= for match_data <- @matches do %>
+              <.match_card match_data={match_data} />
+            <% end %>
+          </div>
+        <% end %>
       <% end %>
+    </div>
+    """
+  end
+
+  defp loading_spinner(assigns) do
+    ~H"""
+    <div class="flex flex-col items-center justify-center py-20">
+      <div class="w-12 h-12 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin">
+      </div>
+      <p class="text-gray-500 mt-4">Loading your matches...</p>
     </div>
     """
   end

@@ -16,6 +16,13 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
     |> Repo.update!()
   end
 
+  # Helper to mount and wait for async loading to complete
+  defp mount_and_render(conn, path) do
+    {:ok, view, _html} = live(conn, path)
+    html = render(view)
+    {:ok, view, html}
+  end
+
   describe "MatchesLive" do
     setup :register_and_log_in_user
 
@@ -32,7 +39,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       # Create profile for user
       profile_fixture(user) |> set_profile_picture()
 
-      {:ok, _view, html} = live(conn, ~p"/matches")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
       assert html =~ "Matches"
     end
@@ -41,7 +48,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       # Create profile for user
       profile_fixture(user) |> set_profile_picture()
 
-      {:ok, _view, html} = live(conn, ~p"/matches")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
       assert html =~ "No matches yet"
       assert html =~ "Keep swiping to find your perfect match!"
@@ -61,7 +68,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       # Create a match
       {:ok, _result} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, _view, html} = live(conn, ~p"/matches")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
       # Should show match with other user's name
       assert html =~ "MatchedPerson"
@@ -85,7 +92,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       {:ok, _message} =
         Messaging.create_message(conversation.id, other_user.id, "Hello there!")
 
-      {:ok, _view, html} = live(conn, ~p"/matches")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
       # Should show message preview
       assert html =~ "Hello there!"
@@ -102,7 +109,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       # Create a match (no messages)
       {:ok, _result} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, _view, html} = live(conn, ~p"/matches")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
       # Should show placeholder text
       assert html =~ "Start a conversation!"
@@ -119,7 +126,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       # Create a match
       {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, _view, html} = live(conn, ~p"/matches")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
       # Should have link to chat
       assert html =~ "/chat/#{match.id}"
@@ -140,7 +147,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       long_message = String.duplicate("a", 100)
       {:ok, _message} = Messaging.create_message(conversation.id, other_user.id, long_message)
 
-      {:ok, _view, html} = live(conn, ~p"/matches")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
       # Should show truncated message with ellipsis
       assert html =~ "..."
@@ -167,7 +174,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       # Create a match (other user has no profile picture)
       {:ok, _result} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, _view, html} = live(conn, ~p"/matches")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
       # Should show name and placeholder
       assert html =~ "NoPicPerson"
@@ -191,7 +198,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       # Send a message to first match (makes it more recent)
       {:ok, _message} = Messaging.create_message(conv1.id, other_user1.id, "Recent message")
 
-      {:ok, _view, html} = live(conn, ~p"/matches")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
       # Both matches should be displayed
       assert html =~ "FirstMatch"
@@ -217,7 +224,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       # Create a match
       {:ok, _result} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, _view, html} = live(conn, ~p"/matches")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
       # Should show Unknown for the name
       assert html =~ "Unknown"
@@ -238,7 +245,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       short_message = "Hi!"
       {:ok, _message} = Messaging.create_message(conversation.id, other_user.id, short_message)
 
-      {:ok, _view, html} = live(conn, ~p"/matches")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
       # Should show full message without ellipsis
       assert html =~ "Hi!"
@@ -256,7 +263,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       # Create a match
       {:ok, _result} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, _view, html} = live(conn, ~p"/matches")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
       # Should show Unknown for the name and placeholder for picture
       assert html =~ "Unknown"
@@ -274,7 +281,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       # Create a match (no messages)
       {:ok, _result} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, _view, html} = live(conn, ~p"/matches")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
       # Should show NEW MATCH label
       assert html =~ "NEW MATCH"
@@ -292,7 +299,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       {:ok, %{conversation: conversation}} = Matches.create_match(user.id, other_user.id)
       {:ok, _message} = Messaging.create_message(conversation.id, other_user.id, "Hey there!")
 
-      {:ok, _view, html} = live(conn, ~p"/matches")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
       # Should NOT show NEW MATCH label
       refute html =~ "NEW MATCH"
@@ -313,7 +320,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       {:ok, _msg2} = Messaging.create_message(conversation.id, other_user.id, "Message 2")
       {:ok, _msg3} = Messaging.create_message(conversation.id, other_user.id, "Message 3")
 
-      {:ok, _view, html} = live(conn, ~p"/matches")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
       # Should show unread count badge
       assert html =~ "UnreadSender"
@@ -334,7 +341,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       {:ok, _msg1} = Messaging.create_message(conversation.id, user.id, "My message 1")
       {:ok, _msg2} = Messaging.create_message(conversation.id, user.id, "My message 2")
 
-      {:ok, _view, html} = live(conn, ~p"/matches")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
       # Should NOT show unread count badge (messages from self don't count)
       assert html =~ "SentTo"
@@ -357,7 +364,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       profile_fixture(other_user2, %{first_name: "NewMatch"}) |> set_profile_picture()
       {:ok, _result} = Matches.create_match(user.id, other_user2.id)
 
-      {:ok, _view, html} = live(conn, ~p"/matches")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
       # NewMatch (no messages) should appear before OldMatch (has messages)
       new_match_pos = :binary.match(html, "NewMatch")
@@ -381,7 +388,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       profile_fixture(other_user, %{first_name: "HighlightedMatch"}) |> set_profile_picture()
       {:ok, _result} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, _view, html} = live(conn, ~p"/matches")
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
       # Should have highlighted styling (pink background)
       assert html =~ "bg-pink-50"
@@ -402,7 +409,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       # Create profile for user
       profile_fixture(user) |> set_profile_picture()
 
-      {:ok, view, html} = live(conn, ~p"/matches")
+      {:ok, view, html} = mount_and_render(conn, ~p"/matches")
 
       # Initially no matches
       assert html =~ "No matches yet"
@@ -428,7 +435,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       # Create a match
       {:ok, %{conversation: conversation}} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, view, html} = live(conn, ~p"/matches")
+      {:ok, view, html} = mount_and_render(conn, ~p"/matches")
 
       # Initially shows "Start a conversation!"
       assert html =~ "Start a conversation!"
