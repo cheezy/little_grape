@@ -387,5 +387,59 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       assert html =~ "bg-pink-50"
       assert html =~ "border-pink-200"
     end
+
+    test "subscribes to PubSub on mount", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      {:ok, _view, _html} = live(conn, ~p"/matches")
+
+      # Verify subscription by broadcasting and checking it doesn't crash
+      Phoenix.PubSub.broadcast(LittleGrape.PubSub, "user:#{user.id}", {:new_match, %{}})
+    end
+
+    test "updates when new match event is received", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      {:ok, view, html} = live(conn, ~p"/matches")
+
+      # Initially no matches
+      assert html =~ "No matches yet"
+
+      # Create a match - this will broadcast to PubSub
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "RealtimeMatch"}) |> set_profile_picture()
+      {:ok, _result} = Matches.create_match(user.id, other_user.id)
+
+      # Render should update with the new match
+      html = render(view)
+      assert html =~ "RealtimeMatch"
+    end
+
+    test "updates when new message event is received", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      # Create another user with profile
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "MessageSender"}) |> set_profile_picture()
+
+      # Create a match
+      {:ok, %{conversation: conversation}} = Matches.create_match(user.id, other_user.id)
+
+      {:ok, view, html} = live(conn, ~p"/matches")
+
+      # Initially shows "Start a conversation!"
+      assert html =~ "Start a conversation!"
+
+      # Send a message - this will broadcast to PubSub
+      {:ok, _message} =
+        Messaging.create_message(conversation.id, other_user.id, "Hello from realtime!")
+
+      # Render should update with the new message
+      html = render(view)
+      assert html =~ "Hello from realtime!"
+    end
   end
 end

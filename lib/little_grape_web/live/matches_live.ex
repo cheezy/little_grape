@@ -13,6 +13,10 @@ defmodule LittleGrapeWeb.MatchesLive do
         {:ok, redirect(socket, to: ~p"/users/log-in")}
 
       user ->
+        if connected?(socket) do
+          Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user.id}")
+        end
+
         matches = Matches.list_matches_with_details(user)
 
         {:ok,
@@ -20,6 +24,18 @@ defmodule LittleGrapeWeb.MatchesLive do
          |> assign(:user, user)
          |> assign(:matches, matches)}
     end
+  end
+
+  @impl true
+  def handle_info({:new_match, _match}, socket) do
+    matches = Matches.list_matches_with_details(socket.assigns.user)
+    {:noreply, assign(socket, :matches, matches)}
+  end
+
+  @impl true
+  def handle_info({:new_message, _message}, socket) do
+    matches = Matches.list_matches_with_details(socket.assigns.user)
+    {:noreply, assign(socket, :matches, matches)}
   end
 
   defp assign_current_user(socket, session) do

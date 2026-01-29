@@ -5,6 +5,7 @@ defmodule LittleGrape.Messaging do
 
   import Ecto.Query, warn: false
 
+  alias LittleGrape.Messaging.Conversation
   alias LittleGrape.Messaging.Message
   alias LittleGrape.Repo
 
@@ -29,13 +30,45 @@ defmodule LittleGrape.Messaging do
 
   """
   def create_message(conversation_id, sender_id, content) do
-    %Message{}
-    |> Message.changeset(%{
-      conversation_id: conversation_id,
-      sender_id: sender_id,
-      content: content
-    })
-    |> Repo.insert()
+    result =
+      %Message{}
+      |> Message.changeset(%{
+        conversation_id: conversation_id,
+        sender_id: sender_id,
+        content: content
+      })
+      |> Repo.insert()
+
+    case result do
+      {:ok, message} = success ->
+        broadcast_new_message(conversation_id, message)
+        success
+
+      error ->
+        error
+    end
+  end
+
+  defp broadcast_new_message(conversation_id, message) do
+    conversation =
+      Repo.get(Conversation, conversation_id)
+      |> Repo.preload(:match)
+
+    if conversation && conversation.match do
+      match = conversation.match
+
+      Phoenix.PubSub.broadcast(
+        LittleGrape.PubSub,
+        "user:#{match.user_a_id}",
+        {:new_message, message}
+      )
+
+      Phoenix.PubSub.broadcast(
+        LittleGrape.PubSub,
+        "user:#{match.user_b_id}",
+        {:new_message, message}
+      )
+    end
   end
 
   @doc """

@@ -42,18 +42,33 @@ defmodule LittleGrape.Matches do
   def create_match(user_a_id, user_b_id) do
     {normalized_a, normalized_b} = Match.normalize_user_ids(user_a_id, user_b_id)
 
-    Multi.new()
-    |> Multi.insert(:match, fn _changes ->
-      Match.changeset(%Match{}, %{
-        user_a_id: normalized_a,
-        user_b_id: normalized_b,
-        matched_at: DateTime.utc_now()
-      })
-    end)
-    |> Multi.insert(:conversation, fn %{match: match} ->
-      Conversation.changeset(%Conversation{}, %{match_id: match.id})
-    end)
-    |> Repo.transaction()
+    result =
+      Multi.new()
+      |> Multi.insert(:match, fn _changes ->
+        Match.changeset(%Match{}, %{
+          user_a_id: normalized_a,
+          user_b_id: normalized_b,
+          matched_at: DateTime.utc_now()
+        })
+      end)
+      |> Multi.insert(:conversation, fn %{match: match} ->
+        Conversation.changeset(%Conversation{}, %{match_id: match.id})
+      end)
+      |> Repo.transaction()
+
+    case result do
+      {:ok, %{match: match}} = success ->
+        broadcast_new_match(match)
+        success
+
+      error ->
+        error
+    end
+  end
+
+  defp broadcast_new_match(match) do
+    Phoenix.PubSub.broadcast(LittleGrape.PubSub, "user:#{match.user_a_id}", {:new_match, match})
+    Phoenix.PubSub.broadcast(LittleGrape.PubSub, "user:#{match.user_b_id}", {:new_match, match})
   end
 
   @doc """
@@ -260,7 +275,9 @@ defmodule LittleGrape.Matches do
   end
 
   defp get_unread_count(%{conversation: nil}, _unread_counts), do: 0
-  defp get_unread_count(%{conversation: conv}, unread_counts), do: Map.get(unread_counts, conv.id, 0)
+
+  defp get_unread_count(%{conversation: conv}, unread_counts),
+    do: Map.get(unread_counts, conv.id, 0)
 
   defp sort_matches_by_priority(match_details) do
     Enum.sort_by(
