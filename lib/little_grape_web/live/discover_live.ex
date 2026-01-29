@@ -65,8 +65,12 @@ defmodule LittleGrapeWeb.DiscoverLive do
           {:noreply, socket}
 
         {:error, _changeset} ->
-          # Swipe already exists or other error - just advance
-          socket = advance_to_next_candidate(socket)
+          # Swipe already exists or other error - show feedback and advance
+          socket =
+            socket
+            |> put_flash(:error, "Something went wrong. Please try again.")
+            |> advance_to_next_candidate()
+
           {:noreply, socket}
       end
     end
@@ -118,12 +122,18 @@ defmodule LittleGrapeWeb.DiscoverLive do
   defp handle_swipe_success(socket, action, user_id, candidate) do
     if action == "like" and Swipes.check_for_match(user_id, candidate.user_id) do
       # It's a match! Create the match record
-      {:ok, _result} = Matches.create_match(user_id, candidate.user_id)
+      case Matches.create_match(user_id, candidate.user_id) do
+        {:ok, _result} ->
+          socket
+          |> assign(:matched_profile, candidate)
+          |> assign(:show_match_modal, true)
+          |> advance_to_next_candidate()
 
-      socket
-      |> assign(:matched_profile, candidate)
-      |> assign(:show_match_modal, true)
-      |> advance_to_next_candidate()
+        {:error, _reason} ->
+          socket
+          |> put_flash(:error, "Something went wrong creating the match. Please try again.")
+          |> advance_to_next_candidate()
+      end
     else
       advance_to_next_candidate(socket)
     end

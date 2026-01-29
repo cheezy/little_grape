@@ -87,7 +87,7 @@ defmodule LittleGrapeWeb.ChatLive do
            |> assign(:message_form, to_form(%{"content" => ""}))}
 
         {:error, _changeset} ->
-          {:noreply, socket}
+          {:noreply, put_flash(socket, :error, "Failed to send message. Please try again.")}
       end
     end
   end

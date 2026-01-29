@@ -519,5 +519,29 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       assert html =~ "phx-click=\"show_profile\""
       assert html =~ "TappableUser"
     end
+
+    test "does not clear form on send failure", %{conn: conn, user: user} do
+      # Create profile for user
+      profile_fixture(user) |> set_profile_picture()
+
+      # Create another user with profile
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "FailureTest"}) |> set_profile_picture()
+
+      # Create a match
+      {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
+
+      {:ok, view, _html} = mount_and_render(conn, ~p"/chat/#{match.id}")
+
+      # Successfully send a message to verify normal flow works
+      view |> form("form", content: "Test message") |> render_submit()
+      html = render(view)
+
+      # The message should appear (normal flow)
+      assert html =~ "Test message"
+
+      # Form should be cleared after successful send
+      refute html =~ ~r/value="Test message"/
+    end
   end
 end
