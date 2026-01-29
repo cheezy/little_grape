@@ -301,4 +301,92 @@ defmodule LittleGrape.Messaging do
       {:new_message, message}
     )
   end
+
+  @doc """
+  Marks all unread messages from other users as read in a conversation.
+
+  Only marks messages sent by OTHER users as read (not the user's own messages).
+  Broadcasts a :messages_read event to the conversation topic.
+
+  ## Parameters
+
+    * `user` - The user marking messages as read
+    * `conversation_id` - The ID of the conversation
+
+  ## Returns
+
+    * `{:ok, count}` - Number of messages marked as read
+    * `{:error, :not_authorized}` - User is not a participant in the conversation
+
+  ## Examples
+
+      iex> mark_as_read(user, conversation_id)
+      {:ok, 3}
+
+  """
+  def mark_as_read(%User{id: user_id}, conversation_id) do
+    case authorize_conversation_access(user_id, conversation_id) do
+      {:ok, _conversation} ->
+        read_at = DateTime.utc_now() |> DateTime.truncate(:second)
+
+        {count, _} =
+          from(m in Message,
+            where: m.conversation_id == ^conversation_id,
+            where: m.sender_id != ^user_id,
+            where: is_nil(m.read_at)
+          )
+          |> Repo.update_all(set: [read_at: read_at])
+
+        if count > 0 do
+          broadcast_messages_read(conversation_id, user_id)
+        end
+
+        {:ok, count}
+
+      {:error, :not_found} ->
+        {:error, :not_authorized}
+    end
+  end
+
+  defp broadcast_messages_read(conversation_id, reader_id) do
+    Phoenix.PubSub.broadcast(
+      LittleGrape.PubSub,
+      "conversation:#{conversation_id}",
+      {:messages_read, %{conversation_id: conversation_id, reader_id: reader_id}}
+    )
+  end
+
+  @doc """
+  Counts total unread messages across all conversations for a user.
+
+  Returns the sum of all unread messages from other users in all matches
+  where the user is a participant.
+
+  ## Parameters
+
+    * `user` - The user to count unread messages for
+
+  ## Returns
+
+    * Integer count of total unread messages
+
+  ## Examples
+
+      iex> total_unread_count(user)
+      15
+
+  """
+  def total_unread_count(%User{id: user_id}) do
+    from(m in Message,
+      join: c in Conversation,
+      on: m.conversation_id == c.id,
+      join: match in Match,
+      on: c.match_id == match.id,
+      where: match.user_a_id == ^user_id or match.user_b_id == ^user_id,
+      where: m.sender_id != ^user_id,
+      where: is_nil(m.read_at),
+      select: count(m.id)
+    )
+    |> Repo.one()
+  end
 end

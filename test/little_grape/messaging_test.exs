@@ -427,4 +427,212 @@ defmodule LittleGrape.MessagingTest do
       refute_receive {:new_message, _}
     end
   end
+
+  describe "mark_as_read/2" do
+    test "marks all unread messages from other user as read" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      # user2 sends messages to user1
+      {:ok, msg1} = Messaging.create_message(conversation.id, user2.id, "Message 1")
+      {:ok, msg2} = Messaging.create_message(conversation.id, user2.id, "Message 2")
+      {:ok, msg3} = Messaging.create_message(conversation.id, user2.id, "Message 3")
+
+      # user1 marks as read
+      assert {:ok, 3} = Messaging.mark_as_read(user1, conversation.id)
+
+      # All messages should have read_at set
+      msg1 = Repo.get!(Message, msg1.id)
+      msg2 = Repo.get!(Message, msg2.id)
+      msg3 = Repo.get!(Message, msg3.id)
+
+      assert msg1.read_at != nil
+      assert msg2.read_at != nil
+      assert msg3.read_at != nil
+    end
+
+    test "returns 0 when no unread messages" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      # No messages sent
+      assert {:ok, 0} = Messaging.mark_as_read(user1, conversation.id)
+    end
+
+    test "does not mark user's own messages as read" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      # user1 sends messages (their own)
+      {:ok, msg1} = Messaging.create_message(conversation.id, user1.id, "My message 1")
+      {:ok, msg2} = Messaging.create_message(conversation.id, user1.id, "My message 2")
+
+      # user1 marks as read - should not affect their own messages
+      assert {:ok, 0} = Messaging.mark_as_read(user1, conversation.id)
+
+      # Own messages should still have nil read_at
+      msg1 = Repo.get!(Message, msg1.id)
+      msg2 = Repo.get!(Message, msg2.id)
+
+      assert msg1.read_at == nil
+      assert msg2.read_at == nil
+    end
+
+    test "does not re-mark already read messages" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      # user2 sends messages
+      {:ok, _msg1} = Messaging.create_message(conversation.id, user2.id, "Message 1")
+      {:ok, _msg2} = Messaging.create_message(conversation.id, user2.id, "Message 2")
+
+      # First call marks 2 messages
+      assert {:ok, 2} = Messaging.mark_as_read(user1, conversation.id)
+
+      # Second call should mark 0 messages
+      assert {:ok, 0} = Messaging.mark_as_read(user1, conversation.id)
+    end
+
+    test "returns error for non-participant" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      non_participant = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      assert {:error, :not_authorized} = Messaging.mark_as_read(non_participant, conversation.id)
+    end
+
+    test "returns error for non-existent conversation" do
+      user = user_fixture()
+
+      assert {:error, :not_authorized} = Messaging.mark_as_read(user, 999_999)
+    end
+
+    test "broadcasts messages_read event when messages are marked" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      # user2 sends message
+      {:ok, _msg} = Messaging.create_message(conversation.id, user2.id, "Message")
+
+      # Subscribe to conversation topic
+      Phoenix.PubSub.subscribe(LittleGrape.PubSub, "conversation:#{conversation.id}")
+
+      # user1 marks as read
+      {:ok, 1} = Messaging.mark_as_read(user1, conversation.id)
+
+      # Should receive broadcast
+      assert_receive {:messages_read, payload}
+      assert payload.conversation_id == conversation.id
+      assert payload.reader_id == user1.id
+    end
+
+    test "does not broadcast when no messages are marked" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      # Subscribe to conversation topic
+      Phoenix.PubSub.subscribe(LittleGrape.PubSub, "conversation:#{conversation.id}")
+
+      # user1 marks as read (no messages)
+      {:ok, 0} = Messaging.mark_as_read(user1, conversation.id)
+
+      # Should NOT receive broadcast
+      refute_receive {:messages_read, _}
+    end
+  end
+
+  describe "total_unread_count/1" do
+    test "returns 0 when user has no matches" do
+      user = user_fixture()
+
+      assert Messaging.total_unread_count(user) == 0
+    end
+
+    test "returns 0 when user has matches but no messages" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, _result} = Matches.create_match(user1.id, user2.id)
+
+      assert Messaging.total_unread_count(user1) == 0
+    end
+
+    test "counts unread messages across all conversations" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      user3 = user_fixture()
+
+      {:ok, %{conversation: conv1}} = Matches.create_match(user1.id, user2.id)
+      {:ok, %{conversation: conv2}} = Matches.create_match(user1.id, user3.id)
+
+      # user2 sends 2 messages in conv1
+      {:ok, _} = Messaging.create_message(conv1.id, user2.id, "From user2 - 1")
+      {:ok, _} = Messaging.create_message(conv1.id, user2.id, "From user2 - 2")
+
+      # user3 sends 3 messages in conv2
+      {:ok, _} = Messaging.create_message(conv2.id, user3.id, "From user3 - 1")
+      {:ok, _} = Messaging.create_message(conv2.id, user3.id, "From user3 - 2")
+      {:ok, _} = Messaging.create_message(conv2.id, user3.id, "From user3 - 3")
+
+      # user1 should see 5 total unread messages
+      assert Messaging.total_unread_count(user1) == 5
+    end
+
+    test "does not count messages sent by the user" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      # user1 sends messages (should not count for user1)
+      {:ok, _} = Messaging.create_message(conversation.id, user1.id, "My message 1")
+      {:ok, _} = Messaging.create_message(conversation.id, user1.id, "My message 2")
+
+      # user2 sends messages (should count for user1)
+      {:ok, _} = Messaging.create_message(conversation.id, user2.id, "From user2")
+
+      assert Messaging.total_unread_count(user1) == 1
+    end
+
+    test "does not count already read messages" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      # user2 sends messages
+      {:ok, msg1} = Messaging.create_message(conversation.id, user2.id, "Message 1")
+      {:ok, _msg2} = Messaging.create_message(conversation.id, user2.id, "Message 2")
+
+      # Mark first message as read
+      read_at = DateTime.utc_now() |> DateTime.truncate(:second)
+
+      msg1
+      |> Message.mark_read_changeset(read_at)
+      |> Repo.update!()
+
+      # Should only count 1 unread message
+      assert Messaging.total_unread_count(user1) == 1
+    end
+
+    test "returns separate counts for different users" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      # Both users send messages
+      {:ok, _} = Messaging.create_message(conversation.id, user1.id, "From user1 - 1")
+      {:ok, _} = Messaging.create_message(conversation.id, user1.id, "From user1 - 2")
+      {:ok, _} = Messaging.create_message(conversation.id, user2.id, "From user2")
+
+      # user1 sees 1 unread (message from user2)
+      assert Messaging.total_unread_count(user1) == 1
+      # user2 sees 2 unread (messages from user1)
+      assert Messaging.total_unread_count(user2) == 2
+    end
+  end
 end
