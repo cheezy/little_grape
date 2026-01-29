@@ -121,4 +121,44 @@ defmodule LittleGrape.Matches do
     )
     |> Repo.one()
   end
+
+  @doc """
+  Removes a match and its associated conversation and messages.
+
+  Only succeeds if the user is a participant in the match (user_a or user_b).
+  The database cascade delete will automatically remove the conversation and
+  any messages when the match is deleted.
+
+  ## Parameters
+
+    * `user` - The user struct with an id
+    * `match_id` - The ID of the match to remove
+
+  ## Returns
+
+    * `:ok` if the match was deleted successfully
+    * `{:error, :not_found}` if the match doesn't exist or user is not a participant
+
+  ## Examples
+
+      iex> unmatch(participant_user, match_id)
+      :ok
+
+      iex> unmatch(non_participant_user, match_id)
+      {:error, :not_found}
+
+      iex> unmatch(user, non_existent_id)
+      {:error, :not_found}
+
+  """
+  def unmatch(%User{} = user, match_id) do
+    case get_match(user, match_id) do
+      nil ->
+        {:error, :not_found}
+
+      match ->
+        Repo.delete(match)
+        :ok
+    end
+  end
 end

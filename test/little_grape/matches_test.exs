@@ -6,6 +6,7 @@ defmodule LittleGrape.MatchesTest do
   alias LittleGrape.Matches
   alias LittleGrape.Matches.Match
   alias LittleGrape.Messaging.Conversation
+  alias LittleGrape.Messaging.Message
 
   describe "create_match/2" do
     test "creates match with correct user order when user_a_id < user_b_id" do
@@ -215,6 +216,83 @@ defmodule LittleGrape.MatchesTest do
       non_existent_id = 999_999
 
       assert Matches.get_match(user, non_existent_id) == nil
+    end
+  end
+
+  describe "unmatch/2" do
+    test "removes match when user is participant" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+
+      {:ok, %{match: match, conversation: _}} = Matches.create_match(user1.id, user2.id)
+
+      assert :ok = Matches.unmatch(user1, match.id)
+      assert Repo.get(Match, match.id) == nil
+    end
+
+    test "returns error when user is not a participant" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      user3 = user_fixture()
+
+      {:ok, %{match: match, conversation: _}} = Matches.create_match(user1.id, user2.id)
+
+      # user3 is not a participant
+      assert {:error, :not_found} = Matches.unmatch(user3, match.id)
+      # Match should still exist
+      assert Repo.get(Match, match.id) != nil
+    end
+
+    test "returns error for non-existent match" do
+      user = user_fixture()
+      non_existent_id = 999_999
+
+      assert {:error, :not_found} = Matches.unmatch(user, non_existent_id)
+    end
+
+    test "cascade deletes conversation when match is deleted" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+
+      {:ok, %{match: match, conversation: conversation}} =
+        Matches.create_match(user1.id, user2.id)
+
+      assert :ok = Matches.unmatch(user1, match.id)
+      assert Repo.get(Conversation, conversation.id) == nil
+    end
+
+    test "cascade deletes messages when match is deleted" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+
+      {:ok, %{match: match, conversation: conversation}} =
+        Matches.create_match(user1.id, user2.id)
+
+      # Create a message in the conversation
+      {:ok, message} =
+        %Message{}
+        |> Message.changeset(%{
+          conversation_id: conversation.id,
+          sender_id: user1.id,
+          content: "Hello!"
+        })
+        |> Repo.insert()
+
+      assert :ok = Matches.unmatch(user1, match.id)
+      assert Repo.get(Message, message.id) == nil
+    end
+
+    test "either user can unmatch" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+
+      # First match - user1 unmatches
+      {:ok, %{match: match1, conversation: _}} = Matches.create_match(user1.id, user2.id)
+      assert :ok = Matches.unmatch(user1, match1.id)
+
+      # Second match - user2 unmatches
+      {:ok, %{match: match2, conversation: _}} = Matches.create_match(user1.id, user2.id)
+      assert :ok = Matches.unmatch(user2, match2.id)
     end
   end
 end
