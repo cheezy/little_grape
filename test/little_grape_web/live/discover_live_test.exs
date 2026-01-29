@@ -26,7 +26,8 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       {:error, {:redirect, %{to: path, flash: flash}}} = live(conn, ~p"/discover")
 
       assert path == "/users/profile"
-      assert flash["error"] == "Please complete your profile before discovering matches."
+      assert flash["error"] =~ "Please complete your profile to start discovering matches"
+      assert flash["error"] =~ "Missing:"
     end
 
     test "mounts successfully with complete profile", %{conn: conn, user: user} do

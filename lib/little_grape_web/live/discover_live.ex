@@ -19,7 +19,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
       user ->
         user = Repo.preload(user, :profile)
 
-        if profile_complete?(user.profile) do
+        if Accounts.profile_complete?(user.profile) do
           if connected?(socket) do
             Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user.id}")
           end
@@ -39,9 +39,14 @@ defmodule LittleGrapeWeb.DiscoverLive do
            |> assign(:expanded, false)
            |> assign(:unread_count, unread_count)}
         else
+          missing = Accounts.missing_profile_fields(user.profile)
+
+          message =
+            "Please complete your profile to start discovering matches. Missing: #{Enum.join(missing, ", ")}"
+
           {:ok,
            socket
-           |> put_flash(:error, "Please complete your profile before discovering matches.")
+           |> put_flash(:error, message)
            |> redirect(to: ~p"/users/profile")}
         end
     end
@@ -133,15 +138,6 @@ defmodule LittleGrapeWeb.DiscoverLive do
           nil -> assign(socket, :current_user, nil)
         end
     end
-  end
-
-  defp profile_complete?(nil), do: false
-
-  defp profile_complete?(profile) do
-    profile.profile_picture != nil and
-      profile.first_name != nil and
-      profile.birthdate != nil and
-      profile.gender != nil
   end
 
   defp calculate_age(nil), do: nil

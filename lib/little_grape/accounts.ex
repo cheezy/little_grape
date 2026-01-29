@@ -448,4 +448,53 @@ defmodule LittleGrape.Accounts do
       {:ok, profile}
     end
   end
+
+  @required_profile_fields [
+    {:profile_picture, "Profile photo"},
+    {:first_name, "First name"},
+    {:birthdate, "Birthdate"},
+    {:gender, "Gender"},
+    {:preferred_gender, "Gender preference"}
+  ]
+
+  @doc """
+  Checks if a profile has all required fields completed.
+
+  Required fields: profile_picture, first_name, birthdate, gender, preferred_gender
+
+  ## Examples
+
+      iex> profile_complete?(nil)
+      false
+
+      iex> profile_complete?(%Profile{profile_picture: "pic.jpg", first_name: "Jane", ...})
+      true
+
+  """
+  def profile_complete?(nil), do: false
+
+  def profile_complete?(%Profile{} = profile) do
+    Enum.all?(@required_profile_fields, fn {field, _label} ->
+      Map.get(profile, field) != nil
+    end)
+  end
+
+  @doc """
+  Returns a list of human-readable names for missing profile fields.
+
+  ## Examples
+
+      iex> missing_profile_fields(%Profile{first_name: nil, birthdate: ~D[2000-01-01]})
+      ["First name", ...]
+
+  """
+  def missing_profile_fields(nil) do
+    Enum.map(@required_profile_fields, fn {_field, label} -> label end)
+  end
+
+  def missing_profile_fields(%Profile{} = profile) do
+    @required_profile_fields
+    |> Enum.filter(fn {field, _label} -> Map.get(profile, field) == nil end)
+    |> Enum.map(fn {_field, label} -> label end)
+  end
 end

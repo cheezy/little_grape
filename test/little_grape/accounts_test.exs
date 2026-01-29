@@ -1289,4 +1289,149 @@ defmodule LittleGrape.AccountsTest do
       end
     end
   end
+
+  describe "profile_complete?/1" do
+    test "returns false for nil profile" do
+      refute Accounts.profile_complete?(nil)
+    end
+
+    test "returns false when profile_picture is missing" do
+      profile = %Profile{
+        profile_picture: nil,
+        first_name: "Jane",
+        birthdate: ~D[1995-01-01],
+        gender: "female",
+        preferred_gender: "male"
+      }
+
+      refute Accounts.profile_complete?(profile)
+    end
+
+    test "returns false when first_name is missing" do
+      profile = %Profile{
+        profile_picture: "/uploads/pic.jpg",
+        first_name: nil,
+        birthdate: ~D[1995-01-01],
+        gender: "female",
+        preferred_gender: "male"
+      }
+
+      refute Accounts.profile_complete?(profile)
+    end
+
+    test "returns false when birthdate is missing" do
+      profile = %Profile{
+        profile_picture: "/uploads/pic.jpg",
+        first_name: "Jane",
+        birthdate: nil,
+        gender: "female",
+        preferred_gender: "male"
+      }
+
+      refute Accounts.profile_complete?(profile)
+    end
+
+    test "returns false when gender is missing" do
+      profile = %Profile{
+        profile_picture: "/uploads/pic.jpg",
+        first_name: "Jane",
+        birthdate: ~D[1995-01-01],
+        gender: nil,
+        preferred_gender: "male"
+      }
+
+      refute Accounts.profile_complete?(profile)
+    end
+
+    test "returns false when preferred_gender is missing" do
+      profile = %Profile{
+        profile_picture: "/uploads/pic.jpg",
+        first_name: "Jane",
+        birthdate: ~D[1995-01-01],
+        gender: "female",
+        preferred_gender: nil
+      }
+
+      refute Accounts.profile_complete?(profile)
+    end
+
+    test "returns true when all required fields are present" do
+      profile = %Profile{
+        profile_picture: "/uploads/pic.jpg",
+        first_name: "Jane",
+        birthdate: ~D[1995-01-01],
+        gender: "female",
+        preferred_gender: "male"
+      }
+
+      assert Accounts.profile_complete?(profile)
+    end
+
+    test "returns true with preferred_gender set to 'any'" do
+      profile = %Profile{
+        profile_picture: "/uploads/pic.jpg",
+        first_name: "Jane",
+        birthdate: ~D[1995-01-01],
+        gender: "female",
+        preferred_gender: "any"
+      }
+
+      assert Accounts.profile_complete?(profile)
+    end
+  end
+
+  describe "missing_profile_fields/1" do
+    test "returns all fields for nil profile" do
+      missing = Accounts.missing_profile_fields(nil)
+      assert "Profile photo" in missing
+      assert "First name" in missing
+      assert "Birthdate" in missing
+      assert "Gender" in missing
+      assert "Gender preference" in missing
+      assert length(missing) == 5
+    end
+
+    test "returns empty list when all fields are present" do
+      profile = %Profile{
+        profile_picture: "/uploads/pic.jpg",
+        first_name: "Jane",
+        birthdate: ~D[1995-01-01],
+        gender: "female",
+        preferred_gender: "male"
+      }
+
+      assert Accounts.missing_profile_fields(profile) == []
+    end
+
+    test "returns only missing fields" do
+      profile = %Profile{
+        profile_picture: nil,
+        first_name: "Jane",
+        birthdate: ~D[1995-01-01],
+        gender: nil,
+        preferred_gender: "male"
+      }
+
+      missing = Accounts.missing_profile_fields(profile)
+      assert "Profile photo" in missing
+      assert "Gender" in missing
+      refute "First name" in missing
+      refute "Birthdate" in missing
+      refute "Gender preference" in missing
+      assert length(missing) == 2
+    end
+
+    test "returns single missing field" do
+      profile = %Profile{
+        profile_picture: "/uploads/pic.jpg",
+        first_name: "Jane",
+        birthdate: ~D[1995-01-01],
+        gender: "female",
+        preferred_gender: nil
+      }
+
+      missing = Accounts.missing_profile_fields(profile)
+      assert missing == ["Gender preference"]
+    end
+  end
 end
