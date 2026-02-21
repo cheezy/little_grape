@@ -535,7 +535,12 @@ defmodule LittleGrape.Discovery do
     years = today.year - birthdate.year
 
     # Check if birthday hasn't occurred yet this year
-    birthday_this_year = Date.new!(today.year, birthdate.month, birthdate.day)
+    # Handle leap year birthdays (Feb 29) in non-leap years by using Feb 28
+    birthday_this_year =
+      case Date.new(today.year, birthdate.month, birthdate.day) do
+        {:ok, date} -> date
+        {:error, :invalid_date} -> Date.new!(today.year, birthdate.month, birthdate.day - 1)
+      end
 
     case Date.compare(birthday_this_year, today) do
       :gt -> years - 1
