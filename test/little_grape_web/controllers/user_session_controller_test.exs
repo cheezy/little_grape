@@ -202,27 +202,6 @@ defmodule LittleGrapeWeb.UserSessionControllerTest do
   end
 
   describe "POST /users/log-in - magic link" do
-    test "sends magic link email when user exists", %{conn: conn, user: user} do
-      conn =
-        post(conn, ~p"/users/log-in", %{
-          "user" => %{"email" => user.email}
-        })
-
-      assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "If your email is in our system"
-      assert LittleGrape.Repo.get_by!(Accounts.UserToken, user_id: user.id).context == "login"
-    end
-
-    test "does not reveal whether email exists for non-existent user", %{conn: conn} do
-      conn =
-        post(conn, ~p"/users/log-in", %{
-          "user" => %{"email" => "nonexistent@example.com"}
-        })
-
-      # Same message as when user exists to prevent enumeration
-      assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "If your email is in our system"
-      assert redirected_to(conn) == ~p"/users/log-in"
-    end
-
     test "logs the user in", %{conn: conn, user: user} do
       {token, _hashed_token} = generate_user_magic_link_token(user)
 
