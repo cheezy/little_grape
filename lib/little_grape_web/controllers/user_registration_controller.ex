@@ -21,7 +21,9 @@ defmodule LittleGrapeWeb.UserRegistrationController do
         conn
         |> put_flash(
           :info,
-          "An email was sent to #{user.email}, please access it to confirm your account."
+          gettext("An email was sent to %{email}, please access it to confirm your account.",
+            email: user.email
+          )
         )
         |> redirect(to: ~p"/users/log-in")
 

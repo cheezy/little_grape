@@ -31,6 +31,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
            |> assign(:loading, true)
            |> assign(:candidates, [])
            |> assign(:current_candidate, nil)
+           |> assign(:previously_passed, [])
            |> assign(:swiping, false)
            |> assign(:show_match_modal, false)
            |> assign(:matched_profile, nil)
@@ -68,7 +69,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
           # Swipe already exists or other error - show feedback and advance
           socket =
             socket
-            |> put_flash(:error, "Something went wrong. Please try again.")
+            |> put_flash(:error, gettext("Something went wrong. Please try again."))
             |> advance_to_next_candidate()
 
           {:noreply, socket}
@@ -87,7 +88,21 @@ defmodule LittleGrapeWeb.DiscoverLive do
   end
 
   @impl true
-  def handle_info({:new_message, _message}, socket) do
+  def handle_event("reconsider", %{"target-user-id" => target_id}, socket) do
+    user = socket.assigns.user
+
+    case Swipes.delete_pass(user, String.to_integer(target_id)) do
+      {:ok, _swipe} ->
+        send(self(), :load_candidates)
+        {:noreply, put_flash(socket, :info, gettext("Profile added back to your feed."))}
+
+      {:error, :not_found} ->
+        {:noreply, put_flash(socket, :error, gettext("Could not undo that pass."))}
+    end
+  end
+
+  @impl true
+  def handle_info({:message_received, _message}, socket) do
     unread_count = Messaging.total_unread_count(socket.assigns.user)
     {:noreply, assign(socket, :unread_count, unread_count)}
   end
@@ -109,6 +124,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
   def handle_info(:load_candidates, socket) do
     candidates = Discovery.get_candidates(socket.assigns.user)
     current_candidate = List.first(candidates)
+    previously_passed = Discovery.list_previously_passed(socket.assigns.user)
     unread_count = Messaging.total_unread_count(socket.assigns.user)
 
     {:noreply,
@@ -116,6 +132,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
      |> assign(:loading, false)
      |> assign(:candidates, candidates)
      |> assign(:current_candidate, current_candidate)
+     |> assign(:previously_passed, previously_passed)
      |> assign(:unread_count, unread_count)}
   end
 
@@ -131,7 +148,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
 
         {:error, _reason} ->
           socket
-          |> put_flash(:error, "Something went wrong creating the match. Please try again.")
+          |> put_flash(:error, gettext("Something went wrong creating the match. Please try again."))
           |> advance_to_next_candidate()
       end
     else
@@ -180,7 +197,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
   def render(assigns) do
     ~H"""
     <div class="max-w-lg mx-auto px-4 py-8">
-      <h1 class="text-2xl font-bold text-center mb-8">Discover</h1>
+      <h1 class="text-2xl font-bold text-center mb-8">{gettext("Discover")}</h1>
 
       <%= if @loading do %>
         <.loading_spinner />
@@ -190,16 +207,22 @@ defmodule LittleGrapeWeb.DiscoverLive do
         <% else %>
           <div class="text-center py-12">
             <div class="text-6xl mb-4">🔍</div>
-            <p class="text-gray-500 text-lg font-medium">No more profiles right now</p>
-            <p class="text-gray-400 mt-2">Try broadening your preferences to see more people!</p>
+            <p class="text-gray-500 text-lg font-medium">{gettext("No more profiles right now")}</p>
+            <p class="text-gray-400 mt-2">
+              {gettext("Try broadening your preferences to see more people!")}
+            </p>
             <.link
               navigate={~p"/users/profile"}
-              class="inline-block mt-6 bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-6 rounded-full transition-colors"
+              class="inline-block mt-6 bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-full transition-colors"
             >
-              Update Preferences
+              {gettext("Update Preferences")}
             </.link>
           </div>
         <% end %>
+      <% end %>
+
+      <%= if @previously_passed != [] do %>
+        <.previously_passed_section profiles={@previously_passed} />
       <% end %>
 
       <%= if @show_match_modal do %>
@@ -209,12 +232,55 @@ defmodule LittleGrapeWeb.DiscoverLive do
     """
   end
 
+  defp previously_passed_section(assigns) do
+    ~H"""
+    <section class="mt-10">
+      <h2 class="text-lg font-semibold text-gray-700 mb-3">{gettext("Previously passed")}</h2>
+      <p class="text-sm text-gray-500 mb-4">
+        {gettext("Reconsider someone — they'll re-enter your discovery feed.")}
+      </p>
+      <ul class="space-y-3">
+        <%= for profile <- @profiles do %>
+          <li class="flex items-center gap-3 bg-white rounded-xl shadow-sm p-3">
+            <%= if profile.profile_picture do %>
+              <img
+                src={profile.profile_picture}
+                alt={"#{profile.first_name}'s photo"}
+                class="w-12 h-12 rounded-full object-cover"
+              />
+            <% else %>
+              <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                <span class="text-gray-400 text-xl">👤</span>
+              </div>
+            <% end %>
+            <div class="flex-1 min-w-0">
+              <p class="font-medium text-gray-900 truncate">{profile.first_name}</p>
+              <%= if profile.city || profile.country do %>
+                <p class="text-sm text-gray-500 truncate">
+                  {[profile.city, profile.country] |> Enum.filter(& &1) |> Enum.join(", ")}
+                </p>
+              <% end %>
+            </div>
+            <button
+              phx-click="reconsider"
+              phx-value-target-user-id={profile.user_id}
+              class="px-4 py-2 text-sm font-semibold text-red-600 border border-red-200 rounded-full hover:bg-red-50 transition-colors"
+            >
+              {gettext("Reconsider")}
+            </button>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+    """
+  end
+
   defp loading_spinner(assigns) do
     ~H"""
     <div class="flex flex-col items-center justify-center py-20">
-      <div class="w-12 h-12 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin">
+      <div class="w-12 h-12 border-4 border-red-200 border-t-red-500 rounded-full animate-spin">
       </div>
-      <p class="text-gray-500 mt-4">Finding people near you...</p>
+      <p class="text-gray-500 mt-4">{gettext("Finding people near you...")}</p>
     </div>
     """
   end
@@ -256,7 +322,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
             </p>
           <% end %>
           <%= unless @expanded do %>
-            <p class="text-white/60 text-sm mt-2">Tap to see more</p>
+            <p class="text-white/60 text-sm mt-2">{gettext("Tap to see more")}</p>
           <% end %>
         </div>
       </div>
@@ -278,7 +344,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
           phx-click="swipe"
           phx-value-action="like"
           disabled={@swiping}
-          class="w-16 h-16 rounded-full bg-pink-500 hover:bg-pink-600 flex items-center justify-center text-3xl text-white shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center text-3xl text-white shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           ♥
         </button>
@@ -292,17 +358,17 @@ defmodule LittleGrapeWeb.DiscoverLive do
     <div class="p-6 space-y-4 border-t border-gray-100 max-h-96 overflow-y-auto">
       <%= if @profile.bio do %>
         <div>
-          <h3 class="font-semibold text-gray-700 mb-1">About Me</h3>
+          <h3 class="font-semibold text-gray-700 mb-1">{gettext("About Me")}</h3>
           <p class="text-gray-600">{@profile.bio}</p>
         </div>
       <% end %>
 
       <%= if @profile.interests && @profile.interests != [] do %>
         <div>
-          <h3 class="font-semibold text-gray-700 mb-2">Interests</h3>
+          <h3 class="font-semibold text-gray-700 mb-2">{gettext("Interests")}</h3>
           <div class="flex flex-wrap gap-2">
             <%= for interest <- @profile.interests do %>
-              <span class="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-sm">
+              <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm">
                 {format_value(interest)}
               </span>
             <% end %>
@@ -312,14 +378,14 @@ defmodule LittleGrapeWeb.DiscoverLive do
 
       <%= if @profile.occupation do %>
         <div>
-          <h3 class="font-semibold text-gray-700 mb-1">Occupation</h3>
+          <h3 class="font-semibold text-gray-700 mb-1">{gettext("Occupation")}</h3>
           <p class="text-gray-600">{@profile.occupation}</p>
         </div>
       <% end %>
 
       <%= if @profile.looking_for do %>
         <div>
-          <h3 class="font-semibold text-gray-700 mb-1">Looking For</h3>
+          <h3 class="font-semibold text-gray-700 mb-1">{gettext("Looking For")}</h3>
           <p class="text-gray-600">{format_value(@profile.looking_for)}</p>
         </div>
       <% end %>
@@ -327,42 +393,42 @@ defmodule LittleGrapeWeb.DiscoverLive do
       <div class="grid grid-cols-2 gap-4">
         <%= if @profile.height_cm do %>
           <div>
-            <h3 class="font-semibold text-gray-700 mb-1">Height</h3>
+            <h3 class="font-semibold text-gray-700 mb-1">{gettext("Height")}</h3>
             <p class="text-gray-600">{@profile.height_cm} cm</p>
           </div>
         <% end %>
 
         <%= if @profile.body_type do %>
           <div>
-            <h3 class="font-semibold text-gray-700 mb-1">Body Type</h3>
+            <h3 class="font-semibold text-gray-700 mb-1">{gettext("Body Type")}</h3>
             <p class="text-gray-600">{format_value(@profile.body_type)}</p>
           </div>
         <% end %>
 
         <%= if @profile.education do %>
           <div>
-            <h3 class="font-semibold text-gray-700 mb-1">Education</h3>
+            <h3 class="font-semibold text-gray-700 mb-1">{gettext("Education")}</h3>
             <p class="text-gray-600">{format_value(@profile.education)}</p>
           </div>
         <% end %>
 
         <%= if @profile.religion do %>
           <div>
-            <h3 class="font-semibold text-gray-700 mb-1">Religion</h3>
+            <h3 class="font-semibold text-gray-700 mb-1">{gettext("Religion")}</h3>
             <p class="text-gray-600">{format_value(@profile.religion)}</p>
           </div>
         <% end %>
 
         <%= if @profile.smoking do %>
           <div>
-            <h3 class="font-semibold text-gray-700 mb-1">Smoking</h3>
+            <h3 class="font-semibold text-gray-700 mb-1">{gettext("Smoking")}</h3>
             <p class="text-gray-600">{format_value(@profile.smoking)}</p>
           </div>
         <% end %>
 
         <%= if @profile.drinking do %>
           <div>
-            <h3 class="font-semibold text-gray-700 mb-1">Drinking</h3>
+            <h3 class="font-semibold text-gray-700 mb-1">{gettext("Drinking")}</h3>
             <p class="text-gray-600">{format_value(@profile.drinking)}</p>
           </div>
         <% end %>
@@ -370,14 +436,14 @@ defmodule LittleGrapeWeb.DiscoverLive do
 
       <%= if @profile.languages && @profile.languages != [] do %>
         <div>
-          <h3 class="font-semibold text-gray-700 mb-1">Languages</h3>
+          <h3 class="font-semibold text-gray-700 mb-1">{gettext("Languages")}</h3>
           <p class="text-gray-600">
             {Enum.map(@profile.languages, &format_language/1) |> Enum.join(", ")}
           </p>
         </div>
       <% end %>
 
-      <p class="text-center text-gray-400 text-sm pt-2">Tap photo to collapse</p>
+      <p class="text-center text-gray-400 text-sm pt-2">{gettext("Tap photo to collapse")}</p>
     </div>
     """
   end
@@ -389,46 +455,46 @@ defmodule LittleGrapeWeb.DiscoverLive do
     |> Enum.map_join(" ", &String.capitalize/1)
   end
 
-  defp format_language("sq"), do: "Albanian"
-  defp format_language("en"), do: "English"
-  defp format_language("it"), do: "Italian"
-  defp format_language("de"), do: "German"
-  defp format_language("fr"), do: "French"
-  defp format_language("sr"), do: "Serbian"
-  defp format_language("mk"), do: "Macedonian"
-  defp format_language("tr"), do: "Turkish"
-  defp format_language("other"), do: "Other"
+  defp format_language("sq"), do: gettext("Albanian")
+  defp format_language("en"), do: gettext("English")
+  defp format_language("it"), do: gettext("Italian")
+  defp format_language("de"), do: gettext("German")
+  defp format_language("fr"), do: gettext("French")
+  defp format_language("sr"), do: gettext("Serbian")
+  defp format_language("mk"), do: gettext("Macedonian")
+  defp format_language("tr"), do: gettext("Turkish")
+  defp format_language("other"), do: gettext("Other")
   defp format_language(code), do: code
 
   defp match_modal(assigns) do
     ~H"""
     <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div class="bg-white rounded-2xl p-8 max-w-sm mx-4 text-center shadow-2xl">
-        <h2 class="text-3xl font-bold text-pink-500 mb-4">It's a Match!</h2>
+        <h2 class="text-3xl font-bold text-red-500 mb-4">{gettext("It's a Match!")}</h2>
 
         <div class="mb-6">
           <%= if @profile.profile_picture do %>
             <img
               src={@profile.profile_picture}
               alt={"#{@profile.first_name}'s photo"}
-              class="w-32 h-32 rounded-full object-cover mx-auto border-4 border-pink-500"
+              class="w-32 h-32 rounded-full object-cover mx-auto border-4 border-red-500"
             />
           <% else %>
-            <div class="w-32 h-32 rounded-full bg-gray-200 mx-auto flex items-center justify-center border-4 border-pink-500">
+            <div class="w-32 h-32 rounded-full bg-gray-200 mx-auto flex items-center justify-center border-4 border-red-500">
               <span class="text-gray-400 text-4xl">👤</span>
             </div>
           <% end %>
         </div>
 
         <p class="text-gray-600 mb-6">
-          You and {@profile.first_name} liked each other!
+          {gettext("You and %{name} liked each other!", name: @profile.first_name)}
         </p>
 
         <button
           phx-click="close_match_modal"
-          class="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-6 rounded-full transition-colors"
+          class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-full transition-colors"
         >
-          Keep Swiping
+          {gettext("Keep Swiping")}
         </button>
       </div>
     </div>

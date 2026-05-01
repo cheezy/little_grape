@@ -74,7 +74,8 @@ defmodule LittleGrapeWeb.Router do
     delete "/users/profile/picture", UserProfileController, :delete_picture
 
     live_session :authenticated_app,
-      layout: {LittleGrapeWeb.Layouts, :app} do
+      layout: {LittleGrapeWeb.Layouts, :app},
+      on_mount: [LittleGrapeWeb.UserAuth, LittleGrapeWeb.Plugs.Locale] do
       live "/discover", DiscoverLive
       live "/matches", MatchesLive
       live "/chat/:match_id", ChatLive

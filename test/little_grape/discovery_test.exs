@@ -1315,4 +1315,85 @@ defmodule LittleGrape.DiscoveryTest do
       assert Enum.all?(candidates, fn c -> is_struct(c, Profile) end)
     end
   end
+
+  describe "ai_pick/1" do
+    test "returns nil when no candidates exist" do
+      user = create_user_with_complete_profile(%{gender: "male", preferred_gender: "female"})
+      assert Discovery.ai_pick(user) == nil
+    end
+
+    test "returns the highest-scoring candidate as a profile + reasons" do
+      user =
+        create_user_with_complete_profile(%{
+          gender: "male",
+          preferred_gender: "female",
+          country: "US",
+          preferred_country: "US",
+          interests: ["sports", "music"]
+        })
+
+      _low =
+        create_user_with_complete_profile(%{
+          gender: "female",
+          preferred_gender: "male",
+          country: "DE",
+          interests: ["cooking"]
+        })
+
+      high =
+        create_user_with_complete_profile(%{
+          gender: "female",
+          preferred_gender: "male",
+          country: "US",
+          interests: ["sports", "music", "travel"]
+        })
+
+      assert {profile, score, reasons} = Discovery.ai_pick(user)
+      assert profile.user_id == high.id
+      assert is_float(score)
+      assert is_list(reasons)
+      assert {:country, %{country: "US"}} in reasons
+      assert Enum.any?(reasons, &match?({:interests, %{list: _}}, &1))
+    end
+
+    test "respects hard filters (gender preference)" do
+      user =
+        create_user_with_complete_profile(%{
+          gender: "male",
+          preferred_gender: "female"
+        })
+
+      # Same-gender candidate that wouldn't pass the bidirectional gender filter
+      _wrong_gender =
+        create_user_with_complete_profile(%{
+          gender: "male",
+          preferred_gender: "female"
+        })
+
+      assert Discovery.ai_pick(user) == nil
+    end
+  end
+
+  describe "list_previously_passed/1" do
+    test "returns profiles for users the current user passed on, most recent first" do
+      user = create_user_with_complete_profile(%{gender: "male", preferred_gender: "female"})
+      first = create_user_with_complete_profile(%{gender: "female", preferred_gender: "male"})
+      second = create_user_with_complete_profile(%{gender: "female", preferred_gender: "male"})
+      liked = create_user_with_complete_profile(%{gender: "female", preferred_gender: "male"})
+
+      {:ok, _} = LittleGrape.Swipes.create_swipe(user, first.id, "pass")
+      {:ok, _} = LittleGrape.Swipes.create_swipe(user, liked.id, "like")
+      {:ok, _} = LittleGrape.Swipes.create_swipe(user, second.id, "pass")
+
+      result = Discovery.list_previously_passed(user)
+
+      assert Enum.map(result, & &1.user_id) == [second.id, first.id]
+      assert Enum.all?(result, &is_struct(&1, Profile))
+    end
+
+    test "returns empty list when no passes exist" do
+      user = create_user_with_complete_profile(%{gender: "male", preferred_gender: "female"})
+      assert Discovery.list_previously_passed(user) == []
+    end
+  end
 end

@@ -22,7 +22,7 @@ defmodule LittleGrapeWeb.UserProfileController do
     with {:ok, profile} <- Accounts.update_profile(profile, profile_params),
          {:ok, _profile} <- handle_picture_upload(profile, picture_upload) do
       conn
-      |> put_flash(:info, "Profile updated successfully.")
+      |> put_flash(:info, gettext("Profile updated successfully."))
       |> redirect(to: ~p"/users/profile")
     else
       {:error, changeset} ->
@@ -37,12 +37,12 @@ defmodule LittleGrapeWeb.UserProfileController do
     case Accounts.delete_profile_picture(profile) do
       {:ok, _profile} ->
         conn
-        |> put_flash(:info, "Profile picture removed.")
+        |> put_flash(:info, gettext("Profile picture removed."))
         |> redirect(to: ~p"/users/profile")
 
       {:error, _changeset} ->
         conn
-        |> put_flash(:error, "Failed to remove profile picture.")
+        |> put_flash(:error, gettext("Failed to remove profile picture."))
         |> redirect(to: ~p"/users/profile")
     end
   end

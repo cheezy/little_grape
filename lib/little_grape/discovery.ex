@@ -83,6 +83,21 @@ defmodule LittleGrape.Discovery do
   end
 
   @doc """
+  Excludes users that the current user has already LIKED. Users they've
+  passed on are still allowed — used by the AI Match feature so it can
+  surface a "second look" suggestion.
+  """
+  def exclude_already_liked(query, user_id) do
+    from [user: u] in query,
+      where:
+        u.id not in subquery(
+          from s in Swipe,
+            where: s.user_id == ^user_id and s.action == "like",
+            select: s.target_user_id
+        )
+  end
+
+  @doc """
   Excludes users that are blocked in either direction.
   - Users that the current user has blocked
   - Users that have blocked the current user
@@ -524,6 +539,130 @@ defmodule LittleGrape.Discovery do
     |> score_and_rank(query)
     |> Enum.take(limit)
     |> Enum.map(fn {candidate, _score} -> candidate.profile end)
+  end
+
+  @doc """
+  Returns the single best candidate profile for the user along with the reasons
+  the algorithm picked it. Used by the "AI Match" card on `/matches`.
+
+  Applies the standard hard filters (gender preferences, blocks, complete profiles,
+  not-yet-swiped) and returns the highest scorer. The pick is one-directional —
+  the candidate doesn't have to have liked the user back.
+
+  ## Returns
+
+    * `nil` — no candidate found
+    * `{%Profile{}, score, reasons}` — best candidate; `reasons` is a list of
+      `{key, label}` tuples (e.g. `{:country, "Same country (Sweden)"}`) suitable
+      for rendering in the UI.
+  """
+  def ai_pick(%User{} = user) do
+    user_profile = user.profile
+
+    if is_nil(user_profile) do
+      nil
+    else
+      query =
+        base_query()
+        |> exclude_self(user.id)
+        |> exclude_already_liked(user.id)
+        |> exclude_blocked(user.id)
+        |> require_complete_profile()
+        |> filter_by_mutual_gender_preferences(
+          user_profile.gender,
+          user_profile.preferred_gender
+        )
+
+      case user |> score_and_rank(query) |> List.first() do
+        nil ->
+          nil
+
+        {candidate, score} ->
+          {candidate.profile, score, pick_reasons(user_profile, candidate.profile)}
+      end
+    end
+  end
+
+  @doc """
+  Returns a list of `{key, params}` reason tuples explaining why a candidate is
+  a good pick for the user. The web layer is responsible for converting the
+  tuples into translated strings.
+
+  Possible keys:
+    * `:age` — `%{}` (no params)
+    * `:country` — `%{country: "Sweden"}`
+    * `:interests` — `%{list: ["sports", "music"]}`
+    * `:languages` — `%{list: ["sq", "en"]}`
+    * `:religion` — `%{}`
+  """
+  def pick_reasons(%Profile{} = user_profile, %Profile{} = candidate_profile) do
+    user_profile
+    |> compute_scores(candidate_profile)
+    |> build_reasons(user_profile, candidate_profile)
+  end
+
+  defp compute_scores(user_profile, candidate_profile) do
+    %{
+      age:
+        score_age(
+          candidate_profile.birthdate,
+          user_profile.preferred_age_min,
+          user_profile.preferred_age_max
+        ),
+      country: score_country(user_profile.preferred_country, candidate_profile.country),
+      interests: score_interests(user_profile.interests, candidate_profile.interests),
+      languages: score_languages(user_profile.languages, candidate_profile.languages),
+      religion: score_religion(user_profile.religion, candidate_profile.religion)
+    }
+  end
+
+  defp build_reasons(scores, user_profile, candidate_profile) do
+    [
+      scores.age >= 0.75 && {:age, %{}},
+      scores.country >= 1.0 && country_reason(candidate_profile.country),
+      scores.interests >= 0.5 && shared_list_reason(:interests, user_profile.interests, candidate_profile.interests),
+      scores.languages >= 0.5 && shared_list_reason(:languages, user_profile.languages, candidate_profile.languages),
+      scores.religion >= 1.0 && {:religion, %{}}
+    ]
+    |> Enum.filter(& &1)
+  end
+
+  defp country_reason(nil), do: false
+  defp country_reason(country), do: {:country, %{country: country}}
+
+  defp shared_list_reason(_key, nil, _), do: false
+  defp shared_list_reason(_key, _, nil), do: false
+
+  defp shared_list_reason(key, user_list, candidate_list)
+       when is_list(user_list) and is_list(candidate_list) do
+    shared =
+      user_list
+      |> MapSet.new()
+      |> MapSet.intersection(MapSet.new(candidate_list))
+      |> MapSet.to_list()
+
+    case shared do
+      [] -> false
+      list -> {key, %{list: list}}
+    end
+  end
+
+  @doc """
+  Returns profiles the user previously passed on, most recently passed first.
+  Each profile carries a `:user_id` so the LiveView can act on it.
+  """
+  def list_previously_passed(%User{} = user) do
+    target_ids = LittleGrape.Swipes.list_passed_target_ids(user)
+
+    if target_ids == [] do
+      []
+    else
+      from(p in Profile,
+        where: p.user_id in ^target_ids
+      )
+      |> Repo.all()
+      |> Enum.sort_by(fn profile -> Enum.find_index(target_ids, &(&1 == profile.user_id)) end)
+    end
   end
 
   # ============================================================================

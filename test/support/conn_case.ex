@@ -34,6 +34,9 @@ defmodule LittleGrapeWeb.ConnCase do
   setup tags do
     LittleGrape.DataCase.setup_sandbox(tags)
     LittleGrape.DataCase.setup_upload_cleanup()
+    # Force English in the test process so flash and UI assertions stay stable
+    # — LiveView and async test processes don't run through the locale plug.
+    Gettext.put_locale(LittleGrapeWeb.Gettext, "en")
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 

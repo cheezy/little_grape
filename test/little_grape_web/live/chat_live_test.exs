@@ -142,7 +142,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
 
       # Own messages should have pink background and right alignment
       assert html =~ "My own message"
-      assert html =~ "bg-pink-500"
+      assert html =~ "bg-red-500"
       assert html =~ "justify-end"
     end
 

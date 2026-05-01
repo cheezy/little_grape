@@ -1,6 +1,9 @@
 defmodule LittleGrapeWeb.ChatLive do
   use LittleGrapeWeb, :live_view
 
+  import LittleGrapeWeb.ChatComponents,
+    only: [messages_list: 1, message_input: 1]
+
   alias LittleGrape.Accounts
   alias LittleGrape.Matches
   alias LittleGrape.Messaging
@@ -44,7 +47,7 @@ defmodule LittleGrapeWeb.ChatLive do
 
   defp redirect_not_found(socket) do
     socket
-    |> put_flash(:error, "Conversation not found")
+    |> put_flash(:error, gettext("Conversation not found"))
     |> redirect(to: ~p"/matches")
   end
 
@@ -84,10 +87,11 @@ defmodule LittleGrapeWeb.ChatLive do
         {:ok, _message} ->
           {:noreply,
            socket
-           |> assign(:message_form, to_form(%{"content" => ""}))}
+           |> assign(:message_form, to_form(%{"content" => ""}))
+           |> push_event("clear:chat-message-input", %{})}
 
         {:error, _changeset} ->
-          {:noreply, put_flash(socket, :error, "Failed to send message. Please try again.")}
+          {:noreply, put_flash(socket, :error, gettext("Failed to send message. Please try again."))}
       end
     end
   end
@@ -118,6 +122,12 @@ defmodule LittleGrapeWeb.ChatLive do
      |> assign(:messages, socket.assigns.messages ++ [message])
      |> assign(:unread_count, unread_count)
      |> push_event("scroll_to_bottom", %{})}
+  end
+
+  @impl true
+  def handle_info({:message_received, _message}, socket) do
+    unread_count = Messaging.total_unread_count(socket.assigns.user)
+    {:noreply, assign(socket, :unread_count, unread_count)}
   end
 
   @impl true
@@ -178,15 +188,11 @@ defmodule LittleGrapeWeb.ChatLive do
       >
         <.chat_header other_profile={@other_profile} />
 
-        <div id="messages-container" class="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-gray-50">
-          <%= if @messages == [] do %>
-            <.empty_state other_profile={@other_profile} />
-          <% else %>
-            <%= for message <- @messages do %>
-              <.message_bubble message={message} current_user_id={@user.id} />
-            <% end %>
-          <% end %>
-        </div>
+        <.messages_list
+          messages={@messages}
+          other_profile={@other_profile}
+          current_user_id={@user.id}
+        />
 
         <.message_input form={@message_form} />
 
@@ -223,9 +229,9 @@ defmodule LittleGrapeWeb.ChatLive do
   defp loading_spinner(assigns) do
     ~H"""
     <div class="flex-1 flex flex-col items-center justify-center bg-gray-50">
-      <div class="w-12 h-12 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin">
+      <div class="w-12 h-12 border-4 border-red-200 border-t-red-500 rounded-full animate-spin">
       </div>
-      <p class="text-gray-500 mt-4">Loading messages...</p>
+      <p class="text-gray-500 mt-4">{gettext("Loading messages...")}</p>
     </div>
     """
   end
@@ -268,36 +274,6 @@ defmodule LittleGrapeWeb.ChatLive do
     """
   end
 
-  defp message_input(assigns) do
-    ~H"""
-    <div class="px-4 py-3 bg-white border-t">
-      <form phx-submit="send_message" class="flex gap-2">
-        <input
-          type="text"
-          name="content"
-          value={@form["content"].value}
-          placeholder="Type a message..."
-          autocomplete="off"
-          class="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-        />
-        <button
-          type="submit"
-          class="px-4 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition-colors"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-          </svg>
-        </button>
-      </form>
-    </div>
-    """
-  end
-
   defp chat_header(assigns) do
     ~H"""
     <div class="flex items-center gap-3 px-4 py-3 bg-white border-b shadow-sm">
@@ -330,60 +306,6 @@ defmodule LittleGrapeWeb.ChatLive do
     """
   end
 
-  defp empty_state(assigns) do
-    ~H"""
-    <div class="flex flex-col items-center justify-center h-full text-center">
-      <div class="text-5xl mb-4">💬</div>
-      <p class="text-gray-500 font-medium">No messages yet</p>
-      <p class="text-gray-400 text-sm mt-1">
-        Say hello to {display_name(@other_profile)}!
-      </p>
-    </div>
-    """
-  end
-
-  defp message_bubble(assigns) do
-    is_own = assigns.message.sender_id == assigns.current_user_id
-
-    assigns =
-      assigns
-      |> assign(:is_own, is_own)
-      |> assign(:alignment, if(is_own, do: "justify-end", else: "justify-start"))
-      |> assign(
-        :bubble_style,
-        if(is_own,
-          do: "bg-pink-500 text-white rounded-br-sm",
-          else: "bg-white text-gray-900 rounded-bl-sm"
-        )
-      )
-
-    ~H"""
-    <div class={"flex #{@alignment}"}>
-      <div class={"max-w-xs px-4 py-2 rounded-2xl shadow-sm #{@bubble_style}"}>
-        <p class="break-words">{@message.content}</p>
-        <p class={[
-          "text-xs mt-1",
-          if(@is_own, do: "text-pink-200", else: "text-gray-400")
-        ]}>
-          {format_timestamp(@message.inserted_at)}
-        </p>
-      </div>
-    </div>
-    """
-  end
-
   defp display_name(nil), do: "Unknown"
   defp display_name(profile), do: profile.first_name || "Unknown"
-
-  defp format_timestamp(datetime) do
-    hour = datetime.hour
-    minute = datetime.minute
-
-    {hour_12, am_pm} =
-      if hour >= 12,
-        do: {rem(hour - 1, 12) + 1, "PM"},
-        else: {if(hour == 0, do: 12, else: hour), "AM"}
-
-    "#{hour_12}:#{String.pad_leading(Integer.to_string(minute), 2, "0")} #{am_pm}"
-  end
 end

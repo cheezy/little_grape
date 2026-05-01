@@ -106,4 +106,34 @@ defmodule LittleGrape.Swipes do
 
     Repo.exists?(query)
   end
+
+  @doc """
+  Lists the target user IDs that the given user previously passed on,
+  most recently passed first.
+  """
+  def list_passed_target_ids(%User{id: user_id}) do
+    from(s in Swipe,
+      where: s.user_id == ^user_id and s.action == "pass",
+      order_by: [desc: s.inserted_at, desc: s.id],
+      select: s.target_user_id
+    )
+    |> Repo.all()
+  end
+
+  @doc """
+  Deletes a "pass" swipe so the target user can re-enter the discovery feed.
+
+  Only deletes swipes with action `"pass"` — likes cannot be removed this way.
+
+  ## Returns
+
+    * `{:ok, %Swipe{}}` — the deleted swipe
+    * `{:error, :not_found}` — no matching pass swipe exists
+  """
+  def delete_pass(%User{id: user_id}, target_user_id) do
+    case Repo.get_by(Swipe, user_id: user_id, target_user_id: target_user_id, action: "pass") do
+      nil -> {:error, :not_found}
+      swipe -> Repo.delete(swipe)
+    end
+  end
 end

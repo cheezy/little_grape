@@ -1,5 +1,6 @@
 defmodule LittleGrapeWeb.UserAuth do
   use LittleGrapeWeb, :verified_routes
+  use Gettext, backend: LittleGrapeWeb.Gettext
 
   import Plug.Conn
   import Phoenix.Controller
@@ -73,6 +74,23 @@ defmodule LittleGrapeWeb.UserAuth do
     else
       nil -> assign(conn, :current_scope, Scope.for_user(nil))
     end
+  end
+
+  @doc """
+  LiveView `on_mount` hook that mirrors `fetch_current_scope_for_user/2` so
+  LiveViews — which run in their own process and don't pass through the plug
+  pipeline — assign `:current_scope` from the session token like controllers do.
+  """
+  def on_mount(:default, _params, session, socket) do
+    user =
+      with token when is_binary(token) <- session["user_token"],
+           {user, _token_inserted_at} <- Accounts.get_user_by_session_token(token) do
+        user
+      else
+        _ -> nil
+      end
+
+    {:cont, Phoenix.Component.assign(socket, :current_scope, Scope.for_user(user))}
   end
 
   defp ensure_user_token(conn) do
@@ -177,7 +195,7 @@ defmodule LittleGrapeWeb.UserAuth do
       conn
     else
       conn
-      |> put_flash(:error, "You must re-authenticate to access this page.")
+      |> put_flash(:error, gettext("You must re-authenticate to access this page."))
       |> maybe_store_return_to()
       |> redirect(to: ~p"/users/log-in")
       |> halt()
@@ -207,7 +225,7 @@ defmodule LittleGrapeWeb.UserAuth do
       conn
     else
       conn
-      |> put_flash(:error, "You must log in to access this page.")
+      |> put_flash(:error, gettext("You must log in to access this page."))
       |> maybe_store_return_to()
       |> redirect(to: ~p"/users/log-in")
       |> halt()

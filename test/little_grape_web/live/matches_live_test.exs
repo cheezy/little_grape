@@ -115,21 +115,28 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       assert html =~ "Start a conversation!"
     end
 
-    test "match card links to chat page", %{conn: conn, user: user} do
-      # Create profile for user
+    test "match card opens the chat in-page when clicked", %{conn: conn, user: user} do
       profile_fixture(user) |> set_profile_picture()
-
-      # Create another user with profile
       other_user = user_fixture()
       profile_fixture(other_user, %{first_name: "ChatPartner"}) |> set_profile_picture()
 
-      # Create a match
       {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
 
-      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
+      {:ok, view, html} = mount_and_render(conn, ~p"/matches")
 
-      # Should have link to chat
-      assert html =~ "/chat/#{match.id}"
+      # The match list shows a select_match button, not a navigate link
+      assert html =~ ~s(phx-click="select_match")
+      assert html =~ ~s(phx-value-match-id="#{match.id}")
+      refute html =~ "/chat/#{match.id}"
+
+      # Clicking the row loads the chat into the right pane and keeps the list visible
+      html = view |> element(~s(button[phx-value-match-id="#{match.id}"])) |> render_click()
+
+      # List still shown
+      assert html =~ "ChatPartner"
+      # Chat pane now visible (header + input)
+      assert html =~ ~s(id="chat-container")
+      assert html =~ ~s(id="chat-message-form")
     end
 
     test "truncates long message previews", %{conn: conn, user: user} do
@@ -391,8 +398,8 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
       # Should have highlighted styling (pink background)
-      assert html =~ "bg-pink-50"
-      assert html =~ "border-pink-200"
+      assert html =~ "bg-red-50"
+      assert html =~ "border-red-200"
     end
 
     test "subscribes to PubSub on mount", %{conn: conn, user: user} do

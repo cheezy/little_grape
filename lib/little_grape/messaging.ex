@@ -62,13 +62,13 @@ defmodule LittleGrape.Messaging do
       Phoenix.PubSub.broadcast(
         LittleGrape.PubSub,
         "user:#{match.user_a_id}",
-        {:new_message, message}
+        {:message_received, message}
       )
 
       Phoenix.PubSub.broadcast(
         LittleGrape.PubSub,
         "user:#{match.user_b_id}",
-        {:new_message, message}
+        {:message_received, message}
       )
     end
   end

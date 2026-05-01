@@ -42,6 +42,13 @@ const Hooks = {
       }
     }
   },
+  ClearOnEvent: {
+    mounted() {
+      this.handleEvent("clear:" + this.el.id, () => {
+        this.el.value = ""
+      })
+    }
+  },
   ...colocatedHooks
 }
 

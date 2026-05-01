@@ -176,6 +176,67 @@ defmodule LittleGrape.SwipesTest do
     end
   end
 
+  describe "list_passed_target_ids/1" do
+    test "returns target ids of pass swipes, most recent first" do
+      user = user_fixture()
+      first = user_fixture()
+      second = user_fixture()
+      liked = user_fixture()
+
+      {:ok, _} = Swipes.create_swipe(user, first.id, "pass")
+      {:ok, _} = Swipes.create_swipe(user, liked.id, "like")
+      {:ok, _} = Swipes.create_swipe(user, second.id, "pass")
+
+      assert Swipes.list_passed_target_ids(user) == [second.id, first.id]
+    end
+
+    test "returns empty list when user has no pass swipes" do
+      user = user_fixture()
+      target = user_fixture()
+      {:ok, _} = Swipes.create_swipe(user, target.id, "like")
+
+      assert Swipes.list_passed_target_ids(user) == []
+    end
+
+    test "scopes to the given user" do
+      user = user_fixture()
+      other_user = user_fixture()
+      target = user_fixture()
+
+      {:ok, _} = Swipes.create_swipe(other_user, target.id, "pass")
+
+      assert Swipes.list_passed_target_ids(user) == []
+    end
+  end
+
+  describe "delete_pass/2" do
+    test "deletes a pass swipe and returns it" do
+      user = user_fixture()
+      target = user_fixture()
+      {:ok, swipe} = Swipes.create_swipe(user, target.id, "pass")
+
+      assert {:ok, deleted} = Swipes.delete_pass(user, target.id)
+      assert deleted.id == swipe.id
+      refute Swipes.has_swiped?(user.id, target.id)
+    end
+
+    test "refuses to delete a like swipe" do
+      user = user_fixture()
+      target = user_fixture()
+      {:ok, _} = Swipes.create_swipe(user, target.id, "like")
+
+      assert {:error, :not_found} = Swipes.delete_pass(user, target.id)
+      assert Swipes.has_swiped?(user.id, target.id)
+    end
+
+    test "returns :not_found when no swipe exists" do
+      user = user_fixture()
+      target = user_fixture()
+
+      assert {:error, :not_found} = Swipes.delete_pass(user, target.id)
+    end
+  end
+
   describe "swipes table migration" do
     test "creates table with correct columns" do
       user1 = user_fixture()

@@ -40,125 +40,167 @@ defmodule LittleGrapeWeb.Layouts do
   def app(assigns) do
     ~H"""
     <div class="min-h-screen flex flex-col">
-      <main class="flex-1 pb-16">
+      <.top_nav
+        current_scope={@current_scope}
+        unread_count={@unread_count}
+        locale={Map.get(assigns, :locale, "sq")}
+      />
+
+      <main class="flex-1">
         <%= if @inner_content do %>
           {@inner_content}
         <% else %>
           {render_slot(@inner_block)}
         <% end %>
       </main>
-
-      <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 safe-area-inset-bottom">
-        <div class="max-w-lg mx-auto px-4">
-          <div class="flex justify-around py-2">
-            <.nav_item href={~p"/discover"} icon="discover" label="Discover" />
-            <.nav_item href={~p"/matches"} icon="matches" label="Matches" badge={@unread_count} />
-            <.nav_item href={~p"/users/profile"} icon="profile" label="Profile" />
-          </div>
-        </div>
-      </nav>
     </div>
 
     <.flash_group flash={@flash} />
     """
   end
 
+  @doc """
+  Shared site-wide top navigation. Used by `app/1` (LiveViews via the
+  `:authenticated_app` live_session) and by every controller-rendered template
+  so the header looks the same across the whole app.
+  """
+  attr :current_scope, :map, default: nil
+  attr :unread_count, :integer, default: 0
+  attr :locale, :string, default: "sq"
+
+  def top_nav(assigns) do
+    ~H"""
+    <nav class="bg-white/90 backdrop-blur-sm border-b border-gray-200 px-6 py-4">
+      <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+        <a href={~p"/"} class="inline-flex items-center gap-3 shrink-0">
+          <svg viewBox="0 0 100 100" class="h-10 w-10" fill="none">
+            <circle cx="50" cy="50" r="48" fill="black" stroke="white" stroke-width="2" />
+            <path
+              d="M50 75 L25 50 C15 40 15 25 30 20 C40 17 50 25 50 35 C50 25 60 17 70 20 C85 25 85 40 75 50 Z"
+              fill="#CC0000"
+              stroke="white"
+              stroke-width="2"
+            />
+          </svg>
+          <span class="text-gray-900 text-xl font-bold tracking-tight">Zemra Ime</span>
+        </a>
+
+        <div class="hidden md:flex items-center gap-6">
+          <%= if @current_scope && @current_scope.user do %>
+            <span class="text-gray-500 text-sm bg-gray-100 px-3 py-1 rounded-full">
+              {@current_scope.user.email}
+            </span>
+            <.top_nav_link href={~p"/"} label={gettext("Home")} />
+            <.top_nav_link href={~p"/discover"} label={gettext("Discover")} />
+            <.top_nav_link
+              href={~p"/matches"}
+              label={gettext("Matches")}
+              badge={@unread_count}
+            />
+            <.top_nav_link href={~p"/users/profile"} label={gettext("Profile")} />
+            <.link
+              href={~p"/users/log-out"}
+              method="delete"
+              class="text-gray-600 hover:text-red-600 transition font-medium"
+            >
+              {gettext("Log out")}
+            </.link>
+          <% else %>
+            <.top_nav_link href={~p"/users/log-in"} label={gettext("Log In")} />
+            <.link
+              href={~p"/users/register"}
+              class="bg-red-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-red-700 transition shadow"
+            >
+              {gettext("Sign Up")}
+            </.link>
+          <% end %>
+
+          <.language_switcher locale={@locale} />
+        </div>
+
+        <div class="flex md:hidden items-center gap-3">
+          <.language_switcher locale={@locale} />
+          <button
+            type="button"
+            class="p-2 rounded-lg text-gray-600 hover:text-red-600 hover:bg-gray-100 transition"
+            onclick="['mobile-menu','mobile-menu-open-icon','mobile-menu-close-icon'].forEach(id => document.getElementById(id).classList.toggle('hidden'))"
+            aria-label={gettext("Toggle menu")}
+            aria-controls="mobile-menu"
+          >
+            <span id="mobile-menu-open-icon" class="block">
+              <.icon name="hero-bars-3" class="size-6" />
+            </span>
+            <span id="mobile-menu-close-icon" class="hidden">
+              <.icon name="hero-x-mark" class="size-6" />
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <div id="mobile-menu" class="hidden md:hidden mt-4 pt-4 border-t border-gray-200">
+        <div class="flex flex-col gap-3">
+          <%= if @current_scope && @current_scope.user do %>
+            <span class="text-gray-500 text-sm bg-gray-100 px-3 py-1 rounded-full self-start">
+              {@current_scope.user.email}
+            </span>
+            <.top_nav_link href={~p"/"} label={gettext("Home")} />
+            <.top_nav_link href={~p"/discover"} label={gettext("Discover")} />
+            <.top_nav_link
+              href={~p"/matches"}
+              label={gettext("Matches")}
+              badge={@unread_count}
+            />
+            <.top_nav_link href={~p"/users/profile"} label={gettext("Profile")} />
+            <.link
+              href={~p"/users/log-out"}
+              method="delete"
+              class="text-gray-600 hover:text-red-600 transition font-medium"
+            >
+              {gettext("Log out")}
+            </.link>
+          <% else %>
+            <.top_nav_link href={~p"/users/log-in"} label={gettext("Log In")} />
+            <.link
+              href={~p"/users/register"}
+              class="bg-red-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-red-700 transition shadow self-start"
+            >
+              {gettext("Sign Up")}
+            </.link>
+          <% end %>
+        </div>
+      </div>
+    </nav>
+    """
+  end
+
   attr :href, :string, required: true
-  attr :icon, :string, required: true
   attr :label, :string, required: true
   attr :badge, :integer, default: 0
 
-  defp nav_item(assigns) do
+  defp top_nav_link(assigns) do
     ~H"""
-    <a href={@href} class="flex flex-col items-center py-2 px-4 text-gray-600 hover:text-pink-500">
-      <div class="relative">
-        <.nav_icon icon={@icon} />
-        <%= if @badge > 0 do %>
-          <span class="absolute -top-1 -right-2 bg-pink-500 text-white text-xs font-bold rounded-full h-5 min-w-5 px-1 flex items-center justify-center">
-            {if @badge > 99, do: "99+", else: @badge}
-          </span>
-        <% end %>
-      </div>
-      <span class="text-xs mt-1">{@label}</span>
+    <a href={@href} class="relative text-gray-600 hover:text-red-600 transition font-medium">
+      {@label}
+      <%= if @badge > 0 do %>
+        <span class="absolute -top-2 -right-4 bg-pink-500 text-white text-xs font-bold rounded-full h-5 min-w-5 px-1 flex items-center justify-center">
+          {if @badge > 99, do: "99+", else: @badge}
+        </span>
+      <% end %>
     </a>
     """
   end
 
-  attr :icon, :string, required: true
+  attr :locale, :string, required: true
 
-  defp nav_icon(%{icon: "discover"} = assigns) do
+  defp language_switcher(assigns) do
     ~H"""
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      class="h-6 w-6"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
+    <select
+      onchange="window.location.href = window.location.pathname + '?locale=' + this.value"
+      class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
     >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-      />
-    </svg>
-    """
-  end
-
-  defp nav_icon(%{icon: "matches"} = assigns) do
-    ~H"""
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      class="h-6 w-6"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-      />
-    </svg>
-    """
-  end
-
-  defp nav_icon(%{icon: "profile"} = assigns) do
-    ~H"""
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      class="h-6 w-6"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-      />
-    </svg>
-    """
-  end
-
-  defp nav_icon(assigns) do
-    ~H"""
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      class="h-6 w-6"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M4 6h16M4 12h16M4 18h16"
-      />
-    </svg>
+      <option value="sq" selected={@locale == "sq"}>Shqip</option>
+      <option value="en" selected={@locale == "en"}>English</option>
+    </select>
     """
   end
 

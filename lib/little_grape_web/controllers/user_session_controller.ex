@@ -34,14 +34,14 @@ defmodule LittleGrapeWeb.UserSessionController do
   def create(conn, %{"user" => %{"email" => email, "password" => password} = user_params}) do
     if user = Accounts.get_user_by_email_and_password(email, password) do
       conn
-      |> put_flash(:info, "Welcome back!")
+      |> put_flash(:info, gettext("Welcome back!"))
       |> UserAuth.log_in_user(user, user_params)
     else
       form = Phoenix.Component.to_form(user_params, as: "user")
 
       # In order to prevent user enumeration attacks, don't disclose whether the email is registered.
       conn
-      |> put_flash(:error, "Invalid email or password")
+      |> put_flash(:error, gettext("Invalid email or password"))
       |> render(:new, form: form)
     end
   end
@@ -56,19 +56,19 @@ defmodule LittleGrapeWeb.UserSessionController do
       |> render(:confirm)
     else
       conn
-      |> put_flash(:error, "Magic link is invalid or it has expired.")
+      |> put_flash(:error, gettext("Magic link is invalid or it has expired."))
       |> redirect(to: ~p"/users/log-in")
     end
   end
 
   def delete(conn, _params) do
     conn
-    |> put_flash(:info, "Logged out successfully.")
+    |> put_flash(:info, gettext("Logged out successfully."))
     |> UserAuth.log_out_user()
   end
 
-  defp confirmation_message(%{"_action" => "confirmed"}), do: "User confirmed successfully."
-  defp confirmation_message(_params), do: "Welcome back!"
+  defp confirmation_message(%{"_action" => "confirmed"}), do: gettext("User confirmed successfully.")
+  defp confirmation_message(_params), do: gettext("Welcome back!")
 
   defp render_password_error(conn, token, changeset) do
     user = Accounts.get_user_by_magic_link_token(token)
@@ -84,7 +84,7 @@ defmodule LittleGrapeWeb.UserSessionController do
 
   defp render_token_error(conn) do
     conn
-    |> put_flash(:error, "The link is invalid or it has expired.")
+    |> put_flash(:error, gettext("The link is invalid or it has expired."))
     |> render(:new, form: Phoenix.Component.to_form(%{}, as: "user"))
   end
 

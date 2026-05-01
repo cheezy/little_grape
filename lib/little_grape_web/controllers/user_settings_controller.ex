@@ -38,12 +38,12 @@ defmodule LittleGrapeWeb.UserSettingsController do
     case Accounts.update_user_email(conn.assigns.current_scope.user, token) do
       {:ok, _user} ->
         conn
-        |> put_flash(:info, "Email changed successfully.")
+        |> put_flash(:info, gettext("Email changed successfully."))
         |> redirect(to: ~p"/users/settings/email")
 
       {:error, _} ->
         conn
-        |> put_flash(:error, "Email change link is invalid or it has expired.")
+        |> put_flash(:error, gettext("Email change link is invalid or it has expired."))
         |> redirect(to: ~p"/users/settings/email")
     end
   end
@@ -60,7 +60,7 @@ defmodule LittleGrapeWeb.UserSettingsController do
     case Accounts.update_user_password(user, user_params) do
       {:ok, {user, _}} ->
         conn
-        |> put_flash(:info, "Password updated successfully.")
+        |> put_flash(:info, gettext("Password updated successfully."))
         |> put_session(:user_return_to, ~p"/users/settings/password")
         |> UserAuth.log_in_user(user)
 

@@ -3,784 +3,1532 @@ msgid ""
 msgstr ""
 "Language: sq\n"
 
-## Navigation
-msgid "Features"
-msgstr "Veçoritë"
-
-msgid "About"
-msgstr "Rreth Nesh"
-
-msgid "Success Stories"
-msgstr "Histori Suksesi"
-
-msgid "Log In"
-msgstr "Hyr"
-
-msgid "Sign Up"
-msgstr "Regjistrohu"
-
-## Hero Section
-msgid "Join 50,000+ Albanians worldwide"
-msgstr "Bashkohu me 50,000+ shqiptarë në mbarë botën"
-
-msgid "Find Your"
-msgstr "Gjej"
-
-msgid "Albanian"
-msgstr "Zemrën"
-
-msgid "Soulmate"
-msgstr "Tënde"
-
-msgid "Connect with Albanians from around the world. Whether you're in Tirana, New York, London, or anywhere else — your perfect match is waiting."
-msgstr "Lidhu me shqiptarë nga e gjithë bota. Qoftë në Tiranë, Nju Jork, Londër, ose kudo tjetër — partneri/ja yt/jote e përsosur po të pret."
-
-msgid "Start Free Today"
-msgstr "Fillo Falas Sot"
-
-msgid "How It Works"
-msgstr "Si Funksionon"
-
-msgid "Verified Profiles"
-msgstr "Profile të Verifikuara"
-
+#: lib/little_grape_web/controllers/page_html/home.html.heex:73
+#, elixir-autogen, elixir-format
 msgid "100% Private"
 msgstr "100% Private"
 
+#: lib/little_grape_web/controllers/page_html/home.html.heex:79
+#, elixir-autogen, elixir-format
 msgid "4.8 Star Rating"
 msgstr "Vlerësim 4.8 Yje"
 
-msgid "Your match awaits"
-msgstr "Partneri/ja jote po të pret"
-
-msgid "Find Your Perfect Match"
-msgstr "Gjej Partnerin/en e Përsosur"
-
-msgid "Based on culture & compatibility"
-msgstr "Bazuar në kulturë dhe përshtatshmëri"
-
-## Features Section
-msgid "Why Choose Zemra Ime?"
-msgstr "Pse të Zgjedhësh Zemra Ime?"
-
-msgid "Built by Albanians, for Albanians. We understand our culture, traditions, and what matters in finding a life partner."
-msgstr "Ndërtuar nga shqiptarët, për shqiptarët. Ne e kuptojmë kulturën, traditat tona, dhe çfarë ka rëndësi në gjetjen e një partneri jete."
-
-msgid "Global Albanian Community"
-msgstr "Komuniteti Global Shqiptar"
-
-msgid "Connect with Albanians from Kosovo, Albania, North Macedonia, Montenegro, and diaspora communities worldwide."
-msgstr "Lidhu me shqiptarë nga Kosova, Shqipëria, Maqedonia e Veriut, Mali i Zi, dhe komunitetet e diasporës në mbarë botën."
-
-msgid "Verified & Safe"
-msgstr "I Verifikuar dhe i Sigurt"
-
-msgid "Every profile is verified. Your privacy and security are our top priority with advanced safety features."
-msgstr "Çdo profil është i verifikuar. Privatësia dhe siguria juaj janë prioriteti ynë kryesor me veçori të avancuara sigurie."
-
-msgid "Smart Matching"
-msgstr "Përputhje Inteligjente"
-
-msgid "Our algorithm considers cultural values, family traditions, and personal preferences for meaningful connections."
-msgstr "Algoritmi ynë merr parasysh vlerat kulturore, traditat familjare, dhe preferencat personale për lidhje kuptimplota."
-
-## Stats Section
-msgid "Active Members"
-msgstr "Anëtarë Aktivë"
-
-msgid "Successful Matches"
-msgstr "Përputhje të Suksesshme"
-
-msgid "Countries"
-msgstr "Vende"
-
-msgid "App Store Rating"
-msgstr "Vlerësimi në App Store"
-
-## About Section
-msgid "More Than Dating —"
-msgstr "Më Shumë se Takime —"
-
+#: lib/little_grape_web/controllers/page_html/home.html.heex:238
+#, elixir-autogen, elixir-format
 msgid "A Cultural Connection"
 msgstr "Një Lidhje Kulturore"
 
-msgid "Zemra Ime (meaning \"My Heart\" in Albanian) captures the essence of what we're all searching for — that special connection. We created this platform because we understand that for Albanians, finding a partner is about more than just compatibility — it's about shared values, family, and cultural understanding."
-msgstr "Zemra Ime kap thelbin e asaj që të gjithë po kërkojmë — atë lidhje të veçantë. Ne e krijuam këtë platformë sepse e kuptojmë që për shqiptarët, gjetja e një partneri është më shumë se thjesht përshtatshmëri — bëhet fjalë për vlera të përbashkëta, familje, dhe mirëkuptim kulturor."
-
-msgid "Whether you're looking for someone who appreciates our traditions, speaks the language, or simply shares your Albanian heritage, you'll find them here."
-msgstr "Qoftë duke kërkuar dikë që vlerëson traditat tona, flet gjuhën, ose thjesht ndan trashëgiminë tuaj shqiptare, do ta gjeni këtu."
-
-msgid "Albania"
-msgstr "Shqipëria"
-
-msgid "Kosovo"
-msgstr "Kosova"
-
-msgid "North Macedonia"
-msgstr "Maqedonia e Veriut"
-
-msgid "Diaspora"
-msgstr "Diaspora"
-
-msgid "Where there's smoke, there's fire. Where there's love, there's family."
-msgstr "Ku ka tym, ka zjarr. Ku ka dashuri, ka familje."
-
-msgid "Albanian Proverb"
-msgstr "Proverb Shqiptar"
-
-msgid "Traditional Wisdom"
-msgstr "Urtësi Tradicionale"
-
-## CTA Section
-msgid "Ready to Find Your Albanian Match?"
-msgstr "Gati të Gjesh Partnerin/en Tënd/e Shqiptar/e?"
-
-msgid "Join thousands of Albanians who have found love, friendship, and meaningful connections on Zemra Ime."
-msgstr "Bashkohu me mijëra shqiptarë që kanë gjetur dashurinë, miqësinë, dhe lidhje kuptimplota në Zemra Ime."
-
-msgid "Create Free Account"
-msgstr "Krijo Llogari Falas"
-
-msgid "Learn More"
-msgstr "Mëso Më Shumë"
-
-## Footer
-msgid "Connecting Albanians worldwide. Find love, build relationships, honor traditions."
-msgstr "Duke lidhur shqiptarët në mbarë botën. Gjej dashurinë, ndërto marrëdhënie, ndero traditat."
-
-msgid "Company"
-msgstr "Kompania"
-
-msgid "About Us"
-msgstr "Rreth Nesh"
-
-msgid "Careers"
-msgstr "Karriera"
-
-msgid "Press"
-msgstr "Shtypi"
-
-msgid "Contact"
-msgstr "Kontakti"
-
-msgid "Support"
-msgstr "Mbështetja"
-
-msgid "Help Center"
-msgstr "Qendra e Ndihmës"
-
-msgid "Safety Tips"
-msgstr "Këshilla Sigurie"
-
-msgid "Community Guidelines"
-msgstr "Udhëzimet e Komunitetit"
-
-msgid "Report an Issue"
-msgstr "Raporto një Problem"
-
-msgid "Legal"
-msgstr "Ligjore"
-
-msgid "Privacy Policy"
-msgstr "Politika e Privatësisë"
-
-msgid "Terms of Service"
-msgstr "Kushtet e Shërbimit"
-
-msgid "Cookie Policy"
-msgstr "Politika e Cookie-ve"
-
-msgid "Made with love for Albanians everywhere."
-msgstr "Bërë me dashuri për shqiptarët kudo."
-
-## Language Switcher
-msgid "Language"
-msgstr "Gjuha"
-
-msgid "English"
-msgstr "Anglisht"
-
-msgid "Shqip"
-msgstr "Shqip"
-
-## Authentication
-msgid "Register"
-msgstr "Regjistrohu"
-
-msgid "Register for an account"
-msgstr "Regjistrohu për një llogari"
-
-msgid "Already registered?"
-msgstr "Je regjistruar tashmë?"
-
-msgid "Log in"
-msgstr "Hyr"
-
-msgid "to your account now."
-msgstr "në llogarinë tënde tani."
-
-msgid "Email"
-msgstr "Email-i"
-
-msgid "Create an account"
-msgstr "Krijo një llogari"
-
-msgid "Creating account..."
-msgstr "Duke krijuar llogarinë..."
-
-msgid "Don't have an account?"
-msgstr "Nuk ke llogari?"
-
-msgid "Sign up"
-msgstr "Regjistrohu"
-
-msgid "for an account now."
-msgstr "për një llogari tani."
-
-msgid "Password"
-msgstr "Fjalëkalimi"
-
-msgid "Log in with email"
-msgstr "Hyr me email"
-
-msgid "or"
-msgstr "ose"
-
-msgid "Log in and stay logged in"
-msgstr "Hyr dhe qëndro i kyçur"
-
-msgid "Log in only this time"
-msgstr "Hyr vetëm këtë herë"
-
-msgid "Log out"
-msgstr "Dil"
-
-msgid "Settings"
-msgstr "Profili"
-
-msgid "Account Settings"
-msgstr "Cilësimet e Llogarisë"
-
-msgid "Manage your account email address and password settings"
-msgstr "Menaxho email-in dhe fjalëkalimin e llogarisë tënde"
-
-msgid "Change Email"
-msgstr "Ndrysho Email-in"
-
-msgid "Changing..."
-msgstr "Duke ndryshuar..."
-
-msgid "New password"
-msgstr "Fjalëkalimi i ri"
-
-msgid "Confirm new password"
-msgstr "Konfirmo fjalëkalimin e ri"
-
-msgid "Confirm password"
-msgstr "Konfirmo fjalëkalimin"
-
-msgid "Save Password"
-msgstr "Ruaj Fjalëkalimin"
-
-msgid "Welcome"
-msgstr "Mirë se vjen"
-
-msgid "Confirm and stay logged in"
-msgstr "Konfirmo dhe qëndro i kyçur"
-
-msgid "Confirm and log in only this time"
-msgstr "Konfirmo dhe hyr vetëm këtë herë"
-
-msgid "Keep me logged in on this device"
-msgstr "Mbaj më të kyçur në këtë pajisje"
-
-msgid "Log me in only this time"
-msgstr "Hyrm vetëm këtë herë"
-
-msgid "Confirming..."
-msgstr "Duke konfirmuar..."
-
-msgid "Logging in..."
-msgstr "Duke hyrë..."
-
-msgid "You need to reauthenticate to perform sensitive actions on your account."
-msgstr "Duhet të identifikohesh përsëri për të kryer veprime të ndjeshme në llogarinë tënde."
-
-msgid "You are running the local mail adapter."
-msgstr "Po përdor adapterin lokal të postës."
-
-msgid "To see sent emails, visit"
-msgstr "Për të parë email-et e dërguara, vizito"
-
-msgid "the mailbox page"
-msgstr "faqen e kutisë postare"
-
-msgid "Tip: If you prefer passwords, you can enable them in the user settings."
-msgstr "Këshillë: Nëse preferon fjalëkalimet, mund t'i aktivizosh në cilësimet e përdoruesit."
-
-## Authentication Errors
-msgid "Invalid email or password"
-msgstr "Email ose fjalëkalim i pavlefshëm"
-
-msgid "must have the @ sign and no spaces"
-msgstr "duhet të ketë shenjën @ dhe pa hapësira"
-
-msgid "has already been taken"
-msgstr "është marrë tashmë"
-
-msgid "does not match password"
-msgstr "nuk përputhet me fjalëkalimin"
-
-msgid "Click below to confirm your account and log in."
-msgstr "Kliko më poshtë për të konfirmuar llogarinë dhe hyrë."
-
-msgid "Your account is confirmed. Click below to log in."
-msgstr "Llogaria jote është konfirmuar. Kliko më poshtë për të hyrë."
-
-msgid "should be at least %{count} character(s)"
-msgstr "duhet të jetë së paku %{count} karaktere"
-
-msgid "should be at most %{count} character(s)"
-msgstr "duhet të jetë më së shumti %{count} karaktere"
-
-msgid "Set your password to complete registration."
-msgstr "Vendos fjalëkalimin për të përfunduar regjistrimin."
-
-msgid "Complete registration"
-msgstr "Përfundo regjistrimin"
-
-msgid "must contain at least one lowercase letter"
-msgstr "duhet të përmbajë së paku një shkronjë të vogël"
-
-msgid "must contain at least one uppercase letter"
-msgstr "duhet të përmbajë së paku një shkronjë të madhe"
-
-msgid "must contain at least one number"
-msgstr "duhet të përmbajë së paku një numër"
-
-msgid "must contain at least one special character (!?@#$%^&*_-+=)"
-msgstr "duhet të përmbajë së paku një karakter special (!?@#$%^&*_-+=)"
-
-## Profile
-msgid "Profile"
-msgstr "Profili"
-
-msgid "My Profile"
-msgstr "Profili Im"
-
-msgid "Tell us about yourself to find your perfect match"
-msgstr "Na trego për veten tënde për të gjetur partnerin/en e përsosur"
-
-msgid "Basic Info"
-msgstr "Informacionet Bazë"
-
-msgid "First Name"
-msgstr "Emri"
-
-msgid "Last Name"
-msgstr "Mbiemri"
-
-msgid "Birthdate"
-msgstr "Datëlindja"
-
-msgid "Gender"
-msgstr "Gjinia"
-
-msgid "City"
-msgstr "Qyteti"
-
-msgid "Country"
-msgstr "Shteti"
-
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:228
+#: lib/little_grape_web/live/discover_live.ex:361
+#, elixir-autogen, elixir-format
 msgid "About Me"
 msgstr "Rreth Meje"
 
-msgid "Bio"
-msgstr "Biografia"
+#: lib/little_grape_web/controllers/page_html/home.html.heex:362
+#, elixir-autogen, elixir-format
+msgid "About Us"
+msgstr "Rreth Nesh"
 
-msgid "Tell others about yourself..."
-msgstr "Tregoju të tjerëve për veten..."
+#: lib/little_grape_web/components/core_components.ex:372
+#, elixir-autogen, elixir-format
+msgid "Actions"
+msgstr "Veprime"
 
-msgid "Occupation"
-msgstr "Profesioni"
+## Stats Section
+#: lib/little_grape_web/controllers/page_html/home.html.heex:213
+#, elixir-autogen, elixir-format
+msgid "Active Members"
+msgstr "Anëtarë Aktivë"
 
-msgid "Physical Attributes"
-msgstr "Karakteristikat Fizike"
+#: lib/little_grape_web/controllers/page_html/home.html.heex:253
+#: lib/little_grape_web/controllers/user_profile_html.ex:24
+#, elixir-autogen, elixir-format
+msgid "Albania"
+msgstr "Shqipëria"
 
-msgid "Height (cm)"
-msgstr "Gjatësia (cm)"
+#: lib/little_grape_web/controllers/page_html/home.html.heex:28
+#: lib/little_grape_web/controllers/user_profile_html.ex:116
+#: lib/little_grape_web/live/discover_live.ex:458
+#, elixir-autogen, elixir-format
+msgid "Albanian"
+msgstr "Zemrën"
 
-msgid "Body Type"
-msgstr "Lloji i Trupit"
+#: lib/little_grape_web/controllers/page_html/home.html.heex:294
+#, elixir-autogen, elixir-format
+msgid "Albanian Proverb"
+msgstr "Proverb Shqiptar"
 
-msgid "Eye Color"
-msgstr "Ngjyra e Syve"
+#: lib/little_grape_web/controllers/user_registration_html/new.html.heex:14
+#, elixir-autogen, elixir-format
+msgid "Already registered?"
+msgstr "Je regjistruar tashmë?"
 
-msgid "Hair Color"
-msgstr "Ngjyra e Flokëve"
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:591
+#, elixir-autogen, elixir-format
+msgid "Any"
+msgstr "Çdo"
 
-msgid "Preferences"
-msgstr "Preferencat"
+#: lib/little_grape_web/controllers/page_html/home.html.heex:225
+#, elixir-autogen, elixir-format
+msgid "App Store Rating"
+msgstr "Vlerësimi në App Store"
 
-msgid "Looking For"
-msgstr "Kërkoj"
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:57
+#, elixir-autogen, elixir-format
+msgid "Are you sure you want to remove your profile picture?"
+msgstr "Je i sigurt që dëshiron të heqësh foton e profilit?"
 
-msgid "Preferred Age (Min)"
-msgstr "Mosha e Preferuar (Min)"
+#: lib/little_grape_web/controllers/user_profile_html.ex:134
+#, elixir-autogen, elixir-format
+msgid "Art"
+msgstr "Art"
 
-msgid "Preferred Age (Max)"
-msgstr "Mosha e Preferuar (Maks)"
+#: lib/little_grape_web/controllers/user_profile_html.ex:111
+#, elixir-autogen, elixir-format
+msgid "Atheist"
+msgstr "Ateist"
 
-msgid "Preferred Country"
-msgstr "Vendi i Preferuar"
-
-msgid "Save Profile"
-msgstr "Ruaj Profilin"
-
-msgid "Select..."
-msgstr "Zgjidh..."
-
-## Gender Options
-msgid "Male"
-msgstr "Mashkull"
-
-msgid "Female"
-msgstr "Femër"
-
-msgid "Other"
-msgstr "Tjetër"
-
-## Body Type Options
-msgid "Slim"
-msgstr "I Hollë"
-
+#: lib/little_grape_web/controllers/user_profile_html.ex:56
+#, elixir-autogen, elixir-format
 msgid "Athletic"
 msgstr "Atletik"
 
+#: lib/little_grape_web/components/layouts.ex:180
+#: lib/little_grape_web/components/layouts.ex:192
+#, elixir-autogen, elixir-format
+msgid "Attempting to reconnect"
+msgstr "Po përpiqemi të rilidhemi"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:43
+#, elixir-autogen, elixir-format
+msgid "Australia"
+msgstr "Australia"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:34
+#, elixir-autogen, elixir-format
+msgid "Austria"
+msgstr "Austria"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:57
+#, elixir-autogen, elixir-format
 msgid "Average"
 msgstr "Mesatar"
 
-msgid "Curvy"
-msgstr "Me Forma"
+#: lib/little_grape_web/controllers/user_profile_html.ex:102
+#, elixir-autogen, elixir-format
+msgid "Bachelor's Degree"
+msgstr "Diplomë Bachelor"
 
-msgid "Muscular"
-msgstr "Muskuloz"
+## Background Section
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:367
+#, elixir-autogen, elixir-format
+msgid "Background"
+msgstr "Prapavija"
 
-msgid "Plus Size"
-msgstr "Madhësi Plus"
+#: lib/little_grape_web/controllers/page_html/home.html.heex:113
+#, elixir-autogen, elixir-format
+msgid "Based on culture & compatibility"
+msgstr "Bazuar në kulturë dhe përshtatshmëri"
 
-## Eye Color Options
-msgid "Brown"
-msgstr "Kafe"
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:126
+#, elixir-autogen, elixir-format
+msgid "Basic Info"
+msgstr "Informacionet Bazë"
 
-msgid "Blue"
-msgstr "Blu"
+#: lib/little_grape_web/controllers/user_profile_html.ex:37
+#, elixir-autogen, elixir-format
+msgid "Belgium"
+msgstr "Belgjika"
 
-msgid "Green"
-msgstr "Gjelbër"
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:233
+#, elixir-autogen, elixir-format
+msgid "Bio"
+msgstr "Biografia"
 
-msgid "Hazel"
-msgstr "Lajthi"
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:153
+#, elixir-autogen, elixir-format
+msgid "Birthdate"
+msgstr "Datëlindja"
 
-msgid "Gray"
-msgstr "Gri"
-
+#: lib/little_grape_web/controllers/user_profile_html.ex:67
+#: lib/little_grape_web/controllers/user_profile_html.ex:69
+#, elixir-autogen, elixir-format
 msgid "Black"
 msgstr "Zi"
 
 ## Hair Color Options
+#: lib/little_grape_web/controllers/user_profile_html.ex:71
+#, elixir-autogen, elixir-format
 msgid "Blonde"
 msgstr "Biond"
 
-msgid "Red"
-msgstr "Kuq"
+#: lib/little_grape_web/controllers/user_profile_html.ex:63
+#, elixir-autogen, elixir-format
+msgid "Blue"
+msgstr "Blu"
 
-msgid "White"
-msgstr "Bardhë"
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:489
+#: lib/little_grape_web/live/discover_live.ex:403
+#, elixir-autogen, elixir-format
+msgid "Body Type"
+msgstr "Lloji i Trupit"
 
-## Looking For Options
-msgid "Friendship"
-msgstr "Miqësi"
-
-msgid "Dating"
-msgstr "Takime"
-
-msgid "Relationship"
-msgstr "Lidhje"
-
-msgid "Marriage"
-msgstr "Martesë"
-
-msgid "Not Sure"
-msgstr "Nuk Jam i Sigurt"
-
-## Profile Validation Errors
-msgid "is too far in the past"
-msgstr "është shumë larg në të kaluarën"
-
-msgid "you must be at least 18 years old"
-msgstr "duhet të jesh së paku 18 vjeç"
-
-msgid "must be greater than or equal to minimum age"
-msgstr "duhet të jetë më e madhe ose e barabartë me moshën minimale"
-
-## Country Options
-msgid "Montenegro"
-msgstr "Mali i Zi"
-
-msgid "Serbia"
-msgstr "Serbia"
-
+#: lib/little_grape_web/controllers/user_profile_html.ex:29
+#, elixir-autogen, elixir-format
 msgid "Bosnia and Herzegovina"
 msgstr "Bosnja dhe Hercegovina"
 
-msgid "Croatia"
-msgstr "Kroacia"
+## Eye Color Options
+#: lib/little_grape_web/controllers/user_profile_html.ex:62
+#: lib/little_grape_web/controllers/user_profile_html.ex:70
+#, elixir-autogen, elixir-format
+msgid "Brown"
+msgstr "Kafe"
 
-msgid "Slovenia"
-msgstr "Sllovenia"
+#: lib/little_grape_web/controllers/page_html/home.html.heex:135
+#, elixir-autogen, elixir-format
+msgid "Built by Albanians, for Albanians. We understand our culture, traditions, and what matters in finding a life partner."
+msgstr "Ndërtuar nga shqiptarët, për shqiptarët. Ne e kuptojmë kulturën, traditat tona, dhe çfarë ka rëndësi në gjetjen e një partneri jete."
 
-msgid "Greece"
-msgstr "Greqia"
-
-msgid "Italy"
-msgstr "Italia"
-
-msgid "Austria"
-msgstr "Austria"
-
-msgid "Germany"
-msgstr "Gjermania"
-
-msgid "Switzerland"
-msgstr "Zvicra"
-
-msgid "Belgium"
-msgstr "Belgjika"
-
-msgid "Netherlands"
-msgstr "Holanda"
-
-msgid "France"
-msgstr "Franca"
-
-msgid "United Kingdom"
-msgstr "Mbretëria e Bashkuar"
-
-msgid "United States"
-msgstr "Shtetet e Bashkuara"
-
+#: lib/little_grape_web/controllers/user_profile_html.ex:42
+#, elixir-autogen, elixir-format
 msgid "Canada"
 msgstr "Kanadaja"
 
-msgid "Australia"
-msgstr "Australia"
+#: lib/little_grape_web/controllers/page_html/home.html.heex:363
+#, elixir-autogen, elixir-format
+msgid "Careers"
+msgstr "Karriera"
 
-msgid "Sweden"
-msgstr "Suedia"
-
-msgid "Norway"
-msgstr "Norvegjia"
-
-msgid "Denmark"
-msgstr "Danimarka"
-
-msgid "Finland"
-msgstr "Finlanda"
-
-msgid "Spain"
-msgstr "Spanja"
-
-msgid "Portugal"
-msgstr "Portugalia"
-
-msgid "Turkey"
-msgstr "Turqia"
-
-msgid "Cyprus"
-msgstr "Qiproja"
-
-msgid "Malta"
-msgstr "Malta"
-
-## Profile Picture
-msgid "Profile Picture"
-msgstr "Fotoja e Profilit"
-
-msgid "Profile picture"
-msgstr "Fotoja e profilit"
-
-msgid "Upload New Picture"
-msgstr "Ngarko Foto të Re"
-
-msgid "JPG, PNG, GIF or WebP. Max 5MB."
-msgstr "JPG, PNG, GIF ose WebP. Maks 5MB."
-
-msgid "Are you sure you want to remove your profile picture?"
-msgstr "Je i sigurt që dëshiron të heqësh foton e profilit?"
-
-msgid "Profile picture removed."
-msgstr "Fotoja e profilit u hoq."
-
-msgid "Failed to remove profile picture."
-msgstr "Dështoi heqja e fotos së profilit."
-
-## Lifestyle Section
-msgid "Lifestyle"
-msgstr "Stili i Jetës"
-
-msgid "Smoking"
-msgstr "Pirja e Duhanit"
-
-msgid "Non-smoker"
-msgstr "Jo duhanpirës"
-
-msgid "Occasional smoker"
-msgstr "Duhanpirës rastësor"
-
-msgid "Regular smoker"
-msgstr "Duhanpirës i rregullt"
-
-msgid "Drinking"
-msgstr "Pirja e Alkoolit"
-
-msgid "Non-drinker"
-msgstr "Jo pirës"
-
-msgid "Social drinker"
-msgstr "Pirës shoqëror"
-
-msgid "Regular drinker"
-msgstr "Pirës i rregullt"
-
-msgid "Has Children"
-msgstr "Ka Fëmijë"
-
-msgid "Wants Children"
-msgstr "Dëshiron Fëmijë"
-
-msgid "Have children, want more"
-msgstr "Kam fëmijë, dua më shumë"
-
-## Background Section
-msgid "Background"
-msgstr "Prapavija"
-
-msgid "Education"
-msgstr "Arsimi"
-
-msgid "High School"
-msgstr "Shkolla e Mesme"
-
-msgid "Some College"
-msgstr "Disa Studime"
-
-msgid "Bachelor's Degree"
-msgstr "Diplomë Bachelor"
-
-msgid "Master's Degree"
-msgstr "Diplomë Master"
-
-msgid "Doctorate"
-msgstr "Doktoraturë"
-
-msgid "Religion"
-msgstr "Feja"
-
-msgid "Muslim"
-msgstr "Mysliman"
-
-msgid "Orthodox Christian"
-msgstr "Ortodoks"
-
+#: lib/little_grape_web/controllers/user_profile_html.ex:110
+#, elixir-autogen, elixir-format
 msgid "Catholic"
 msgstr "Katolik"
 
-msgid "Atheist"
-msgstr "Ateist"
+#: lib/little_grape_web/controllers/user_settings_html/edit_email.html.heex:10
+#: lib/little_grape_web/controllers/user_settings_html/edit_email.html.heex:32
+#, elixir-autogen, elixir-format
+msgid "Change Email"
+msgstr "Ndrysho Email-in"
 
-msgid "Prefer not to say"
-msgstr "Preferoj të mos them"
+#: lib/little_grape_web/controllers/user_settings_html/edit_password.html.heex:60
+#, elixir-autogen, elixir-format
+msgid "Change Email instead"
+msgstr "Ndrysho Email-in përkundrazi"
 
-msgid "Languages Spoken"
-msgstr "Gjuhët e Folura"
+#: lib/little_grape_web/controllers/user_settings_html/edit_password.html.heex:10
+#, elixir-autogen, elixir-format
+msgid "Change Password"
+msgstr "Ndrysho Fjalëkalimin"
 
-msgid "Italian"
-msgstr "Italisht"
+#: lib/little_grape_web/controllers/user_settings_html/edit_email.html.heex:43
+#, elixir-autogen, elixir-format
+msgid "Change Password instead"
+msgstr "Ndrysho Fjalëkalimin"
 
-msgid "German"
-msgstr "Gjermanisht"
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:182
+#, elixir-autogen, elixir-format
+msgid "City"
+msgstr "Qyteti"
 
-msgid "French"
-msgstr "Frëngjisht"
+#: lib/little_grape_web/controllers/page_html/home.html.heex:376
+#, elixir-autogen, elixir-format
+msgid "Community Guidelines"
+msgstr "Udhëzimet e Komunitetit"
 
-msgid "Serbian"
-msgstr "Serbisht"
+#: lib/little_grape_web/controllers/page_html/home.html.heex:360
+#, elixir-autogen, elixir-format
+msgid "Company"
+msgstr "Kompania"
 
-msgid "Macedonian"
-msgstr "Maqedonisht"
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:59
+#, elixir-autogen, elixir-format
+msgid "Complete registration"
+msgstr "Përfundo regjistrimin"
 
-msgid "Turkish"
-msgstr "Turqisht"
+#: lib/little_grape_web/controllers/user_settings_html/edit_password.html.heex:34
+#, elixir-autogen, elixir-format
+msgid "Confirm new password"
+msgstr "Konfirmo fjalëkalimin e ri"
 
-msgid "Other Languages"
-msgstr "Gjuhë të Tjera"
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:41
+#, elixir-autogen, elixir-format
+msgid "Confirm password"
+msgstr "Konfirmo fjalëkalimin"
 
-msgid "e.g., Greek, Spanish, Portuguese"
-msgstr "p.sh., Greqisht, Spanjisht, Portugalisht"
+#: lib/little_grape_web/controllers/page_html/home.html.heex:158
+#, elixir-autogen, elixir-format
+msgid "Connect with Albanians from Kosovo, Albania, North Macedonia, Montenegro, and diaspora communities worldwide."
+msgstr "Lidhu me shqiptarë nga Kosova, Shqipëria, Maqedonia e Veriut, Mali i Zi, dhe komunitetet e diasporës në mbarë botën."
 
-## Preferences Section
-msgid "Interested In"
-msgstr "Të Interesuar Për"
+#: lib/little_grape_web/controllers/page_html/home.html.heex:33
+#, elixir-autogen, elixir-format
+msgid "Connect with Albanians from around the world. Whether you're in Tirana, New York, London, or anywhere else — your perfect match is waiting."
+msgstr "Lidhu me shqiptarë nga e gjithë bota. Qoftë në Tiranë, Nju Jork, Londër, ose kudo tjetër — partneri/ja yt/jote e përsosur po të pret."
 
-msgid "Any"
-msgstr "Çdo"
+## Footer
+#: lib/little_grape_web/controllers/page_html/home.html.heex:353
+#, elixir-autogen, elixir-format
+msgid "Connecting Albanians worldwide. Find love, build relationships, honor traditions."
+msgstr "Duke lidhur shqiptarët në mbarë botën. Gjej dashurinë, ndërto marrëdhënie, ndero traditat."
 
-## Interests Section
-msgid "Interests"
-msgstr "Interesat"
+#: lib/little_grape_web/controllers/page_html/home.html.heex:365
+#, elixir-autogen, elixir-format
+msgid "Contact"
+msgstr "Kontakti"
 
-msgid "Select your interests to help find better matches"
-msgstr "Zgjidhni interesat tuaja për të gjetur përputhje më të mira"
+#: lib/little_grape_web/controllers/page_html/home.html.heex:395
+#, elixir-autogen, elixir-format
+msgid "Cookie Policy"
+msgstr "Politika e Cookie-ve"
 
-msgid "Sports"
-msgstr "Sporteve"
-
-msgid "Music"
-msgstr "Muzikë"
-
-msgid "Travel"
-msgstr "Udhëtim"
-
-msgid "Reading"
-msgstr "Lexim"
-
+#: lib/little_grape_web/controllers/user_profile_html.ex:131
+#, elixir-autogen, elixir-format
 msgid "Cooking"
 msgstr "Gatim"
 
-msgid "Movies"
-msgstr "Filma"
+#: lib/little_grape_web/controllers/page_html/home.html.heex:221
+#, elixir-autogen, elixir-format
+msgid "Countries"
+msgstr "Vende"
 
-msgid "Fitness"
-msgstr "Fitnes"
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:193
+#, elixir-autogen, elixir-format
+msgid "Country"
+msgstr "Shteti"
 
-msgid "Art"
-msgstr "Art"
+#: lib/little_grape_web/controllers/page_html/home.html.heex:325
+#, elixir-autogen, elixir-format
+msgid "Create Free Account"
+msgstr "Krijo Llogari Falas"
 
-msgid "Nature"
-msgstr "Natyrë"
+#: lib/little_grape_web/controllers/user_registration_html/new.html.heex:40
+#, elixir-autogen, elixir-format
+msgid "Create an account"
+msgstr "Krijo një llogari"
 
-msgid "Technology"
-msgstr "Teknologji"
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:56
+#, elixir-autogen, elixir-format
+msgid "Creating account..."
+msgstr "Duke krijuar llogarinë..."
 
-msgid "Gaming"
-msgstr "Lojëra"
+#: lib/little_grape_web/controllers/user_profile_html.ex:30
+#, elixir-autogen, elixir-format
+msgid "Croatia"
+msgstr "Kroacia"
 
-msgid "Photography"
-msgstr "Fotografi"
+#: lib/little_grape_web/controllers/user_profile_html.ex:58
+#, elixir-autogen, elixir-format
+msgid "Curvy"
+msgstr "Me Forma"
 
+#: lib/little_grape_web/controllers/user_profile_html.ex:51
+#, elixir-autogen, elixir-format
+msgid "Cyprus"
+msgstr "Qiproja"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:139
+#, elixir-autogen, elixir-format
 msgid "Dancing"
 msgstr "Vallëzim"
 
+#: lib/little_grape_web/controllers/user_profile_html.ex:78
+#, elixir-autogen, elixir-format
+msgid "Dating"
+msgstr "Takime"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:46
+#, elixir-autogen, elixir-format
+msgid "Denmark"
+msgstr "Danimarka"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:265
+#, elixir-autogen, elixir-format
+msgid "Diaspora"
+msgstr "Diaspora"
+
+#: lib/little_grape_web/components/layouts.ex:94
+#: lib/little_grape_web/live/discover_live.ex:200
+#, elixir-autogen, elixir-format
+msgid "Discover"
+msgstr "Zbulo"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:104
+#, elixir-autogen, elixir-format
+msgid "Doctorate"
+msgstr "Doktoraturë"
+
+#: lib/little_grape_web/controllers/user_session_html/new.html.heex:15
+#, elixir-autogen, elixir-format
+msgid "Don't have an account?"
+msgstr "Nuk ke llogari?"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:295
+#: lib/little_grape_web/live/discover_live.ex:431
+#, elixir-autogen, elixir-format
+msgid "Drinking"
+msgstr "Pirja e Alkoolit"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:372
+#: lib/little_grape_web/live/discover_live.ex:410
+#, elixir-autogen, elixir-format
+msgid "Education"
+msgstr "Arsimi"
+
+#: lib/little_grape_web/controllers/user_registration_html/new.html.heex:24
+#: lib/little_grape_web/controllers/user_session_html/new.html.heex:30
+#, elixir-autogen, elixir-format
+msgid "Email"
+msgstr "Email-i"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:117
+#: lib/little_grape_web/live/discover_live.ex:459
+#, elixir-autogen, elixir-format
+msgid "English"
+msgstr "Anglisht"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:178
+#, elixir-autogen, elixir-format
+msgid "Every profile is verified. Your privacy and security are our top priority with advanced safety features."
+msgstr "Çdo profil është i verifikuar. Privatësia dhe siguria juaj janë prioriteti ynë kryesor me veçori të avancuara sigurie."
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:505
+#, elixir-autogen, elixir-format
+msgid "Eye Color"
+msgstr "Ngjyra e Syve"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:140
+#, elixir-autogen, elixir-format
 msgid "Fashion"
 msgstr "Modë"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:21
+#, elixir-autogen, elixir-format
+msgid "Female"
+msgstr "Femër"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:27
+#, elixir-autogen, elixir-format
+msgid "Find Your"
+msgstr "Gjej"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:111
+#, elixir-autogen, elixir-format
+msgid "Find Your Perfect Match"
+msgstr "Gjej Partnerin/en e Përsosur"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:47
+#, elixir-autogen, elixir-format
+msgid "Finland"
+msgstr "Finlanda"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:131
+#, elixir-autogen, elixir-format
+msgid "First Name"
+msgstr "Emri"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:133
+#, elixir-autogen, elixir-format
+msgid "Fitness"
+msgstr "Fitnes"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:39
+#, elixir-autogen, elixir-format
+msgid "France"
+msgstr "Franca"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:120
+#: lib/little_grape_web/live/discover_live.ex:462
+#, elixir-autogen, elixir-format
+msgid "French"
+msgstr "Frëngjisht"
+
+## Looking For Options
+#: lib/little_grape_web/controllers/user_profile_html.ex:77
+#, elixir-autogen, elixir-format
+msgid "Friendship"
+msgstr "Miqësi"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:137
+#, elixir-autogen, elixir-format
+msgid "Gaming"
+msgstr "Lojëra"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:166
+#, elixir-autogen, elixir-format
+msgid "Gender"
+msgstr "Gjinia"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:119
+#: lib/little_grape_web/live/discover_live.ex:461
+#, elixir-autogen, elixir-format
+msgid "German"
+msgstr "Gjermanisht"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:35
+#, elixir-autogen, elixir-format
+msgid "Germany"
+msgstr "Gjermania"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:155
+#, elixir-autogen, elixir-format
+msgid "Global Albanian Community"
+msgstr "Komuniteti Global Shqiptar"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:66
+#: lib/little_grape_web/controllers/user_profile_html.ex:73
+#, elixir-autogen, elixir-format
+msgid "Gray"
+msgstr "Gri"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:32
+#, elixir-autogen, elixir-format
+msgid "Greece"
+msgstr "Greqia"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:64
+#, elixir-autogen, elixir-format
+msgid "Green"
+msgstr "Gjelbër"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:521
+#, elixir-autogen, elixir-format
+msgid "Hair Color"
+msgstr "Ngjyra e Flokëve"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:312
+#, elixir-autogen, elixir-format
+msgid "Has Children"
+msgstr "Ka Fëmijë"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:97
+#, elixir-autogen, elixir-format
+msgid "Have children, want more"
+msgstr "Kam fëmijë, dua më shumë"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:65
+#, elixir-autogen, elixir-format
+msgid "Hazel"
+msgstr "Lajthi"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:475
+#, elixir-autogen, elixir-format
+msgid "Height (cm)"
+msgstr "Gjatësia (cm)"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:372
+#, elixir-autogen, elixir-format
+msgid "Help Center"
+msgstr "Qendra e Ndihmës"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:100
+#, elixir-autogen, elixir-format
+msgid "High School"
+msgstr "Shkolla e Mesme"
+
+#: lib/little_grape_web/components/layouts.ex:93
+#, elixir-autogen, elixir-format
+msgid "Home"
+msgstr "Kreu"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:49
+#, elixir-autogen, elixir-format
+msgid "How It Works"
+msgstr "Si Funksionon"
+
+## Preferences Section
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:578
+#, elixir-autogen, elixir-format
+msgid "Interested In"
+msgstr "Të Interesuar Për"
+
+## Interests Section
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:667
+#: lib/little_grape_web/live/discover_live.ex:368
+#, elixir-autogen, elixir-format
+msgid "Interests"
+msgstr "Interesat"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:118
+#: lib/little_grape_web/live/discover_live.ex:460
+#, elixir-autogen, elixir-format
+msgid "Italian"
+msgstr "Italisht"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:33
+#, elixir-autogen, elixir-format
+msgid "Italy"
+msgstr "Italia"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:102
+#, elixir-autogen, elixir-format
+msgid "JPG, PNG, GIF or WebP. Max 5MB."
+msgstr "JPG, PNG, GIF ose WebP. Maks 5MB."
+
+## Hero Section
+#: lib/little_grape_web/controllers/page_html/home.html.heex:22
+#, elixir-autogen, elixir-format
+msgid "Join 50,000+ Albanians worldwide"
+msgstr "Bashkohu me 50,000+ shqiptarë në mbarë botën"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:316
+#, elixir-autogen, elixir-format
+msgid "Join thousands of Albanians who have found love, friendship, and meaningful connections on Zemra Ime."
+msgstr "Bashkohu me mijëra shqiptarë që kanë gjetur dashurinë, miqësinë, dhe lidhje kuptimplota në Zemra Ime."
+
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:87
+#, elixir-autogen, elixir-format
+msgid "Keep me logged in on this device"
+msgstr "Mbaj më të kyçur në këtë pajisje"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:257
+#: lib/little_grape_web/controllers/user_profile_html.ex:25
+#, elixir-autogen, elixir-format
+msgid "Kosovo"
+msgstr "Kosova"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:405
+#, elixir-autogen, elixir-format
+msgid "Languages Spoken"
+msgstr "Gjuhët e Folura"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:142
+#, elixir-autogen, elixir-format
+msgid "Last Name"
+msgstr "Mbiemri"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:331
+#, elixir-autogen, elixir-format
+msgid "Learn More"
+msgstr "Mëso Më Shumë"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:386
+#, elixir-autogen, elixir-format
+msgid "Legal"
+msgstr "Ligjore"
+
+## Lifestyle Section
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:274
+#, elixir-autogen, elixir-format
+msgid "Lifestyle"
+msgstr "Stili i Jetës"
+
+#: lib/little_grape_web/components/layouts.ex:109
+#, elixir-autogen, elixir-format
+msgid "Log In"
+msgstr "Hyr"
+
+#: lib/little_grape_web/controllers/user_registration_html/new.html.heex:16
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:77
+#: lib/little_grape_web/controllers/user_session_html/new.html.heex:10
+#, elixir-autogen, elixir-format
+msgid "Log in"
+msgstr "Hyr"
+
+#: lib/little_grape_web/controllers/user_session_html/new.html.heex:57
+#, elixir-autogen, elixir-format
+msgid "Log in and stay logged in"
+msgstr "Hyr dhe qëndro i kyçur"
+
+#: lib/little_grape_web/controllers/user_session_html/new.html.heex:63
+#, elixir-autogen, elixir-format
+msgid "Log in only this time"
+msgstr "Hyr vetëm këtë herë"
+
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:94
+#, elixir-autogen, elixir-format
+msgid "Log me in only this time"
+msgstr "Hyrm vetëm këtë herë"
+
+#: lib/little_grape_web/components/layouts.ex:106
+#, elixir-autogen, elixir-format
+msgid "Log out"
+msgstr "Dil"
+
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:74
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:84
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:91
+#, elixir-autogen, elixir-format
+msgid "Logging in..."
+msgstr "Duke hyrë..."
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:561
+#: lib/little_grape_web/live/discover_live.ex:388
+#, elixir-autogen, elixir-format
+msgid "Looking For"
+msgstr "Kërkoj"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:122
+#: lib/little_grape_web/live/discover_live.ex:464
+#, elixir-autogen, elixir-format
+msgid "Macedonian"
+msgstr "Maqedonisht"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:403
+#, elixir-autogen, elixir-format
+msgid "Made with love for Albanians everywhere."
+msgstr "Bërë me dashuri për shqiptarët kudo."
+
+## Gender Options
+#: lib/little_grape_web/controllers/user_profile_html.ex:20
+#, elixir-autogen, elixir-format
+msgid "Male"
+msgstr "Mashkull"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:52
+#, elixir-autogen, elixir-format
+msgid "Malta"
+msgstr "Malta"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:80
+#, elixir-autogen, elixir-format
+msgid "Marriage"
+msgstr "Martesë"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:103
+#, elixir-autogen, elixir-format
+msgid "Master's Degree"
+msgstr "Diplomë Master"
+
+#: lib/little_grape_web/components/layouts.ex:97
+#: lib/little_grape_web/live/matches_live.ex:229
+#, elixir-autogen, elixir-format
+msgid "Matches"
+msgstr "Përputhjet"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:96
+#, elixir-autogen, elixir-format
+msgid "Maybe"
+msgstr "Ndoshta"
+
+## Country Options
+#: lib/little_grape_web/controllers/user_profile_html.ex:27
+#, elixir-autogen, elixir-format
+msgid "Montenegro"
+msgstr "Mali i Zi"
+
+## About Section
+#: lib/little_grape_web/controllers/page_html/home.html.heex:237
+#, elixir-autogen, elixir-format
+msgid "More Than Dating —"
+msgstr "Më Shumë se Takime —"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:132
+#, elixir-autogen, elixir-format
+msgid "Movies"
+msgstr "Filma"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:59
+#, elixir-autogen, elixir-format
+msgid "Muscular"
+msgstr "Muskuloz"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:128
+#, elixir-autogen, elixir-format
+msgid "Music"
+msgstr "Muzikë"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:108
+#, elixir-autogen, elixir-format
+msgid "Muslim"
+msgstr "Mysliman"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:10
+#, elixir-autogen, elixir-format
+msgid "My Profile"
+msgstr "Profili Im"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:135
+#, elixir-autogen, elixir-format
+msgid "Nature"
+msgstr "Natyrë"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:38
+#, elixir-autogen, elixir-format
+msgid "Netherlands"
+msgstr "Holanda"
+
+#: lib/little_grape_web/controllers/user_settings_html/edit_email.html.heex:17
+#, elixir-autogen, elixir-format
+msgid "New Email"
+msgstr "Email i Ri"
+
+#: lib/little_grape_web/controllers/user_settings_html/edit_password.html.heex:22
+#, elixir-autogen, elixir-format
+msgid "New password"
+msgstr "Fjalëkalimi i ri"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:95
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:323
+#, elixir-autogen, elixir-format
+msgid "No"
+msgstr "Jo"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:89
+#, elixir-autogen, elixir-format
+msgid "Non-drinker"
+msgstr "Jo pirës"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:84
+#, elixir-autogen, elixir-format
+msgid "Non-smoker"
+msgstr "Jo duhanpirës"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:261
+#: lib/little_grape_web/controllers/user_profile_html.ex:26
+#, elixir-autogen, elixir-format
+msgid "North Macedonia"
+msgstr "Maqedonia e Veriut"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:45
+#, elixir-autogen, elixir-format
+msgid "Norway"
+msgstr "Norvegjia"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:81
+#, elixir-autogen, elixir-format
+msgid "Not Sure"
+msgstr "Nuk Jam i Sigurt"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:85
+#, elixir-autogen, elixir-format
+msgid "Occasional smoker"
+msgstr "Duhanpirës rastësor"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:244
+#: lib/little_grape_web/live/discover_live.ex:381
+#, elixir-autogen, elixir-format
+msgid "Occupation"
+msgstr "Profesioni"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:109
+#, elixir-autogen, elixir-format
+msgid "Orthodox Christian"
+msgstr "Ortodoks"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:22
+#: lib/little_grape_web/controllers/user_profile_html.ex:53
+#: lib/little_grape_web/controllers/user_profile_html.ex:75
+#: lib/little_grape_web/controllers/user_profile_html.ex:105
+#: lib/little_grape_web/controllers/user_profile_html.ex:112
+#: lib/little_grape_web/controllers/user_profile_html.ex:124
+#: lib/little_grape_web/live/discover_live.ex:466
+#, elixir-autogen, elixir-format
+msgid "Other"
+msgstr "Tjetër"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:436
+#, elixir-autogen, elixir-format
+msgid "Other Languages"
+msgstr "Gjuhë të Tjera"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:198
+#, elixir-autogen, elixir-format
+msgid "Our algorithm considers cultural values, family traditions, and personal preferences for meaningful connections."
+msgstr "Algoritmi ynë merr parasysh vlerat kulturore, traditat familjare, dhe preferencat personale për lidhje kuptimplota."
+
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:29
+#: lib/little_grape_web/controllers/user_session_html/new.html.heex:42
+#, elixir-autogen, elixir-format
+msgid "Password"
+msgstr "Fjalëkalimi"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:138
+#, elixir-autogen, elixir-format
+msgid "Photography"
+msgstr "Fotografi"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:470
+#, elixir-autogen, elixir-format
+msgid "Physical Attributes"
+msgstr "Karakteristikat Fizike"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:60
+#, elixir-autogen, elixir-format
+msgid "Plus Size"
+msgstr "Madhësi Plus"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:49
+#, elixir-autogen, elixir-format
+msgid "Portugal"
+msgstr "Portugalia"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:113
+#, elixir-autogen, elixir-format
+msgid "Prefer not to say"
+msgstr "Preferoj të mos them"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:556
+#, elixir-autogen, elixir-format
+msgid "Preferences"
+msgstr "Preferencat"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:615
+#, elixir-autogen, elixir-format
+msgid "Preferred Age (Max)"
+msgstr "Mosha e Preferuar (Maks)"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:599
+#, elixir-autogen, elixir-format
+msgid "Preferred Age (Min)"
+msgstr "Mosha e Preferuar (Min)"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:631
+#, elixir-autogen, elixir-format
+msgid "Preferred Country"
+msgstr "Vendi i Preferuar"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:364
+#, elixir-autogen, elixir-format
+msgid "Press"
+msgstr "Shtypi"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:389
+#, elixir-autogen, elixir-format
+msgid "Privacy Policy"
+msgstr "Politika e Privatësisë"
+
+## Profile
+#: lib/little_grape_web/components/layouts.ex:100
+#, elixir-autogen, elixir-format
+msgid "Profile"
+msgstr "Profili"
+
+## Profile Picture
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:40
+#, elixir-autogen, elixir-format
+msgid "Profile Picture"
+msgstr "Fotoja e Profilit"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:50
+#, elixir-autogen, elixir-format
+msgid "Profile picture"
+msgstr "Fotoja e profilit"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:130
+#, elixir-autogen, elixir-format
+msgid "Reading"
+msgstr "Lexim"
+
+## CTA Section
+#: lib/little_grape_web/controllers/page_html/home.html.heex:313
+#, elixir-autogen, elixir-format
+msgid "Ready to Find Your Albanian Match?"
+msgstr "Gati të Gjesh Partnerin/en Tënd/e Shqiptar/e?"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:72
+#, elixir-autogen, elixir-format
+msgid "Red"
+msgstr "Kuq"
+
+#: lib/little_grape_web/controllers/user_registration_html/new.html.heex:11
+#, elixir-autogen, elixir-format
+msgid "Register for an account"
+msgstr "Regjistrohu për një llogari"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:91
+#, elixir-autogen, elixir-format
+msgid "Regular drinker"
+msgstr "Pirës i rregullt"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:86
+#, elixir-autogen, elixir-format
+msgid "Regular smoker"
+msgstr "Duhanpirës i rregullt"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:79
+#, elixir-autogen, elixir-format
+msgid "Relationship"
+msgstr "Lidhje"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:388
+#: lib/little_grape_web/live/discover_live.ex:417
+#, elixir-autogen, elixir-format
+msgid "Religion"
+msgstr "Feja"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:380
+#, elixir-autogen, elixir-format
+msgid "Report an Issue"
+msgstr "Raporto një Problem"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:373
+#, elixir-autogen, elixir-format
+msgid "Safety Tips"
+msgstr "Këshilla Sigurie"
+
+#: lib/little_grape_web/controllers/user_settings_html/edit_password.html.heex:49
+#, elixir-autogen, elixir-format
+msgid "Save Password"
+msgstr "Ruaj Fjalëkalimin"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:697
+#, elixir-autogen, elixir-format
+msgid "Save Profile"
+msgstr "Ruaj Profilin"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:671
+#, elixir-autogen, elixir-format
+msgid "Select your interests to help find better matches"
+msgstr "Zgjidhni interesat tuaja për të gjetur përputhje më të mira"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:171
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:198
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:284
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:300
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:318
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:337
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:377
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:393
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:494
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:510
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:526
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:566
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:584
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:637
+#, elixir-autogen, elixir-format
+msgid "Select..."
+msgstr "Zgjidh..."
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:28
+#, elixir-autogen, elixir-format
+msgid "Serbia"
+msgstr "Serbia"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:121
+#: lib/little_grape_web/live/discover_live.ex:463
+#, elixir-autogen, elixir-format
+msgid "Serbian"
+msgstr "Serbisht"
+
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:12
+#, elixir-autogen, elixir-format
+msgid "Set your password to complete registration."
+msgstr "Vendos fjalëkalimin për të përfunduar regjistrimin."
+
+#: lib/little_grape_web/components/layouts.ex:114
+#, elixir-autogen, elixir-format
+msgid "Sign Up"
+msgstr "Regjistrohu"
+
+#: lib/little_grape_web/controllers/user_session_html/new.html.heex:20
+#, elixir-autogen, elixir-format
+msgid "Sign up"
+msgstr "Regjistrohu"
+
+## Body Type Options
+#: lib/little_grape_web/controllers/user_profile_html.ex:55
+#, elixir-autogen, elixir-format
+msgid "Slim"
+msgstr "I Hollë"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:31
+#, elixir-autogen, elixir-format
+msgid "Slovenia"
+msgstr "Sllovenia"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:196
+#, elixir-autogen, elixir-format
+msgid "Smart Matching"
+msgstr "Përputhje Inteligjente"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:279
+#: lib/little_grape_web/live/discover_live.ex:424
+#, elixir-autogen, elixir-format
+msgid "Smoking"
+msgstr "Pirja e Duhanit"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:90
+#, elixir-autogen, elixir-format
+msgid "Social drinker"
+msgstr "Pirës shoqëror"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:101
+#, elixir-autogen, elixir-format
+msgid "Some College"
+msgstr "Disa Studime"
+
+#: lib/little_grape_web/components/layouts.ex:187
+#, elixir-autogen, elixir-format
+msgid "Something went wrong!"
+msgstr "Diçka shkoi gabim!"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:29
+#, elixir-autogen, elixir-format
+msgid "Soulmate"
+msgstr "Tënde"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:48
+#, elixir-autogen, elixir-format
+msgid "Spain"
+msgstr "Spanja"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:127
+#, elixir-autogen, elixir-format
+msgid "Sports"
+msgstr "Sporteve"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:43
+#, elixir-autogen, elixir-format
+msgid "Start Free Today"
+msgstr "Fillo Falas Sot"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:217
+#, elixir-autogen, elixir-format
+msgid "Successful Matches"
+msgstr "Përputhje të Suksesshme"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:370
+#, elixir-autogen, elixir-format
+msgid "Support"
+msgstr "Mbështetja"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:44
+#, elixir-autogen, elixir-format
+msgid "Sweden"
+msgstr "Suedia"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:36
+#, elixir-autogen, elixir-format
+msgid "Switzerland"
+msgstr "Zvicra"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:136
+#, elixir-autogen, elixir-format
+msgid "Technology"
+msgstr "Teknologji"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:237
+#, elixir-autogen, elixir-format
+msgid "Tell others about yourself..."
+msgstr "Tregoju të tjerëve për veten..."
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:12
+#, elixir-autogen, elixir-format
+msgid "Tell us about yourself to find your perfect match"
+msgstr "Na trego për veten tënde për të gjetur partnerin/en e përsosur"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:392
+#, elixir-autogen, elixir-format
+msgid "Terms of Service"
+msgstr "Kushtet e Shërbimit"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:295
+#, elixir-autogen, elixir-format
+msgid "Traditional Wisdom"
+msgstr "Urtësi Tradicionale"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:129
+#, elixir-autogen, elixir-format
+msgid "Travel"
+msgstr "Udhëtim"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:50
+#, elixir-autogen, elixir-format
+msgid "Turkey"
+msgstr "Turqia"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:123
+#: lib/little_grape_web/live/discover_live.ex:465
+#, elixir-autogen, elixir-format
+msgid "Turkish"
+msgstr "Turqisht"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:40
+#, elixir-autogen, elixir-format
+msgid "United Kingdom"
+msgstr "Mbretëria e Bashkuar"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:41
+#, elixir-autogen, elixir-format
+msgid "United States"
+msgstr "Shtetet e Bashkuara"
+
+#: lib/little_grape_web/controllers/user_settings_html/edit_email.html.heex:11
+#, elixir-autogen, elixir-format
+msgid "Update your email address"
+msgstr "Përditëso adresën e email-it"
+
+#: lib/little_grape_web/controllers/user_settings_html/edit_password.html.heex:11
+#, elixir-autogen, elixir-format
+msgid "Update your password"
+msgstr "Përditëso fjalëkalimin"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:93
+#, elixir-autogen, elixir-format
+msgid "Upload New Picture"
+msgstr "Ngarko Foto të Re"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:176
+#, elixir-autogen, elixir-format
+msgid "Verified & Safe"
+msgstr "I Verifikuar dhe i Sigurt"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:63
+#, elixir-autogen, elixir-format
+msgid "Verified Profiles"
+msgstr "Profile të Verifikuara"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:331
+#, elixir-autogen, elixir-format
+msgid "Wants Children"
+msgstr "Dëshiron Fëmijë"
+
+#: lib/little_grape_web/components/layouts.ex:175
+#, elixir-autogen, elixir-format
+msgid "We can't find the internet"
+msgstr "Nuk mund të gjejmë internetin"
+
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:10
+#, elixir-autogen, elixir-format
+msgid "Welcome"
+msgstr "Mirë se vjen"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:281
+#, elixir-autogen, elixir-format
+msgid "Where there's smoke, there's fire. Where there's love, there's family."
+msgstr "Ku ka tym, ka zjarr. Ku ka dashuri, ka familje."
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:246
+#, elixir-autogen, elixir-format
+msgid "Whether you're looking for someone who appreciates our traditions, speaks the language, or simply shares your Albanian heritage, you'll find them here."
+msgstr "Qoftë duke kërkuar dikë që vlerëson traditat tona, flet gjuhën, ose thjesht ndan trashëgiminë tuaj shqiptare, do ta gjeni këtu."
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:74
+#, elixir-autogen, elixir-format
+msgid "White"
+msgstr "Bardhë"
+
+## Features Section
+#: lib/little_grape_web/controllers/page_html/home.html.heex:132
+#, elixir-autogen, elixir-format
+msgid "Why Choose Zemra Ime?"
+msgstr "Pse të Zgjedhësh Zemra Ime?"
+
+#: lib/little_grape_web/controllers/user_profile_html.ex:94
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:320
+#, elixir-autogen, elixir-format
+msgid "Yes"
+msgstr "Po"
+
+#: lib/little_grape_web/controllers/user_session_html/new.html.heex:13
+#, elixir-autogen, elixir-format
+msgid "You need to reauthenticate to perform sensitive actions on your account."
+msgstr "Duhet të identifikohesh përsëri për të kryer veprime të ndjeshme në llogarinë tënde."
+
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:15
+#, elixir-autogen, elixir-format
+msgid "Your account is confirmed. Click below to log in."
+msgstr "Llogaria jote është konfirmuar. Kliko më poshtë për të hyrë."
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:106
+#, elixir-autogen, elixir-format
+msgid "Your match awaits"
+msgstr "Partneri/ja jote po të pret"
+
+#: lib/little_grape_web/controllers/page_html/home.html.heex:241
+#, elixir-autogen, elixir-format
+msgid "Zemra Ime (meaning \"My Heart\" in Albanian) captures the essence of what we're all searching for — that special connection. We created this platform because we understand that for Albanians, finding a partner is about more than just compatibility — it's about shared values, family, and cultural understanding."
+msgstr "Zemra Ime kap thelbin e asaj që të gjithë po kërkojmë — atë lidhje të veçantë. Ne e krijuam këtë platformë sepse e kuptojmë që për shqiptarët, gjetja e një partneri është më shumë se thjesht përshtatshmëri — bëhet fjalë për vlera të përbashkëta, familje, dhe mirëkuptim kulturor."
+
+#: lib/little_grape_web/components/core_components.ex:74
+#, elixir-autogen, elixir-format
+msgid "close"
+msgstr "mbyll"
+
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:442
+#, elixir-autogen, elixir-format
+msgid "e.g., Greek, Spanish, Portuguese"
+msgstr "p.sh., Greqisht, Spanjisht, Portugalisht"
+
+#: lib/little_grape_web/controllers/user_session_html/new.html.heex:22
+#, elixir-autogen, elixir-format
+msgid "for an account now."
+msgstr "për një llogari tani."
+
+#: lib/little_grape_web/controllers/user_registration_html/new.html.heex:18
+#, elixir-autogen, elixir-format
+msgid "to your account now."
+msgstr "në llogarinë tënde tani."
+
+#: lib/little_grape_web/controllers/user_registration_controller.ex:24
+#, elixir-autogen, elixir-format
+msgid "An email was sent to %{email}, please access it to confirm your account."
+msgstr "Një email u dërgua te %{email}, ju lutemi hapeni për të konfirmuar llogarinë tuaj."
+
+#: lib/little_grape_web/components/chat_components.ex:21
+#, elixir-autogen, elixir-format
+msgid "Back"
+msgstr "Mbrapa"
+
+#: lib/little_grape_web/live/chat_live.ex:50
+#, elixir-autogen, elixir-format
+msgid "Conversation not found"
+msgstr "Biseda nuk u gjet"
+
+#: lib/little_grape_web/live/matches_live.ex:130
+#, elixir-autogen, elixir-format
+msgid "Conversation not found."
+msgstr "Biseda nuk u gjet."
+
+#: lib/little_grape_web/live/discover_live.ex:100
+#, elixir-autogen, elixir-format
+msgid "Could not undo that pass."
+msgstr "Nuk mund ta zhbënim atë kalim."
+
+#: lib/little_grape_web/controllers/user_settings_controller.ex:46
+#, elixir-autogen, elixir-format
+msgid "Email change link is invalid or it has expired."
+msgstr "Lidhja e ndryshimit të email-it është e pavlefshme ose ka skaduar."
+
+#: lib/little_grape_web/controllers/user_settings_controller.ex:41
+#, elixir-autogen, elixir-format
+msgid "Email changed successfully."
+msgstr "Email-i u ndryshua me sukses."
+
+#: lib/little_grape_web/controllers/user_profile_controller.ex:45
+#, elixir-autogen, elixir-format
+msgid "Failed to remove profile picture."
+msgstr "Heqja e fotos së profilit dështoi."
+
+#: lib/little_grape_web/live/chat_live.ex:94
+#: lib/little_grape_web/live/matches_live.ex:188
+#, elixir-autogen, elixir-format
+msgid "Failed to send message. Please try again."
+msgstr "Dërgimi i mesazhit dështoi. Ju lutemi provoni përsëri."
+
+#: lib/little_grape_web/live/discover_live.ex:283
+#, elixir-autogen, elixir-format
+msgid "Finding people near you..."
+msgstr "Po gjejmë njerëz pranë jush..."
+
+#: lib/little_grape_web/live/discover_live.ex:396
+#, elixir-autogen, elixir-format
+msgid "Height"
+msgstr "Gjatësia"
+
+#: lib/little_grape_web/controllers/user_session_controller.ex:44
+#, elixir-autogen, elixir-format
+msgid "Invalid email or password"
+msgstr "Email ose fjalëkalim i pavlefshëm"
+
+#: lib/little_grape_web/live/discover_live.ex:473
+#, elixir-autogen, elixir-format
+msgid "It's a Match!"
+msgstr "Është një Përputhje!"
+
+#: lib/little_grape_web/live/discover_live.ex:497
+#, elixir-autogen, elixir-format
+msgid "Keep Swiping"
+msgstr "Vazhdo të Rrëshqasësh"
+
+#: lib/little_grape_web/live/matches_live.ex:307
+#, elixir-autogen, elixir-format
+msgid "Keep swiping to find your perfect match!"
+msgstr "Vazhdoni të rrëshqisni për të gjetur përputhjen tuaj perfekte!"
+
+#: lib/little_grape_web/live/discover_live.ex:439
+#, elixir-autogen, elixir-format
+msgid "Languages"
+msgstr "Gjuhët"
+
+#: lib/little_grape_web/live/chat_live.ex:234
+#, elixir-autogen, elixir-format
+msgid "Loading messages..."
+msgstr "Po ngarkohen mesazhet..."
+
+#: lib/little_grape_web/live/matches_live.ex:297
+#, elixir-autogen, elixir-format
+msgid "Loading your matches..."
+msgstr "Po ngarkohen përputhjet tuaja..."
+
+#: lib/little_grape_web/controllers/user_session_controller.ex:66
+#, elixir-autogen, elixir-format
+msgid "Logged out successfully."
+msgstr "Dolët me sukses."
+
+#: lib/little_grape_web/controllers/user_session_controller.ex:59
+#, elixir-autogen, elixir-format
+msgid "Magic link is invalid or it has expired."
+msgstr "Lidhja magjike është e pavlefshme ose ka skaduar."
+
+#: lib/little_grape_web/live/matches_live.ex:369
+#, elixir-autogen, elixir-format
+msgid "NEW MATCH"
+msgstr "PËRPUTHJE E RE"
+
+#: lib/little_grape_web/live/matches_live.ex:306
+#, elixir-autogen, elixir-format
+msgid "No matches yet"
+msgstr "Ende pa përputhje"
+
+#: lib/little_grape_web/components/chat_components.ex:73
+#, elixir-autogen, elixir-format
+msgid "No messages yet"
+msgstr "Ende pa mesazhe"
+
+#: lib/little_grape_web/live/discover_live.ex:210
+#, elixir-autogen, elixir-format
+msgid "No more profiles right now"
+msgstr "Pa profile të tjera për momentin"
+
+#: lib/little_grape_web/controllers/user_settings_controller.ex:63
+#, elixir-autogen, elixir-format
+msgid "Password updated successfully."
+msgstr "Fjalëkalimi u përditësua me sukses."
+
+#: lib/little_grape_web/live/matches_live.ex:322
+#, elixir-autogen, elixir-format
+msgid "Pick a match to chat"
+msgstr "Zgjidh një përputhje për të biseduar"
+
+#: lib/little_grape_web/live/discover_live.ex:238
+#, elixir-autogen, elixir-format
+msgid "Previously passed"
+msgstr "Të kaluar më parë"
+
+#: lib/little_grape_web/live/discover_live.ex:97
+#, elixir-autogen, elixir-format
+msgid "Profile added back to your feed."
+msgstr "Profili u shtua sërish në listën tuaj."
+
+#: lib/little_grape_web/controllers/user_profile_controller.ex:40
+#, elixir-autogen, elixir-format
+msgid "Profile picture removed."
+msgstr "Fotoja e profilit u hoq."
+
+#: lib/little_grape_web/controllers/user_profile_controller.ex:25
+#, elixir-autogen, elixir-format
+msgid "Profile updated successfully."
+msgstr "Profili u përditësua me sukses."
+
+#: lib/little_grape_web/live/discover_live.ex:269
+#, elixir-autogen, elixir-format
+msgid "Reconsider"
+msgstr "Rishqyrto"
+
+#: lib/little_grape_web/live/discover_live.ex:240
+#, elixir-autogen, elixir-format
+msgid "Reconsider someone — they'll re-enter your discovery feed."
+msgstr "Rishqyrto dikë — do të rikthehet në listën tuaj të zbulimit."
+
+#: lib/little_grape_web/components/chat_components.ex:75
+#, elixir-autogen, elixir-format
+msgid "Say hello to %{name}!"
+msgstr "Përshëndet %{name}!"
+
+#: lib/little_grape_web/live/discover_live.ex:151
+#, elixir-autogen, elixir-format
+msgid "Something went wrong creating the match. Please try again."
+msgstr "Diçka shkoi gabim gjatë krijimit të përputhjes. Ju lutemi provoni përsëri."
+
+#: lib/little_grape_web/live/discover_live.ex:72
+#, elixir-autogen, elixir-format
+msgid "Something went wrong. Please try again."
+msgstr "Diçka shkoi gabim. Ju lutemi provoni përsëri."
+
+#: lib/little_grape_web/live/matches_live.ex:312
+#, elixir-autogen, elixir-format
+msgid "Start Discovering"
+msgstr "Fillo të Zbulosh"
+
+#: lib/little_grape_web/live/matches_live.ex:446
+#, elixir-autogen, elixir-format
+msgid "Start a conversation!"
+msgstr "Fillo një bisedë!"
+
+#: lib/little_grape_web/live/discover_live.ex:446
+#, elixir-autogen, elixir-format
+msgid "Tap photo to collapse"
+msgstr "Trokit foton për ta mbyllur"
+
+#: lib/little_grape_web/live/discover_live.ex:325
+#, elixir-autogen, elixir-format
+msgid "Tap to see more"
+msgstr "Trokit për të parë më shumë"
+
+#: lib/little_grape_web/controllers/user_session_controller.ex:87
+#, elixir-autogen, elixir-format
+msgid "The link is invalid or it has expired."
+msgstr "Lidhja është e pavlefshme ose ka skaduar."
+
+#: lib/little_grape_web/live/matches_live.ex:323
+#, elixir-autogen, elixir-format
+msgid "Their conversation will appear here."
+msgstr "Biseda e tyre do të shfaqet këtu."
+
+#: lib/little_grape_web/live/discover_live.ex:212
+#, elixir-autogen, elixir-format
+msgid "Try broadening your preferences to see more people!"
+msgstr "Provoni të zgjeroni preferencat tuaja për të parë më shumë njerëz!"
+
+#: lib/little_grape_web/components/chat_components.ex:127
+#, elixir-autogen, elixir-format
+msgid "Type a message..."
+msgstr "Shkruaj një mesazh..."
+
+#: lib/little_grape_web/live/discover_live.ex:218
+#, elixir-autogen, elixir-format
+msgid "Update Preferences"
+msgstr "Përditëso Preferencat"
+
+#: lib/little_grape_web/controllers/user_session_controller.ex:70
+#, elixir-autogen, elixir-format
+msgid "User confirmed successfully."
+msgstr "Përdoruesi u konfirmua me sukses."
+
+#: lib/little_grape_web/controllers/user_session_controller.ex:37
+#: lib/little_grape_web/controllers/user_session_controller.ex:71
+#, elixir-autogen, elixir-format
+msgid "Welcome back!"
+msgstr "Mirë se erdhe sërish!"
+
+#: lib/little_grape_web/live/discover_live.ex:490
+#, elixir-autogen, elixir-format
+msgid "You and %{name} liked each other!"
+msgstr "Ju dhe %{name} pëlqyet njëri-tjetrin!"
+
+#: lib/little_grape_web/user_auth.ex:228
+#, elixir-autogen, elixir-format
+msgid "You must log in to access this page."
+msgstr "Duhet të hyni për të aksesuar këtë faqe."
+
+#: lib/little_grape_web/user_auth.ex:198
+#, elixir-autogen, elixir-format
+msgid "You must re-authenticate to access this page."
+msgstr "Duhet të riautentikoheni për të aksesuar këtë faqe."
+
+#: lib/little_grape_web/live/matches_live.ex:407
+#, elixir-autogen, elixir-format
+msgid "AI Match"
+msgstr "Përputhje AI"
+
+#: lib/little_grape_web/live/matches_live.ex:434
+#, elixir-autogen, elixir-format
+msgid "Lives in %{country}"
+msgstr "Jeton në %{country}"
+
+#: lib/little_grape_web/live/matches_live.ex:435
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Same religion"
+msgstr "E njëjta fe"
+
+#: lib/little_grape_web/live/matches_live.ex:438
+#, elixir-autogen, elixir-format
+msgid "Shared interests: %{list}"
+msgstr "Interesa të përbashkëta: %{list}"
+
+#: lib/little_grape_web/live/matches_live.ex:441
+#, elixir-autogen, elixir-format
+msgid "Shared languages: %{list}"
+msgstr "Gjuhë të përbashkëta: %{list}"
+
+#: lib/little_grape_web/live/matches_live.ex:433
+#, elixir-autogen, elixir-format
+msgid "Within your preferred age range"
+msgstr "Brenda moshës që preferon"
+
+#: lib/little_grape_web/live/matches_live.ex:409
+#, elixir-autogen, elixir-format
+msgid "picked just for you"
+msgstr "zgjedhur posaçërisht për ty"

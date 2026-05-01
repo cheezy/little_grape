@@ -407,8 +407,8 @@ defmodule LittleGrape.MessagingTest do
       {:ok, message} = Messaging.send_message(user1, conversation.id, "User broadcast test")
 
       # Should receive broadcasts on both user topics
-      assert_receive {:new_message, msg1}
-      assert_receive {:new_message, msg2}
+      assert_receive {:message_received, msg1}
+      assert_receive {:message_received, msg2}
       assert msg1.id == message.id
       assert msg2.id == message.id
     end
