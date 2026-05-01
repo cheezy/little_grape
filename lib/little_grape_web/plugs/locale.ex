@@ -8,7 +8,7 @@ defmodule LittleGrapeWeb.Plugs.Locale do
   """
   import Plug.Conn
 
-  @locales ~w(sq en)
+  @locales ~w(sq en it el de fr)
 
   def init(opts), do: opts
 

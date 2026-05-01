@@ -559,27 +559,32 @@ defmodule LittleGrape.Discovery do
   def ai_pick(%User{} = user) do
     user_profile = user.profile
 
-    if is_nil(user_profile) do
-      nil
-    else
-      query =
-        base_query()
-        |> exclude_self(user.id)
-        |> exclude_already_liked(user.id)
-        |> exclude_blocked(user.id)
-        |> require_complete_profile()
-        |> filter_by_mutual_gender_preferences(
-          user_profile.gender,
-          user_profile.preferred_gender
-        )
+    cond do
+      is_nil(user_profile) ->
+        nil
 
-      case user |> score_and_rank(query) |> List.first() do
-        nil ->
-          nil
+      is_nil(user_profile.gender) or is_nil(user_profile.preferred_gender) ->
+        nil
 
-        {candidate, score} ->
-          {candidate.profile, score, pick_reasons(user_profile, candidate.profile)}
-      end
+      true ->
+        query =
+          base_query()
+          |> exclude_self(user.id)
+          |> exclude_already_liked(user.id)
+          |> exclude_blocked(user.id)
+          |> require_complete_profile()
+          |> filter_by_mutual_gender_preferences(
+            user_profile.gender,
+            user_profile.preferred_gender
+          )
+
+        case user |> score_and_rank(query) |> List.first() do
+          nil ->
+            nil
+
+          {candidate, score} ->
+            {candidate.profile, score, pick_reasons(user_profile, candidate.profile)}
+        end
     end
   end
 

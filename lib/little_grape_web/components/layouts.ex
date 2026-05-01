@@ -200,6 +200,10 @@ defmodule LittleGrapeWeb.Layouts do
     >
       <option value="sq" selected={@locale == "sq"}>Shqip</option>
       <option value="en" selected={@locale == "en"}>English</option>
+      <option value="it" selected={@locale == "it"}>Italiano</option>
+      <option value="el" selected={@locale == "el"}>Ελληνικά</option>
+      <option value="de" selected={@locale == "de"}>Deutsch</option>
+      <option value="fr" selected={@locale == "fr"}>Français</option>
     </select>
     """
   end

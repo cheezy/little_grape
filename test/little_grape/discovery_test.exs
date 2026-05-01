@@ -1372,6 +1372,20 @@ defmodule LittleGrape.DiscoveryTest do
 
       assert Discovery.ai_pick(user) == nil
     end
+
+    test "returns nil when the user's profile has no gender or preferred_gender" do
+      # Mirrors the freshly-registered case: a profile row exists (auto-created
+      # when the user visited /users/profile) but the gender fields are nil.
+      # ai_pick must short-circuit instead of building a query that compares
+      # an Ecto field against nil — which Ecto refuses with ArgumentError.
+      user = user_fixture()
+      _profile = Accounts.get_or_create_profile(user)
+      user = Repo.preload(user, :profile, force: true)
+
+      assert is_nil(user.profile.gender)
+      assert is_nil(user.profile.preferred_gender)
+      assert Discovery.ai_pick(user) == nil
+    end
   end
 
   describe "list_previously_passed/1" do
