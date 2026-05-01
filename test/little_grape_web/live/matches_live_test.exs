@@ -455,5 +455,307 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       html = render(view)
       assert html =~ "Hello from realtime!"
     end
+
+    test "select_match flashes an error when the match does not exist", %{conn: conn, user: user} do
+      profile_fixture(user) |> set_profile_picture()
+
+      {:ok, view, _html} = mount_and_render(conn, ~p"/matches")
+
+      html =
+        render_hook(view, "select_match", %{"match-id" => "999999"})
+
+      assert html =~ "Conversation not found."
+      # Chat pane should remain hidden (no chat container)
+      refute html =~ ~s(id="chat-container")
+    end
+
+    test "selecting a match shows existing messages in the chat pane", %{conn: conn, user: user} do
+      profile_fixture(user) |> set_profile_picture()
+
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "ChatHistory"}) |> set_profile_picture()
+
+      {:ok, %{match: match, conversation: conversation}} =
+        Matches.create_match(user.id, other_user.id)
+
+      {:ok, _msg} =
+        Messaging.create_message(conversation.id, other_user.id, "An earlier message")
+
+      {:ok, view, _html} = mount_and_render(conn, ~p"/matches")
+
+      html =
+        view
+        |> element(~s(button[phx-value-match-id="#{match.id}"]))
+        |> render_click()
+
+      assert html =~ "An earlier message"
+      assert html =~ ~s(id="chat-container")
+    end
+
+    test "selecting a match marks unread messages as read", %{conn: conn, user: user} do
+      profile_fixture(user) |> set_profile_picture()
+
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "MarkReadPerson"}) |> set_profile_picture()
+
+      {:ok, %{match: match, conversation: conversation}} =
+        Matches.create_match(user.id, other_user.id)
+
+      {:ok, _msg} = Messaging.create_message(conversation.id, other_user.id, "Unread message")
+
+      {:ok, view, html} = mount_and_render(conn, ~p"/matches")
+
+      # Before clicking: there's an unread badge with "1"
+      assert html =~ ~r/>\s*1\s*</
+      assert Messaging.unread_count(conversation.id, user.id) == 1
+
+      view
+      |> element(~s(button[phx-value-match-id="#{match.id}"]))
+      |> render_click()
+
+      assert Messaging.unread_count(conversation.id, user.id) == 0
+    end
+
+    test "close_chat clears the selection and hides the chat pane", %{conn: conn, user: user} do
+      profile_fixture(user) |> set_profile_picture()
+
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "Closable"}) |> set_profile_picture()
+
+      {:ok, %{match: match}} = Matches.create_match(user.id, other_user.id)
+
+      {:ok, view, _html} = mount_and_render(conn, ~p"/matches")
+
+      view
+      |> element(~s(button[phx-value-match-id="#{match.id}"]))
+      |> render_click()
+
+      html = render_hook(view, "close_chat", %{})
+
+      refute html =~ ~s(id="chat-container")
+      assert html =~ "Closable"
+    end
+
+    test "send_message ignores empty content", %{conn: conn, user: user} do
+      profile_fixture(user) |> set_profile_picture()
+
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "EmptyTarget"}) |> set_profile_picture()
+
+      {:ok, %{match: match, conversation: conversation}} =
+        Matches.create_match(user.id, other_user.id)
+
+      {:ok, view, _html} = mount_and_render(conn, ~p"/matches")
+
+      view
+      |> element(~s(button[phx-value-match-id="#{match.id}"]))
+      |> render_click()
+
+      render_hook(view, "send_message", %{"content" => ""})
+      render_hook(view, "send_message", %{"content" => "   "})
+
+      assert Messaging.list_messages(conversation) == []
+    end
+
+    test "send_message is a no-op when no conversation is selected", %{conn: conn, user: user} do
+      profile_fixture(user) |> set_profile_picture()
+
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "NoSelection"}) |> set_profile_picture()
+
+      {:ok, %{conversation: conversation}} = Matches.create_match(user.id, other_user.id)
+
+      {:ok, view, _html} = mount_and_render(conn, ~p"/matches")
+
+      # Don't select a match — fire send_message anyway
+      render_hook(view, "send_message", %{"content" => "should be ignored"})
+
+      assert Messaging.list_messages(conversation) == []
+    end
+
+    test "send_message persists the message and clears the form", %{conn: conn, user: user} do
+      profile_fixture(user) |> set_profile_picture()
+
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "Receiver"}) |> set_profile_picture()
+
+      {:ok, %{match: match, conversation: conversation}} =
+        Matches.create_match(user.id, other_user.id)
+
+      {:ok, view, _html} = mount_and_render(conn, ~p"/matches")
+
+      view
+      |> element(~s(button[phx-value-match-id="#{match.id}"]))
+      |> render_click()
+
+      render_hook(view, "send_message", %{"content" => "Hi from sender!"})
+
+      [persisted] = Messaging.list_messages(conversation)
+      assert persisted.content == "Hi from sender!"
+      assert persisted.sender_id == user.id
+    end
+
+    test "send_message flashes an error when the message is too long", %{conn: conn, user: user} do
+      profile_fixture(user) |> set_profile_picture()
+
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "TooLongTarget"}) |> set_profile_picture()
+
+      {:ok, %{match: match, conversation: conversation}} =
+        Matches.create_match(user.id, other_user.id)
+
+      {:ok, view, _html} = mount_and_render(conn, ~p"/matches")
+
+      view
+      |> element(~s(button[phx-value-match-id="#{match.id}"]))
+      |> render_click()
+
+      too_long = String.duplicate("a", 2001)
+      html = render_hook(view, "send_message", %{"content" => too_long})
+
+      assert html =~ "Failed to send message. Please try again."
+      assert Messaging.list_messages(conversation) == []
+    end
+
+    test "appends incoming message from the other user in the open conversation",
+         %{conn: conn, user: user} do
+      profile_fixture(user) |> set_profile_picture()
+
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "LiveSender"}) |> set_profile_picture()
+
+      {:ok, %{match: match, conversation: conversation}} =
+        Matches.create_match(user.id, other_user.id)
+
+      {:ok, view, _html} = mount_and_render(conn, ~p"/matches")
+
+      view
+      |> element(~s(button[phx-value-match-id="#{match.id}"]))
+      |> render_click()
+
+      # Use send_message (not create_message) so :new_message is broadcast on
+      # the conversation topic, which is what triggers the LV's append +
+      # mark-as-read logic.
+      {:ok, _msg} = Messaging.send_message(other_user, conversation.id, "Pinging you live")
+
+      html = render(view)
+      assert html =~ "Pinging you live"
+      # Marked as read because sender is not the current user
+      assert Messaging.unread_count(conversation.id, user.id) == 0
+    end
+
+    test "ignores incoming message for a different conversation", %{conn: conn, user: user} do
+      profile_fixture(user) |> set_profile_picture()
+
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "OpenedChat"}) |> set_profile_picture()
+
+      third_user = user_fixture()
+      profile_fixture(third_user, %{first_name: "ThirdParty"}) |> set_profile_picture()
+
+      {:ok, %{match: match, conversation: opened_conv}} =
+        Matches.create_match(user.id, other_user.id)
+
+      {:ok, %{conversation: other_conv}} =
+        Matches.create_match(user.id, third_user.id)
+
+      {:ok, view, _html} = mount_and_render(conn, ~p"/matches")
+
+      view
+      |> element(~s(button[phx-value-match-id="#{match.id}"]))
+      |> render_click()
+
+      # Synthesize a :new_message for the OTHER conversation by sending it
+      # directly to the LiveView process. This bypasses PubSub topics so the
+      # message reaches the handler without subscribing to the other topic.
+      foreign_message = %LittleGrape.Messaging.Message{
+        conversation_id: other_conv.id,
+        sender_id: third_user.id,
+        content: "Should not appear in this chat"
+      }
+
+      send(view.pid, {:new_message, foreign_message})
+
+      html = render(view)
+      refute html =~ "Should not appear in this chat"
+      # And nothing was marked-as-read for the opened conversation
+      assert Messaging.list_messages(opened_conv) == []
+    end
+
+    test ":messages_read updates the unread badge in the header", %{conn: conn, user: user} do
+      profile_fixture(user) |> set_profile_picture()
+
+      other_user = user_fixture()
+      profile_fixture(other_user, %{first_name: "ReadBroadcaster"}) |> set_profile_picture()
+
+      {:ok, %{conversation: conversation}} = Matches.create_match(user.id, other_user.id)
+      {:ok, _msg} = Messaging.create_message(conversation.id, other_user.id, "Unread one")
+
+      {:ok, view, html} = mount_and_render(conn, ~p"/matches")
+
+      # The header badge on the Matches link uses bg-pink-500 and only renders
+      # when @unread_count > 0; the per-match badge uses bg-red-500.
+      assert html =~ "bg-pink-500"
+
+      # Mark messages as read out-of-band; the LV is only subscribed to the
+      # conversation topic after select_match, so deliver the broadcast
+      # message directly to the LV process.
+      Messaging.mark_as_read(user, conversation.id)
+      send(view.pid, {:messages_read, %{conversation_id: conversation.id, reader_id: user.id}})
+
+      html = render(view)
+      refute html =~ "bg-pink-500"
+    end
+
+    test "displays the AI match card with reasons when discovery picks one",
+         %{conn: conn, user: user} do
+      profile_fixture(user, %{
+        first_name: "Seeker",
+        gender: "male",
+        preferred_gender: "female",
+        country: "AL",
+        preferred_country: "AL",
+        languages: ["sq", "en"],
+        interests: ["sports", "travel"],
+        religion: "muslim"
+      })
+      |> set_profile_picture()
+
+      candidate = user_fixture()
+
+      profile_fixture(candidate, %{
+        first_name: "PerfectMatch",
+        bio: "We share so many things",
+        gender: "female",
+        preferred_gender: "male",
+        country: "AL",
+        preferred_country: "AL",
+        languages: ["sq", "en"],
+        interests: ["sports", "travel"],
+        religion: "muslim",
+        birthdate: Date.add(Date.utc_today(), -28 * 365)
+      })
+      |> set_profile_picture()
+
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
+
+      assert html =~ "AI Match"
+      assert html =~ "PerfectMatch"
+      assert html =~ "We share so many things"
+      assert html =~ "Within your preferred age range"
+      assert html =~ "Lives in AL"
+      assert html =~ "Same religion"
+      assert html =~ "Shared interests"
+      assert html =~ "Shared languages"
+    end
+
+    test "does not display the AI match card when there is no candidate",
+         %{conn: conn, user: user} do
+      profile_fixture(user) |> set_profile_picture()
+
+      {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
+
+      refute html =~ "AI Match"
+    end
   end
 end

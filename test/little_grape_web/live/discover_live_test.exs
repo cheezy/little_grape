@@ -6,6 +6,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
 
   alias LittleGrape.Accounts.Profile
   alias LittleGrape.Matches
+  alias LittleGrape.Messaging
   alias LittleGrape.Repo
   alias LittleGrape.Swipes
 
@@ -616,6 +617,184 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
 
       # Should still show no profiles message (unchanged)
       assert html =~ "No more profiles right now"
+    end
+
+    test "previously passed section is hidden when nothing has been passed",
+         %{conn: conn, user: user} do
+      profile_fixture(user, %{gender: "male", preferred_gender: "female"})
+      |> set_profile_picture()
+
+      {:ok, _view, html} = mount_and_render(conn, ~p"/discover")
+
+      refute html =~ "Previously passed"
+      refute html =~ "Reconsider"
+    end
+
+    test "previously passed section lists profiles the user passed on",
+         %{conn: conn, user: user} do
+      profile_fixture(user, %{gender: "male", preferred_gender: "female"})
+      |> set_profile_picture()
+
+      passed = user_fixture()
+
+      profile_fixture(passed, %{
+        first_name: "PassedAlready",
+        gender: "female",
+        preferred_gender: "male",
+        city: "Tirana",
+        country: "AL"
+      })
+      |> set_profile_picture()
+
+      {:ok, _swipe} = Swipes.create_swipe(user, passed.id, "pass")
+
+      {:ok, _view, html} = mount_and_render(conn, ~p"/discover")
+
+      assert html =~ "Previously passed"
+      assert html =~ "PassedAlready"
+      assert html =~ "Tirana"
+      # Reconsider button uses the user_id, not the swipe id
+      assert html =~ ~s(phx-value-target-user-id="#{passed.id}")
+    end
+
+    test "previously passed item shows placeholder when profile has no picture",
+         %{conn: conn, user: user} do
+      profile_fixture(user, %{gender: "male", preferred_gender: "female"})
+      |> set_profile_picture()
+
+      passed = user_fixture()
+
+      profile_fixture(passed, %{
+        first_name: "NoPicPassed",
+        gender: "female",
+        preferred_gender: "male",
+        city: nil,
+        country: nil
+      })
+
+      # Note: no set_profile_picture/1 here, so profile_picture stays nil
+
+      {:ok, _swipe} = Swipes.create_swipe(user, passed.id, "pass")
+
+      {:ok, _view, html} = mount_and_render(conn, ~p"/discover")
+
+      assert html =~ "NoPicPassed"
+      # Placeholder avatar emoji
+      assert html =~ "👤"
+    end
+
+    test "reconsider restores a passed profile to the discovery feed",
+         %{conn: conn, user: user} do
+      profile_fixture(user, %{gender: "male", preferred_gender: "female"})
+      |> set_profile_picture()
+
+      passed = user_fixture()
+
+      profile_fixture(passed, %{
+        first_name: "ReconsiderTarget",
+        gender: "female",
+        preferred_gender: "male"
+      })
+      |> set_profile_picture()
+
+      {:ok, _swipe} = Swipes.create_swipe(user, passed.id, "pass")
+
+      {:ok, view, html} = mount_and_render(conn, ~p"/discover")
+
+      # Initially: not in the active feed (no current candidate), but listed under Previously passed
+      assert html =~ "No more profiles right now"
+      assert html =~ "ReconsiderTarget"
+
+      html =
+        view
+        |> element(~s(button[phx-value-target-user-id="#{passed.id}"]))
+        |> render_click()
+
+      assert html =~ "Profile added back to your feed."
+      # Pass swipe is gone
+      refute Swipes.has_swiped?(user.id, passed.id)
+
+      # The reconsider handler queues `send(self(), :load_candidates)` which is
+      # processed after the click round-trip; an extra render lets the LV
+      # drain its mailbox so the refreshed feed is visible.
+      html = render(view)
+      refute html =~ "No more profiles right now"
+      assert html =~ "ReconsiderTarget"
+    end
+
+    test "reconsider flashes an error when no matching pass swipe exists",
+         %{conn: conn, user: user} do
+      profile_fixture(user, %{gender: "male", preferred_gender: "female"})
+      |> set_profile_picture()
+
+      {:ok, view, _html} = mount_and_render(conn, ~p"/discover")
+
+      # Send a reconsider for a user we never passed on
+      html =
+        render_hook(view, "reconsider", %{"target-user-id" => "999999"})
+
+      assert html =~ "Could not undo that pass."
+    end
+
+    test "header unread badge updates when a message arrives", %{conn: conn, user: user} do
+      profile_fixture(user, %{gender: "male", preferred_gender: "female"})
+      |> set_profile_picture()
+
+      other_user = user_fixture()
+
+      profile_fixture(other_user, %{
+        first_name: "MsgSender",
+        gender: "female",
+        preferred_gender: "male"
+      })
+      |> set_profile_picture()
+
+      # Match + an unread message — created BEFORE the LV mounts so initial
+      # unread_count reflects this state.
+      {:ok, %{conversation: conversation}} = Matches.create_match(user.id, other_user.id)
+      {:ok, _msg} = Messaging.create_message(conversation.id, other_user.id, "hi")
+
+      {:ok, view, html} = mount_and_render(conn, ~p"/discover")
+
+      # bg-pink-500 is the top-nav unread badge on the Matches link
+      assert html =~ "bg-pink-500"
+
+      # Mark as read out-of-band, then deliver :messages_read directly
+      Messaging.mark_as_read(user, conversation.id)
+      send(view.pid, {:messages_read, %{conversation_id: conversation.id, reader_id: user.id}})
+
+      html = render(view)
+      refute html =~ "bg-pink-500"
+    end
+
+    test ":new_match info handler refreshes the unread badge", %{conn: conn, user: user} do
+      profile_fixture(user, %{gender: "male", preferred_gender: "female"})
+      |> set_profile_picture()
+
+      {:ok, view, html} = mount_and_render(conn, ~p"/discover")
+
+      refute html =~ "bg-pink-500"
+
+      # Create a match + unread message, then synthesise the :new_match
+      # broadcast directly so the LV recomputes unread_count.
+      other_user = user_fixture()
+
+      profile_fixture(other_user, %{
+        first_name: "NewMatchSender",
+        gender: "female",
+        preferred_gender: "male"
+      })
+      |> set_profile_picture()
+
+      {:ok, %{match: match, conversation: conversation}} =
+        Matches.create_match(user.id, other_user.id)
+
+      {:ok, _msg} = Messaging.create_message(conversation.id, other_user.id, "hello")
+
+      send(view.pid, {:new_match, match})
+
+      html = render(view)
+      assert html =~ "bg-pink-500"
     end
 
     test "handles swipe error by advancing to next candidate", %{conn: conn, user: user} do
