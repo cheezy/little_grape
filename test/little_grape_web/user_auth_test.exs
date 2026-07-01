@@ -305,4 +305,64 @@ defmodule LittleGrapeWeb.UserAuthTest do
       refute conn.status
     end
   end
+
+  describe "on_mount :require_authenticated" do
+    defp build_socket do
+      %Phoenix.LiveView.Socket{
+        endpoint: LittleGrapeWeb.Endpoint,
+        assigns: %{__changed__: %{}, flash: %{}}
+      }
+    end
+
+    test "continues and assigns current_scope with a valid token", %{user: user} do
+      token = Accounts.generate_user_session_token(user)
+      session = %{"user_token" => token}
+
+      assert {:cont, socket} =
+               UserAuth.on_mount(:require_authenticated, %{}, session, build_socket())
+
+      assert socket.assigns.current_scope.user.id == user.id
+    end
+
+    test "performs exactly one token lookup", %{user: user} do
+      token = Accounts.generate_user_session_token(user)
+      session = %{"user_token" => token}
+
+      {{:cont, _socket}, query_count} =
+        LittleGrape.DataCase.count_queries(fn ->
+          UserAuth.on_mount(:require_authenticated, %{}, session, build_socket())
+        end)
+
+      assert query_count == 1
+    end
+
+    test "halts and redirects to log-in with no token" do
+      assert {:halt, socket} =
+               UserAuth.on_mount(:require_authenticated, %{}, %{}, build_socket())
+
+      assert {:redirect, %{to: "/users/log-in"}} = socket.redirected
+      assert socket.assigns.flash["error"] =~ "must log in"
+    end
+
+    test "halts and redirects to log-in with an invalid token" do
+      session = %{"user_token" => "bogus-token"}
+
+      assert {:halt, socket} =
+               UserAuth.on_mount(:require_authenticated, %{}, session, build_socket())
+
+      assert {:redirect, %{to: "/users/log-in"}} = socket.redirected
+    end
+
+    test "halts and redirects to log-in with an expired token", %{user: user} do
+      token = Accounts.generate_user_session_token(user)
+      # Session validity is 14 days; age the token past it
+      offset_user_token(token, -15, :day)
+      session = %{"user_token" => token}
+
+      assert {:halt, socket} =
+               UserAuth.on_mount(:require_authenticated, %{}, session, build_socket())
+
+      assert {:redirect, %{to: "/users/log-in"}} = socket.redirected
+    end
+  end
 end

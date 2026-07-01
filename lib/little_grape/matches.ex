@@ -218,6 +218,45 @@ defmodule LittleGrape.Matches do
   end
 
   @doc """
+  Returns the other participant in a match, with their profile.
+
+  ## Parameters
+
+    * `match` - The `%Match{}` struct
+    * `user_id` - The ID of the known participant
+
+  ## Returns
+
+    * `{other_user, other_profile}` tuple
+
+  ## Raises
+
+    * `ArgumentError` if `user_id` is not a participant in the match
+
+  ## Examples
+
+      iex> other_participant(match, match.user_a_id)
+      {%User{}, %Profile{}}
+
+  """
+  def other_participant(%Match{} = match, user_id) do
+    other_user =
+      cond do
+        match.user_a_id == user_id ->
+          Repo.preload(match, :user_b).user_b
+
+        match.user_b_id == user_id ->
+          Repo.preload(match, :user_a).user_a
+
+        true ->
+          raise ArgumentError, "user #{user_id} is not a participant in match #{match.id}"
+      end
+
+    other_profile = Repo.preload(other_user, :profile).profile
+    {other_user, other_profile}
+  end
+
+  @doc """
   Lists all matches for a user with details needed for display.
 
   Returns matches with preloaded user profiles, last message preview, and unread counts.

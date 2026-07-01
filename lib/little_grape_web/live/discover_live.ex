@@ -8,45 +8,37 @@ defmodule LittleGrapeWeb.DiscoverLive do
   alias LittleGrape.Swipes
 
   @impl true
-  def mount(_params, session, socket) do
-    socket = assign_current_user(socket, session)
+  def mount(_params, _session, socket) do
+    user = Repo.preload(socket.assigns.current_scope.user, :profile)
 
-    case socket.assigns[:current_user] do
-      nil ->
-        {:ok, redirect(socket, to: ~p"/users/log-in")}
+    if Accounts.profile_complete?(user.profile) do
+      if connected?(socket) do
+        Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user.id}")
+        send(self(), :load_candidates)
+      end
 
-      user ->
-        user = Repo.preload(user, :profile)
+      {:ok,
+       socket
+       |> assign(:user, user)
+       |> assign(:loading, true)
+       |> assign(:candidates, [])
+       |> assign(:current_candidate, nil)
+       |> assign(:previously_passed, [])
+       |> assign(:swiping, false)
+       |> assign(:show_match_modal, false)
+       |> assign(:matched_profile, nil)
+       |> assign(:expanded, false)
+       |> assign(:unread_count, 0)}
+    else
+      missing = Accounts.missing_profile_fields(user.profile)
 
-        if Accounts.profile_complete?(user.profile) do
-          if connected?(socket) do
-            Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user.id}")
-            send(self(), :load_candidates)
-          end
+      message =
+        "Please complete your profile to start discovering matches. Missing: #{Enum.join(missing, ", ")}"
 
-          {:ok,
-           socket
-           |> assign(:user, user)
-           |> assign(:loading, true)
-           |> assign(:candidates, [])
-           |> assign(:current_candidate, nil)
-           |> assign(:previously_passed, [])
-           |> assign(:swiping, false)
-           |> assign(:show_match_modal, false)
-           |> assign(:matched_profile, nil)
-           |> assign(:expanded, false)
-           |> assign(:unread_count, 0)}
-        else
-          missing = Accounts.missing_profile_fields(user.profile)
-
-          message =
-            "Please complete your profile to start discovering matches. Missing: #{Enum.join(missing, ", ")}"
-
-          {:ok,
-           socket
-           |> put_flash(:error, message)
-           |> redirect(to: ~p"/users/profile")}
-        end
+      {:ok,
+       socket
+       |> put_flash(:error, message)
+       |> redirect(to: ~p"/users/profile")}
     end
   end
 
@@ -153,19 +145,6 @@ defmodule LittleGrapeWeb.DiscoverLive do
     |> assign(:current_candidate, List.first(remaining))
     |> assign(:swiping, false)
     |> assign(:expanded, false)
-  end
-
-  defp assign_current_user(socket, session) do
-    case session["user_token"] do
-      nil ->
-        assign(socket, :current_user, nil)
-
-      token ->
-        case Accounts.get_user_by_session_token(token) do
-          {user, _token_inserted_at} -> assign(socket, :current_user, user)
-          nil -> assign(socket, :current_user, nil)
-        end
-    end
   end
 
   defp calculate_age(birthdate), do: Discovery.calculate_age(birthdate)

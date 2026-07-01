@@ -77,11 +77,18 @@ defmodule LittleGrapeWeb.UserAuth do
   end
 
   @doc """
-  LiveView `on_mount` hook that mirrors `fetch_current_scope_for_user/2` so
-  LiveViews — which run in their own process and don't pass through the plug
-  pipeline — assign `:current_scope` from the session token like controllers do.
+  LiveView `on_mount` hook for live routes that require authentication.
+
+  Mirrors `require_authenticated_user/2`: resolves `:current_scope` from the
+  session token (LiveViews run in their own process and skip the plug
+  pipeline), and halts with a redirect to the log-in page when there is no
+  authenticated user. Runs on both disconnected and connected mounts, so a
+  session invalidated mid-navigation is caught on the next live navigation.
+
+  Unlike the plug, this cannot store a return-to path (`on_mount` has no
+  session write access); this matches stock `phx.gen.auth` behavior.
   """
-  def on_mount(:default, _params, session, socket) do
+  def on_mount(:require_authenticated, _params, session, socket) do
     user =
       with token when is_binary(token) <- session["user_token"],
            {user, _token_inserted_at} <- Accounts.get_user_by_session_token(token) do
@@ -90,7 +97,16 @@ defmodule LittleGrapeWeb.UserAuth do
         _ -> nil
       end
 
-    {:cont, Phoenix.Component.assign(socket, :current_scope, Scope.for_user(user))}
+    socket = Phoenix.Component.assign(socket, :current_scope, Scope.for_user(user))
+
+    if socket.assigns.current_scope && socket.assigns.current_scope.user do
+      {:cont, socket}
+    else
+      {:halt,
+       socket
+       |> Phoenix.LiveView.put_flash(:error, gettext("You must log in to access this page."))
+       |> Phoenix.LiveView.redirect(to: ~p"/users/log-in")}
+    end
   end
 
   defp ensure_user_token(conn) do

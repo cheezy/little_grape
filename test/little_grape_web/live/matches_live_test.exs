@@ -35,6 +35,51 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       assert redirected_to(result) == ~p"/users/log-in"
     end
 
+    test "mount performs exactly one token lookup per mount phase", %{conn: conn, user: user} do
+      profile_fixture(user) |> set_profile_picture()
+
+      ref = make_ref()
+      test_pid = self()
+      handler_id = {__MODULE__, ref}
+
+      :telemetry.attach(
+        handler_id,
+        [:little_grape, :repo, :query],
+        fn _event, _measurements, metadata, _config ->
+          attributable? =
+            test_pid == self() or test_pid in Process.get(:"$callers", [])
+
+          if attributable? and metadata.source == "users_tokens" do
+            send(test_pid, {:token_lookup, ref})
+          end
+        end,
+        nil
+      )
+
+      try do
+        {:ok, _view, _html} = live(conn, ~p"/matches")
+      after
+        :telemetry.detach(handler_id)
+      end
+
+      count =
+        fn -> :tick end
+        |> Stream.repeatedly()
+        |> Enum.reduce_while(0, fn _, acc ->
+          receive do
+            {:token_lookup, ^ref} -> {:cont, acc + 1}
+          after
+            0 -> {:halt, acc}
+          end
+        end)
+
+      # One lookup by the plug on the initial GET, then exactly one per mount
+      # phase (disconnected + connected). Before the require_authenticated
+      # on_mount refactor this was 5 — each mount phase ran both the on_mount
+      # hook and the per-LiveView assign_current_user duplicate.
+      assert count == 3
+    end
+
     test "mounts successfully with authenticated user", %{conn: conn, user: user} do
       # Create profile for user
       profile_fixture(user) |> set_profile_picture()

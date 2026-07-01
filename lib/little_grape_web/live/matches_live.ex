@@ -4,35 +4,28 @@ defmodule LittleGrapeWeb.MatchesLive do
   import LittleGrapeWeb.ChatComponents,
     only: [chat_header: 1, messages_list: 1, message_input: 1]
 
-  alias LittleGrape.Accounts
   alias LittleGrape.Discovery
   alias LittleGrape.Matches
   alias LittleGrape.Messaging
   alias LittleGrape.Repo
 
   @impl true
-  def mount(_params, session, socket) do
-    socket = assign_current_user(socket, session)
+  def mount(_params, _session, socket) do
+    user = socket.assigns.current_scope.user
 
-    case socket.assigns[:current_user] do
-      nil ->
-        {:ok, redirect(socket, to: ~p"/users/log-in")}
-
-      user ->
-        if connected?(socket) do
-          Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user.id}")
-          send(self(), :load_matches)
-        end
-
-        {:ok,
-         socket
-         |> assign(:user, user)
-         |> assign(:loading, true)
-         |> assign(:matches, [])
-         |> assign(:ai_match, nil)
-         |> assign(:unread_count, 0)
-         |> assign_no_selection()}
+    if connected?(socket) do
+      Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user.id}")
+      send(self(), :load_matches)
     end
+
+    {:ok,
+     socket
+     |> assign(:user, user)
+     |> assign(:loading, true)
+     |> assign(:matches, [])
+     |> assign(:ai_match, nil)
+     |> assign(:unread_count, 0)
+     |> assign_no_selection()}
   end
 
   defp assign_no_selection(socket) do
@@ -172,7 +165,7 @@ defmodule LittleGrapeWeb.MatchesLive do
   defp select_match(socket, match, user) do
     {:ok, conversation} = Messaging.get_conversation(user, match.id)
     messages = Messaging.list_messages(conversation)
-    {_other_user, other_profile} = get_other_participant(match, user.id)
+    {_other_user, other_profile} = Matches.other_participant(match, user.id)
 
     socket = unsubscribe_from_current_topic(socket)
     new_topic = "conversation:#{conversation.id}"
@@ -200,31 +193,6 @@ defmodule LittleGrapeWeb.MatchesLive do
   defp unsubscribe_from_current_topic(%{assigns: %{current_topic: topic}} = socket) do
     Phoenix.PubSub.unsubscribe(LittleGrape.PubSub, topic)
     assign(socket, :current_topic, nil)
-  end
-
-  defp get_other_participant(match, user_id) do
-    other_user =
-      if match.user_a_id == user_id do
-        Repo.preload(match, :user_b).user_b
-      else
-        Repo.preload(match, :user_a).user_a
-      end
-
-    other_profile = Repo.preload(other_user, :profile).profile
-    {other_user, other_profile}
-  end
-
-  defp assign_current_user(socket, session) do
-    case session["user_token"] do
-      nil ->
-        assign(socket, :current_user, nil)
-
-      token ->
-        case Accounts.get_user_by_session_token(token) do
-          {user, _token_inserted_at} -> assign(socket, :current_user, user)
-          nil -> assign(socket, :current_user, nil)
-        end
-    end
   end
 
   @impl true

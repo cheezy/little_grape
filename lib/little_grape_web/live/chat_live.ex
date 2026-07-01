@@ -4,44 +4,36 @@ defmodule LittleGrapeWeb.ChatLive do
   import LittleGrapeWeb.ChatComponents,
     only: [messages_list: 1, message_input: 1]
 
-  alias LittleGrape.Accounts
   alias LittleGrape.Matches
   alias LittleGrape.Messaging
-  alias LittleGrape.Repo
 
   @impl true
-  def mount(%{"match_id" => match_id}, session, socket) do
-    socket = assign_current_user(socket, session)
+  def mount(%{"match_id" => match_id}, _session, socket) do
+    user = socket.assigns.current_scope.user
 
-    case socket.assigns[:current_user] do
+    # Check authorization synchronously to return proper redirect
+    case Matches.get_match(user, match_id) do
       nil ->
-        {:ok, redirect(socket, to: ~p"/users/log-in")}
+        {:ok, redirect_not_found(socket)}
 
-      user ->
-        # Check authorization synchronously to return proper redirect
-        case Matches.get_match(user, match_id) do
-          nil ->
-            {:ok, redirect_not_found(socket)}
-
-          match ->
-            if connected?(socket) do
-              send(self(), {:load_conversation, match_id, match})
-            end
-
-            {:ok,
-             socket
-             |> assign(:user, user)
-             |> assign(:match_id, match_id)
-             |> assign(:loading, true)
-             |> assign(:match, nil)
-             |> assign(:conversation, nil)
-             |> assign(:messages, [])
-             |> assign(:other_user, nil)
-             |> assign(:other_profile, nil)
-             |> assign(:message_form, to_form(%{"content" => ""}))
-             |> assign(:show_profile, false)
-             |> assign(:unread_count, 0)}
+      match ->
+        if connected?(socket) do
+          send(self(), {:load_conversation, match_id, match})
         end
+
+        {:ok,
+         socket
+         |> assign(:user, user)
+         |> assign(:match_id, match_id)
+         |> assign(:loading, true)
+         |> assign(:match, nil)
+         |> assign(:conversation, nil)
+         |> assign(:messages, [])
+         |> assign(:other_user, nil)
+         |> assign(:other_profile, nil)
+         |> assign(:message_form, to_form(%{"content" => ""}))
+         |> assign(:show_profile, false)
+         |> assign(:unread_count, 0)}
     end
   end
 
@@ -49,31 +41,6 @@ defmodule LittleGrapeWeb.ChatLive do
     socket
     |> put_flash(:error, gettext("Conversation not found"))
     |> redirect(to: ~p"/matches")
-  end
-
-  defp get_other_participant(match, user_id) do
-    other_user =
-      if match.user_a_id == user_id do
-        Repo.preload(match, :user_b).user_b
-      else
-        Repo.preload(match, :user_a).user_a
-      end
-
-    other_profile = Repo.preload(other_user, :profile).profile
-    {other_user, other_profile}
-  end
-
-  defp assign_current_user(socket, session) do
-    case session["user_token"] do
-      nil ->
-        assign(socket, :current_user, nil)
-
-      token ->
-        case Accounts.get_user_by_session_token(token) do
-          {user, _token_inserted_at} -> assign(socket, :current_user, user)
-          nil -> assign(socket, :current_user, nil)
-        end
-    end
   end
 
   @impl true
@@ -151,7 +118,7 @@ defmodule LittleGrapeWeb.ChatLive do
     case Messaging.get_conversation(user, match_id) do
       {:ok, conversation} ->
         messages = Messaging.list_messages(conversation)
-        {other_user, other_profile} = get_other_participant(match, user.id)
+        {other_user, other_profile} = Matches.other_participant(match, user.id)
 
         Phoenix.PubSub.subscribe(LittleGrape.PubSub, "conversation:#{conversation.id}")
         Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user.id}")

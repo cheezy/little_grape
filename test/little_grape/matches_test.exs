@@ -316,6 +316,46 @@ defmodule LittleGrape.MatchesTest do
     end
   end
 
+  describe "other_participant/2" do
+    test "returns the counterpart and profile for user_a" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      profile_fixture(user1, %{first_name: "Aye"})
+      profile_fixture(user2, %{first_name: "Bee"})
+
+      {:ok, %{match: match}} = Matches.create_match(user1.id, user2.id)
+
+      {other_user, other_profile} = Matches.other_participant(match, match.user_a_id)
+      assert other_user.id == match.user_b_id
+      assert other_profile.user_id == match.user_b_id
+    end
+
+    test "returns the counterpart and profile for user_b" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      profile_fixture(user1)
+      profile_fixture(user2)
+
+      {:ok, %{match: match}} = Matches.create_match(user1.id, user2.id)
+
+      {other_user, other_profile} = Matches.other_participant(match, match.user_b_id)
+      assert other_user.id == match.user_a_id
+      assert other_profile.user_id == match.user_a_id
+    end
+
+    test "raises ArgumentError for a user who is not in the match" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      outsider = user_fixture()
+
+      {:ok, %{match: match}} = Matches.create_match(user1.id, user2.id)
+
+      assert_raise ArgumentError, ~r/not a participant/, fn ->
+        Matches.other_participant(match, outsider.id)
+      end
+    end
+  end
+
   describe "list_matches_with_details/1" do
     test "returns the correct last message per conversation across multiple matches" do
       user = user_fixture()
