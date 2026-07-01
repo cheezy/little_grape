@@ -1,195 +1,100 @@
 defmodule LittleGrape.BlocksTest do
   use LittleGrape.DataCase, async: true
 
+  import LittleGrape.AccountsFixtures
+
+  alias LittleGrape.Blocks
+  alias LittleGrape.Blocks.Block
   alias LittleGrape.Repo
 
-  describe "blocks table" do
-    test "table exists with correct columns" do
-      # Insert a test user first
-      %{num_rows: 1} =
-        Repo.query!(
-          "INSERT INTO users (email, hashed_password, inserted_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id",
-          ["blocker@test.com", "hashed"]
-        )
+  describe "block_user/2" do
+    test "creates a block" do
+      blocker = user_fixture()
+      blocked = user_fixture()
 
-      %{num_rows: 1} =
-        Repo.query!(
-          "INSERT INTO users (email, hashed_password, inserted_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id",
-          ["blocked@test.com", "hashed"]
-        )
-
-      # Get user IDs
-      %{rows: [[blocker_id]]} =
-        Repo.query!("SELECT id FROM users WHERE email = $1", ["blocker@test.com"])
-
-      %{rows: [[blocked_id]]} =
-        Repo.query!("SELECT id FROM users WHERE email = $1", ["blocked@test.com"])
-
-      # Insert a block record
-      %{num_rows: 1} =
-        Repo.query!(
-          "INSERT INTO blocks (blocker_id, blocked_id, inserted_at) VALUES ($1, $2, NOW())",
-          [blocker_id, blocked_id]
-        )
-
-      # Verify the record exists
-      %{rows: [[_id, ^blocker_id, ^blocked_id, inserted_at]]} =
-        Repo.query!("SELECT id, blocker_id, blocked_id, inserted_at FROM blocks LIMIT 1", [])
-
-      assert inserted_at != nil
+      assert {:ok, %Block{} = block} = Blocks.block_user(blocker, blocked.id)
+      assert block.blocker_id == blocker.id
+      assert block.blocked_id == blocked.id
+      assert Blocks.blocked?(blocker.id, blocked.id)
     end
 
-    test "unique index prevents duplicate blocks" do
-      # Insert test users
-      %{rows: [[blocker_id]]} =
-        Repo.query!(
-          "INSERT INTO users (email, hashed_password, inserted_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id",
-          ["blocker2@test.com", "hashed"]
-        )
+    test "is idempotent on duplicate blocks" do
+      blocker = user_fixture()
+      blocked = user_fixture()
 
-      %{rows: [[blocked_id]]} =
-        Repo.query!(
-          "INSERT INTO users (email, hashed_password, inserted_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id",
-          ["blocked2@test.com", "hashed"]
-        )
-
-      # Insert first block
-      %{num_rows: 1} =
-        Repo.query!(
-          "INSERT INTO blocks (blocker_id, blocked_id, inserted_at) VALUES ($1, $2, NOW())",
-          [blocker_id, blocked_id]
-        )
-
-      # Try to insert duplicate - should fail
-      assert_raise Postgrex.Error, ~r/blocks_blocker_id_blocked_id_index/, fn ->
-        Repo.query!(
-          "INSERT INTO blocks (blocker_id, blocked_id, inserted_at) VALUES ($1, $2, NOW())",
-          [blocker_id, blocked_id]
-        )
-      end
+      assert {:ok, %Block{id: block_id}} = Blocks.block_user(blocker, blocked.id)
+      assert {:ok, %Block{id: ^block_id}} = Blocks.block_user(blocker, blocked.id)
+      assert Repo.aggregate(Block, :count) == 1
     end
 
-    test "check constraint prevents user from blocking themselves" do
-      # Insert a test user
-      %{rows: [[user_id]]} =
-        Repo.query!(
-          "INSERT INTO users (email, hashed_password, inserted_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id",
-          ["selfblock@test.com", "hashed"]
-        )
+    test "rejects blocking yourself" do
+      user = user_fixture()
 
-      # Try to insert self-block - should fail
-      assert_raise Postgrex.Error, ~r/cannot_block_self/, fn ->
-        Repo.query!(
-          "INSERT INTO blocks (blocker_id, blocked_id, inserted_at) VALUES ($1, $2, NOW())",
-          [user_id, user_id]
-        )
-      end
+      assert {:error, changeset} = Blocks.block_user(user, user.id)
+      assert "cannot block yourself" in errors_on(changeset).blocked_id
     end
 
-    test "foreign key constraint on blocker_id" do
-      # Insert a valid user for blocked_id
-      %{rows: [[blocked_id]]} =
-        Repo.query!(
-          "INSERT INTO users (email, hashed_password, inserted_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id",
-          ["fk_blocked@test.com", "hashed"]
-        )
+    test "returns an error changeset when the blocked user does not exist" do
+      user = user_fixture()
 
-      # Use a non-existent blocker_id - should be greater to avoid self-block constraint
-      non_existent_blocker_id = blocked_id + 999_999
+      assert {:error, changeset} = Blocks.block_user(user, 999_999)
+      assert "does not exist" in errors_on(changeset).blocked_id
+    end
+  end
 
-      # Try to insert with non-existent blocker_id - should fail
-      assert_raise Postgrex.Error, ~r/blocks_blocker_id_fkey/, fn ->
-        Repo.query!(
-          "INSERT INTO blocks (blocker_id, blocked_id, inserted_at) VALUES ($1, $2, NOW())",
-          [non_existent_blocker_id, blocked_id]
-        )
-      end
+  describe "unblock_user/2" do
+    test "removes an existing block" do
+      blocker = user_fixture()
+      blocked = user_fixture()
+
+      assert {:ok, _block} = Blocks.block_user(blocker, blocked.id)
+      assert {:ok, %Block{}} = Blocks.unblock_user(blocker, blocked.id)
+      refute Blocks.blocked?(blocker.id, blocked.id)
     end
 
-    test "foreign key constraint on blocked_id" do
-      # Insert a valid user for blocker_id
-      %{rows: [[blocker_id]]} =
-        Repo.query!(
-          "INSERT INTO users (email, hashed_password, inserted_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id",
-          ["fk_blocker@test.com", "hashed"]
-        )
+    test "returns {:error, :not_found} when no block exists" do
+      user = user_fixture()
+      other = user_fixture()
 
-      # Use a non-existent blocked_id - should be greater to avoid self-block constraint
-      non_existent_blocked_id = blocker_id + 999_999
-
-      # Try to insert with non-existent blocked_id - should fail
-      assert_raise Postgrex.Error, ~r/blocks_blocked_id_fkey/, fn ->
-        Repo.query!(
-          "INSERT INTO blocks (blocker_id, blocked_id, inserted_at) VALUES ($1, $2, NOW())",
-          [blocker_id, non_existent_blocked_id]
-        )
-      end
+      assert {:error, :not_found} = Blocks.unblock_user(user, other.id)
     end
 
-    test "cascade delete when blocker user is deleted" do
-      # Insert test users
-      %{rows: [[blocker_id]]} =
-        Repo.query!(
-          "INSERT INTO users (email, hashed_password, inserted_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id",
-          ["cascade_blocker@test.com", "hashed"]
-        )
+    test "only removes the caller's own block direction" do
+      user_a = user_fixture()
+      user_b = user_fixture()
 
-      %{rows: [[blocked_id]]} =
-        Repo.query!(
-          "INSERT INTO users (email, hashed_password, inserted_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id",
-          ["cascade_blocked@test.com", "hashed"]
-        )
+      assert {:ok, _block} = Blocks.block_user(user_a, user_b.id)
+      assert {:ok, _block} = Blocks.block_user(user_b, user_a.id)
 
-      # Insert block
-      %{num_rows: 1} =
-        Repo.query!(
-          "INSERT INTO blocks (blocker_id, blocked_id, inserted_at) VALUES ($1, $2, NOW())",
-          [blocker_id, blocked_id]
-        )
+      assert {:ok, %Block{}} = Blocks.unblock_user(user_a, user_b.id)
 
-      # Verify block exists
-      %{rows: [[1]]} =
-        Repo.query!("SELECT COUNT(*) FROM blocks WHERE blocker_id = $1", [blocker_id])
+      # B's block on A remains, so the pair is still blocked
+      assert Blocks.blocked?(user_a.id, user_b.id)
+    end
+  end
 
-      # Delete blocker user
-      %{num_rows: 1} = Repo.query!("DELETE FROM users WHERE id = $1", [blocker_id])
+  describe "blocked?/2" do
+    test "returns true when the first user blocked the second" do
+      blocker = user_fixture()
+      blocked = user_fixture()
 
-      # Verify block was cascade deleted
-      %{rows: [[0]]} =
-        Repo.query!("SELECT COUNT(*) FROM blocks WHERE blocker_id = $1", [blocker_id])
+      assert {:ok, _block} = Blocks.block_user(blocker, blocked.id)
+      assert Blocks.blocked?(blocker.id, blocked.id)
     end
 
-    test "cascade delete when blocked user is deleted" do
-      # Insert test users
-      %{rows: [[blocker_id]]} =
-        Repo.query!(
-          "INSERT INTO users (email, hashed_password, inserted_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id",
-          ["cascade_blocker2@test.com", "hashed"]
-        )
+    test "returns true when the second user blocked the first" do
+      blocker = user_fixture()
+      blocked = user_fixture()
 
-      %{rows: [[blocked_id]]} =
-        Repo.query!(
-          "INSERT INTO users (email, hashed_password, inserted_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id",
-          ["cascade_blocked2@test.com", "hashed"]
-        )
+      assert {:ok, _block} = Blocks.block_user(blocker, blocked.id)
+      assert Blocks.blocked?(blocked.id, blocker.id)
+    end
 
-      # Insert block
-      %{num_rows: 1} =
-        Repo.query!(
-          "INSERT INTO blocks (blocker_id, blocked_id, inserted_at) VALUES ($1, $2, NOW())",
-          [blocker_id, blocked_id]
-        )
+    test "returns false when no block exists between the users" do
+      user = user_fixture()
+      other = user_fixture()
 
-      # Verify block exists
-      %{rows: [[1]]} =
-        Repo.query!("SELECT COUNT(*) FROM blocks WHERE blocked_id = $1", [blocked_id])
-
-      # Delete blocked user
-      %{num_rows: 1} = Repo.query!("DELETE FROM users WHERE id = $1", [blocked_id])
-
-      # Verify block was cascade deleted
-      %{rows: [[0]]} =
-        Repo.query!("SELECT COUNT(*) FROM blocks WHERE blocked_id = $1", [blocked_id])
+      refute Blocks.blocked?(user.id, other.id)
     end
   end
 end

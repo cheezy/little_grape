@@ -6,6 +6,7 @@ defmodule LittleGrape.Messaging do
   import Ecto.Query, warn: false
 
   alias LittleGrape.Accounts.User
+  alias LittleGrape.Blocks
   alias LittleGrape.Matches.Match
   alias LittleGrape.Messaging.Conversation
   alias LittleGrape.Messaging.Message
@@ -239,6 +240,7 @@ defmodule LittleGrape.Messaging do
 
     * `{:ok, %Message{}}` - Successfully sent message
     * `{:error, :not_authorized}` - User is not a participant in the conversation
+    * `{:error, :blocked}` - Either participant has blocked the other
     * `{:error, %Ecto.Changeset{}}` - Validation error
 
   ## Examples
@@ -252,24 +254,11 @@ defmodule LittleGrape.Messaging do
   """
   def send_message(%User{id: user_id} = _user, conversation_id, content) do
     case authorize_conversation_access(user_id, conversation_id) do
-      {:ok, _conversation} ->
-        result =
-          %Message{}
-          |> Message.changeset(%{
-            conversation_id: conversation_id,
-            sender_id: user_id,
-            content: content
-          })
-          |> Repo.insert()
-
-        case result do
-          {:ok, message} = success ->
-            broadcast_to_conversation(conversation_id, message)
-            broadcast_new_message(conversation_id, message)
-            success
-
-          error ->
-            error
+      {:ok, _conversation, other_user_id} ->
+        if Blocks.blocked?(user_id, other_user_id) do
+          {:error, :blocked}
+        else
+          insert_and_broadcast_message(conversation_id, user_id, content)
         end
 
       {:error, :not_found} ->
@@ -277,20 +266,45 @@ defmodule LittleGrape.Messaging do
     end
   end
 
+  defp insert_and_broadcast_message(conversation_id, user_id, content) do
+    result =
+      %Message{}
+      |> Message.changeset(%{
+        conversation_id: conversation_id,
+        sender_id: user_id,
+        content: content
+      })
+      |> Repo.insert()
+
+    case result do
+      {:ok, message} = success ->
+        broadcast_to_conversation(conversation_id, message)
+        broadcast_new_message(conversation_id, message)
+        success
+
+      error ->
+        error
+    end
+  end
+
   defp authorize_conversation_access(user_id, conversation_id) do
-    conversation =
+    result =
       from(c in Conversation,
         join: m in Match,
         on: c.match_id == m.id,
         where: c.id == ^conversation_id,
         where: m.user_a_id == ^user_id or m.user_b_id == ^user_id,
-        select: c
+        select: {c, m.user_a_id, m.user_b_id}
       )
       |> Repo.one()
 
-    case conversation do
-      nil -> {:error, :not_found}
-      conv -> {:ok, conv}
+    case result do
+      nil ->
+        {:error, :not_found}
+
+      {conv, user_a_id, user_b_id} ->
+        other_user_id = if user_a_id == user_id, do: user_b_id, else: user_a_id
+        {:ok, conv, other_user_id}
     end
   end
 
@@ -326,7 +340,7 @@ defmodule LittleGrape.Messaging do
   """
   def mark_as_read(%User{id: user_id}, conversation_id) do
     case authorize_conversation_access(user_id, conversation_id) do
-      {:ok, _conversation} ->
+      {:ok, _conversation, _other_user_id} ->
         read_at = DateTime.utc_now() |> DateTime.truncate(:second)
 
         {count, _} =

@@ -3,6 +3,7 @@ defmodule LittleGrape.MessagingTest do
 
   import LittleGrape.AccountsFixtures
 
+  alias LittleGrape.Blocks
   alias LittleGrape.Matches
   alias LittleGrape.Messaging
   alias LittleGrape.Messaging.Message
@@ -425,6 +426,69 @@ defmodule LittleGrape.MessagingTest do
 
       # Should NOT receive any broadcast
       refute_receive {:new_message, _}
+    end
+
+    test "returns {:error, :blocked} when the sender has blocked the recipient" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      assert {:ok, _block} = Blocks.block_user(user1, user2.id)
+
+      assert {:error, :blocked} = Messaging.send_message(user1, conversation.id, "Hello!")
+    end
+
+    test "returns {:error, :blocked} when the recipient has blocked the sender" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      assert {:ok, _block} = Blocks.block_user(user2, user1.id)
+
+      # Same atom in both directions — the sender cannot tell who blocked whom
+      assert {:error, :blocked} = Messaging.send_message(user1, conversation.id, "Hello!")
+    end
+
+    test "does not insert a message or broadcast when blocked" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      assert {:ok, _block} = Blocks.block_user(user2, user1.id)
+
+      Phoenix.PubSub.subscribe(LittleGrape.PubSub, "conversation:#{conversation.id}")
+      Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user2.id}")
+
+      assert {:error, :blocked} = Messaging.send_message(user1, conversation.id, "Hello!")
+
+      assert Repo.aggregate(Message, :count) == 0
+      refute_receive {:new_message, _}
+      refute_receive {:message_received, _}
+    end
+
+    test "a blocked non-participant still gets :not_authorized" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      outsider = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      assert {:ok, _block} = Blocks.block_user(user1, outsider.id)
+
+      # Block state must not leak to users outside the conversation
+      assert {:error, :not_authorized} =
+               Messaging.send_message(outsider, conversation.id, "Hello!")
+    end
+
+    test "sending works again after unblock" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      assert {:ok, _block} = Blocks.block_user(user1, user2.id)
+      assert {:error, :blocked} = Messaging.send_message(user1, conversation.id, "Hello!")
+
+      assert {:ok, _block} = Blocks.unblock_user(user1, user2.id)
+      assert {:ok, %Message{}} = Messaging.send_message(user1, conversation.id, "Hello!")
     end
   end
 
