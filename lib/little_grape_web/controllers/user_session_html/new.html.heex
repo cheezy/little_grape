@@ -23,8 +23,8 @@
           <% end %>
         </p>
       </div>
-      
-<!-- Email + Password login -->
+
+      <!-- Email + Password login -->
       <.form :let={f} for={@form} as={:user} id="login_form_password" action={~p"/users/log-in"}>
         <div class="mb-4">
           <label class="block text-gray-700 font-medium mb-2">{gettext("Email")}</label>

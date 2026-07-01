@@ -91,7 +91,8 @@ defmodule LittleGrapeWeb.ChatLive do
            |> push_event("clear:chat-message-input", %{})}
 
         {:error, _changeset} ->
-          {:noreply, put_flash(socket, :error, gettext("Failed to send message. Please try again."))}
+          {:noreply,
+           put_flash(socket, :error, gettext("Failed to send message. Please try again."))}
       end
     end
   end
@@ -229,8 +230,7 @@ defmodule LittleGrapeWeb.ChatLive do
   defp loading_spinner(assigns) do
     ~H"""
     <div class="flex-1 flex flex-col items-center justify-center bg-gray-50">
-      <div class="w-12 h-12 border-4 border-red-200 border-t-red-500 rounded-full animate-spin">
-      </div>
+      <div class="w-12 h-12 border-4 border-red-200 border-t-red-500 rounded-full animate-spin"></div>
       <p class="text-gray-500 mt-4">{gettext("Loading messages...")}</p>
     </div>
     """

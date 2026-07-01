@@ -107,7 +107,7 @@ jobs:
 
     # Step: Check that the checked in code has already been formatted.
     - name: Check Formatting
-      run: mix format --check-formatted --no-exit
+      run: mix format --check-formatted
 
     # Step: Run audit on dependencies
     - name: Run Audit Security Vulnerabilities and Retired Packages

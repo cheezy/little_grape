@@ -40,3 +40,7 @@ npm-debug.log
 
 # Stride authentication (contains secrets)
 .stride_auth.md
+
+# Stride runtime state (orchestrator markers, env cache)
+.stride/
+.stride-env-cache

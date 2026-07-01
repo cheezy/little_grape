@@ -150,7 +150,8 @@ defmodule LittleGrapeWeb.MatchesLive do
              |> push_event("clear:chat-message-input", %{})}
 
           {:error, _changeset} ->
-            {:noreply, put_flash(socket, :error, gettext("Failed to send message. Please try again."))}
+            {:noreply,
+             put_flash(socket, :error, gettext("Failed to send message. Please try again."))}
         end
     end
   end
@@ -295,8 +296,7 @@ defmodule LittleGrapeWeb.MatchesLive do
   defp loading_spinner(assigns) do
     ~H"""
     <div class="flex flex-col items-center justify-center py-20">
-      <div class="w-12 h-12 border-4 border-red-200 border-t-red-500 rounded-full animate-spin">
-      </div>
+      <div class="w-12 h-12 border-4 border-red-200 border-t-red-500 rounded-full animate-spin"></div>
       <p class="text-gray-500 mt-4">{gettext("Loading your matches...")}</p>
     </div>
     """
@@ -339,7 +339,10 @@ defmodule LittleGrapeWeb.MatchesLive do
       phx-value-match-id={@match_data.match.id}
       class={[
         "w-full flex items-center gap-4 p-4 rounded-xl shadow-sm hover:shadow-md transition text-left",
-        if(@selected, do: "bg-red-50 border-2 border-red-300", else: "bg-white border border-transparent"),
+        if(@selected,
+          do: "bg-red-50 border-2 border-red-300",
+          else: "bg-white border border-transparent"
+        ),
         @match_data.is_new_match && !@selected && "bg-red-50 border-red-200"
       ]}
     >
@@ -434,7 +437,10 @@ defmodule LittleGrapeWeb.MatchesLive do
   end
 
   defp ai_reason_text({:age, _}), do: gettext("Within your preferred age range")
-  defp ai_reason_text({:country, %{country: country}}), do: gettext("Lives in %{country}", country: country)
+
+  defp ai_reason_text({:country, %{country: country}}),
+    do: gettext("Lives in %{country}", country: country)
+
   defp ai_reason_text({:religion, _}), do: gettext("Same religion")
 
   defp ai_reason_text({:interests, %{list: list}}),

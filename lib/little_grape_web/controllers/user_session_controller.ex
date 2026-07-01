@@ -67,7 +67,9 @@ defmodule LittleGrapeWeb.UserSessionController do
     |> UserAuth.log_out_user()
   end
 
-  defp confirmation_message(%{"_action" => "confirmed"}), do: gettext("User confirmed successfully.")
+  defp confirmation_message(%{"_action" => "confirmed"}),
+    do: gettext("User confirmed successfully.")
+
   defp confirmation_message(_params), do: gettext("Welcome back!")
 
   defp render_password_error(conn, token, changeset) do

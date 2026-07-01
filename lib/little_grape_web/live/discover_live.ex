@@ -148,7 +148,10 @@ defmodule LittleGrapeWeb.DiscoverLive do
 
         {:error, _reason} ->
           socket
-          |> put_flash(:error, gettext("Something went wrong creating the match. Please try again."))
+          |> put_flash(
+            :error,
+            gettext("Something went wrong creating the match. Please try again.")
+          )
           |> advance_to_next_candidate()
       end
     else
@@ -278,8 +281,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
   defp loading_spinner(assigns) do
     ~H"""
     <div class="flex flex-col items-center justify-center py-20">
-      <div class="w-12 h-12 border-4 border-red-200 border-t-red-500 rounded-full animate-spin">
-      </div>
+      <div class="w-12 h-12 border-4 border-red-200 border-t-red-500 rounded-full animate-spin"></div>
       <p class="text-gray-500 mt-4">{gettext("Finding people near you...")}</p>
     </div>
     """

@@ -625,8 +625,10 @@ defmodule LittleGrape.Discovery do
     [
       scores.age >= 0.75 && {:age, %{}},
       scores.country >= 1.0 && country_reason(candidate_profile.country),
-      scores.interests >= 0.5 && shared_list_reason(:interests, user_profile.interests, candidate_profile.interests),
-      scores.languages >= 0.5 && shared_list_reason(:languages, user_profile.languages, candidate_profile.languages),
+      scores.interests >= 0.5 &&
+        shared_list_reason(:interests, user_profile.interests, candidate_profile.interests),
+      scores.languages >= 0.5 &&
+        shared_list_reason(:languages, user_profile.languages, candidate_profile.languages),
       scores.religion >= 1.0 && {:religion, %{}}
     ]
     |> Enum.filter(& &1)
