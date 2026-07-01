@@ -8,13 +8,13 @@ defmodule LittleGrapeWeb.MatchesLive do
   alias LittleGrape.Matches
   alias LittleGrape.Messaging
   alias LittleGrape.Repo
+  alias LittleGrapeWeb.MessageSending
 
   @impl true
   def mount(_params, _session, socket) do
     user = socket.assigns.current_scope.user
 
     if connected?(socket) do
-      Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user.id}")
       send(self(), :load_matches)
     end
 
@@ -24,7 +24,6 @@ defmodule LittleGrapeWeb.MatchesLive do
      |> assign(:loading, true)
      |> assign(:matches, [])
      |> assign(:ai_match, nil)
-     |> assign(:unread_count, 0)
      |> assign_no_selection()}
   end
 
@@ -54,26 +53,18 @@ defmodule LittleGrapeWeb.MatchesLive do
      |> assign(:unread_count, unread_count)}
   end
 
+  # :unread_count is maintained by UnreadCountHook before these clauses run;
+  # they only handle the MatchesLive-specific list reload.
   @impl true
   def handle_info({:new_match, _match}, socket) do
     matches = Matches.list_matches_with_details(socket.assigns.user)
-    unread_count = Messaging.total_unread_count(socket.assigns.user)
-
-    {:noreply,
-     socket
-     |> assign(:matches, matches)
-     |> assign(:unread_count, unread_count)}
+    {:noreply, assign(socket, :matches, matches)}
   end
 
   @impl true
   def handle_info({:message_received, _message}, socket) do
     matches = Matches.list_matches_with_details(socket.assigns.user)
-    unread_count = Messaging.total_unread_count(socket.assigns.user)
-
-    {:noreply,
-     socket
-     |> assign(:matches, matches)
-     |> assign(:unread_count, unread_count)}
+    {:noreply, assign(socket, :matches, matches)}
   end
 
   @impl true
@@ -95,11 +86,10 @@ defmodule LittleGrapeWeb.MatchesLive do
     end
   end
 
+  # Unread-badge events not matched above (e.g. :messages_read) are handled by
+  # UnreadCountHook, which conts so duplicate deliveries land here.
   @impl true
-  def handle_info({:messages_read, _payload}, socket) do
-    unread_count = Messaging.total_unread_count(socket.assigns.user)
-    {:noreply, assign(socket, :unread_count, unread_count)}
-  end
+  def handle_info(_msg, socket), do: {:noreply, socket}
 
   @impl true
   def handle_event("select_match", %{"match-id" => match_id_str}, socket) do
@@ -126,28 +116,7 @@ defmodule LittleGrapeWeb.MatchesLive do
 
   @impl true
   def handle_event("send_message", %{"content" => content}, socket) do
-    content = String.trim(content)
-
-    cond do
-      content == "" ->
-        {:noreply, socket}
-
-      is_nil(socket.assigns.conversation) ->
-        {:noreply, socket}
-
-      true ->
-        case Messaging.send_message(socket.assigns.user, socket.assigns.conversation.id, content) do
-          {:ok, _message} ->
-            {:noreply,
-             socket
-             |> assign(:message_form, to_form(%{"content" => ""}))
-             |> push_event("clear:chat-message-input", %{})}
-
-          {:error, _changeset} ->
-            {:noreply,
-             put_flash(socket, :error, gettext("Failed to send message. Please try again."))}
-        end
-    end
+    MessageSending.send_message(socket, content)
   end
 
   defp compute_ai_match(user) do

@@ -80,7 +80,11 @@ defmodule LittleGrapeWeb.Router do
 
     live_session :authenticated_app,
       layout: {LittleGrapeWeb.Layouts, :app},
-      on_mount: [{LittleGrapeWeb.UserAuth, :require_authenticated}, LittleGrapeWeb.Plugs.Locale] do
+      on_mount: [
+        {LittleGrapeWeb.UserAuth, :require_authenticated},
+        LittleGrapeWeb.Plugs.Locale,
+        LittleGrapeWeb.Hooks.UnreadCountHook
+      ] do
       live "/discover", DiscoverLive
       live "/matches", MatchesLive
       live "/chat/:match_id", ChatLive

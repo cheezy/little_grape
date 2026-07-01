@@ -13,7 +13,6 @@ defmodule LittleGrapeWeb.DiscoverLive do
 
     if Accounts.profile_complete?(user.profile) do
       if connected?(socket) do
-        Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user.id}")
         send(self(), :load_candidates)
       end
 
@@ -27,8 +26,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
        |> assign(:swiping, false)
        |> assign(:show_match_modal, false)
        |> assign(:matched_profile, nil)
-       |> assign(:expanded, false)
-       |> assign(:unread_count, 0)}
+       |> assign(:expanded, false)}
     else
       missing = Accounts.missing_profile_fields(user.profile)
 
@@ -103,25 +101,6 @@ defmodule LittleGrapeWeb.DiscoverLive do
   end
 
   @impl true
-  def handle_info({:message_received, _message}, socket) do
-    unread_count = Messaging.total_unread_count(socket.assigns.user)
-    {:noreply, assign(socket, :unread_count, unread_count)}
-  end
-
-  @impl true
-  def handle_info({:messages_read, _payload}, socket) do
-    unread_count = Messaging.total_unread_count(socket.assigns.user)
-    {:noreply, assign(socket, :unread_count, unread_count)}
-  end
-
-  @impl true
-  def handle_info({:new_match, _match}, socket) do
-    # Just update unread count, don't need to do anything else for discovery
-    unread_count = Messaging.total_unread_count(socket.assigns.user)
-    {:noreply, assign(socket, :unread_count, unread_count)}
-  end
-
-  @impl true
   def handle_info(:load_candidates, socket) do
     candidates = Discovery.get_candidates(socket.assigns.user)
     current_candidate = List.first(candidates)
@@ -136,6 +115,11 @@ defmodule LittleGrapeWeb.DiscoverLive do
      |> assign(:previously_passed, previously_passed)
      |> assign(:unread_count, unread_count)}
   end
+
+  # Unread-badge events (:message_received, :messages_read, :new_match) are
+  # handled by UnreadCountHook, which conts so duplicate deliveries land here.
+  @impl true
+  def handle_info(_msg, socket), do: {:noreply, socket}
 
   defp advance_to_next_candidate(socket) do
     remaining = Enum.drop(socket.assigns.candidates, 1)

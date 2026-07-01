@@ -6,6 +6,7 @@ defmodule LittleGrapeWeb.ChatLive do
 
   alias LittleGrape.Matches
   alias LittleGrape.Messaging
+  alias LittleGrapeWeb.MessageSending
 
   @impl true
   def mount(%{"match_id" => match_id}, _session, socket) do
@@ -32,8 +33,7 @@ defmodule LittleGrapeWeb.ChatLive do
          |> assign(:other_user, nil)
          |> assign(:other_profile, nil)
          |> assign(:message_form, to_form(%{"content" => ""}))
-         |> assign(:show_profile, false)
-         |> assign(:unread_count, 0)}
+         |> assign(:show_profile, false)}
     end
   end
 
@@ -45,23 +45,7 @@ defmodule LittleGrapeWeb.ChatLive do
 
   @impl true
   def handle_event("send_message", %{"content" => content}, socket) do
-    content = String.trim(content)
-
-    if content == "" do
-      {:noreply, socket}
-    else
-      case Messaging.send_message(socket.assigns.user, socket.assigns.conversation.id, content) do
-        {:ok, _message} ->
-          {:noreply,
-           socket
-           |> assign(:message_form, to_form(%{"content" => ""}))
-           |> push_event("clear:chat-message-input", %{})}
-
-        {:error, _changeset} ->
-          {:noreply,
-           put_flash(socket, :error, gettext("Failed to send message. Please try again."))}
-      end
-    end
+    MessageSending.send_message(socket, content)
   end
 
   @impl true
@@ -93,25 +77,6 @@ defmodule LittleGrapeWeb.ChatLive do
   end
 
   @impl true
-  def handle_info({:message_received, _message}, socket) do
-    unread_count = Messaging.total_unread_count(socket.assigns.user)
-    {:noreply, assign(socket, :unread_count, unread_count)}
-  end
-
-  @impl true
-  def handle_info({:messages_read, _payload}, socket) do
-    unread_count = Messaging.total_unread_count(socket.assigns.user)
-    {:noreply, assign(socket, :unread_count, unread_count)}
-  end
-
-  @impl true
-  def handle_info({:new_match, _match}, socket) do
-    # Just update unread count for nav badge
-    unread_count = Messaging.total_unread_count(socket.assigns.user)
-    {:noreply, assign(socket, :unread_count, unread_count)}
-  end
-
-  @impl true
   def handle_info({:load_conversation, match_id, match}, socket) do
     user = socket.assigns.user
 
@@ -121,7 +86,6 @@ defmodule LittleGrapeWeb.ChatLive do
         {other_user, other_profile} = Matches.other_participant(match, user.id)
 
         Phoenix.PubSub.subscribe(LittleGrape.PubSub, "conversation:#{conversation.id}")
-        Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user.id}")
         Messaging.mark_as_read(user, conversation.id)
         unread_count = Messaging.total_unread_count(user)
 
@@ -139,6 +103,11 @@ defmodule LittleGrapeWeb.ChatLive do
         {:noreply, redirect_not_found(socket)}
     end
   end
+
+  # Unread-badge events (:message_received, :messages_read, :new_match) are
+  # handled by UnreadCountHook, which conts so duplicate deliveries land here.
+  @impl true
+  def handle_info(_msg, socket), do: {:noreply, socket}
 
   @impl true
   def render(assigns) do
