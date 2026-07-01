@@ -14,7 +14,10 @@ defmodule LittleGrapeWeb.UserProfileHTML do
   def translate_option(option, :wants_children), do: translate_wants_children(option)
   def translate_option(option, :education), do: translate_education(option)
   def translate_option(option, :religion), do: translate_religion(option)
-  def translate_option(option, :language), do: translate_language(option)
+
+  def translate_option(option, :language),
+    do: LittleGrapeWeb.ProfileOptions.translate_language(option)
+
   def translate_option(option, :interest), do: translate_interest(option)
 
   defp translate_gender("male"), do: gettext("Male")
@@ -111,17 +114,6 @@ defmodule LittleGrapeWeb.UserProfileHTML do
   defp translate_religion("atheist"), do: gettext("Atheist")
   defp translate_religion("other"), do: gettext("Other")
   defp translate_religion("prefer_not_to_say"), do: gettext("Prefer not to say")
-
-  # Language options
-  defp translate_language("sq"), do: gettext("Albanian")
-  defp translate_language("en"), do: gettext("English")
-  defp translate_language("it"), do: gettext("Italian")
-  defp translate_language("de"), do: gettext("German")
-  defp translate_language("fr"), do: gettext("French")
-  defp translate_language("sr"), do: gettext("Serbian")
-  defp translate_language("mk"), do: gettext("Macedonian")
-  defp translate_language("tr"), do: gettext("Turkish")
-  defp translate_language("other"), do: gettext("Other")
 
   # Interest options
   defp translate_interest("sports"), do: gettext("Sports")

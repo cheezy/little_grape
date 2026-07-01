@@ -7,12 +7,28 @@ defmodule LittleGrapeWeb.ChatComponents do
   use Phoenix.Component
   use Gettext, backend: LittleGrapeWeb.Gettext
 
-  attr :other_profile, :any, required: true
-  attr :back_action, :any, default: nil
+  attr :other_profile, :any, default: nil
+  attr :back_action, :any, default: nil, doc: "phx-click event for a back button"
+  attr :navigate_back, :string, default: nil, doc: "path for a back navigation link"
+
+  attr :on_profile_click, :string,
+    default: nil,
+    doc: "phx-click event fired when tapping the photo/name"
+
+  attr :loading, :boolean, default: false, doc: "render a pulse skeleton instead of the profile"
 
   def chat_header(assigns) do
     ~H"""
     <div class="flex items-center gap-3 px-4 py-3 bg-white border-b shadow-sm">
+      <%= if @navigate_back do %>
+        <.link
+          navigate={@navigate_back}
+          class="text-gray-500 hover:text-gray-700"
+          aria-label={gettext("Back")}
+        >
+          <.back_chevron />
+        </.link>
+      <% end %>
       <%= if @back_action do %>
         <button
           type="button"
@@ -20,33 +36,60 @@ defmodule LittleGrapeWeb.ChatComponents do
           class="text-gray-500 hover:text-gray-700"
           aria-label={gettext("Back")}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          </svg>
+          <.back_chevron />
         </button>
       <% end %>
 
-      <div class="flex items-center gap-3 flex-1">
-        <%= if @other_profile && @other_profile.profile_picture do %>
-          <img
-            src={@other_profile.profile_picture}
-            alt={"#{@other_profile.first_name}'s photo"}
-            class="w-10 h-10 rounded-full object-cover"
-          />
+      <%= if @loading do %>
+        <div class="flex items-center gap-3 flex-1">
+          <div class="w-10 h-10 rounded-full bg-gray-200 animate-pulse"></div>
+          <div class="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+        </div>
+      <% else %>
+        <%= if @on_profile_click do %>
+          <button phx-click={@on_profile_click} class="flex items-center gap-3 flex-1 text-left">
+            <.header_identity other_profile={@other_profile} />
+          </button>
         <% else %>
-          <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-            <span class="text-gray-400 text-lg">👤</span>
+          <div class="flex items-center gap-3 flex-1">
+            <.header_identity other_profile={@other_profile} />
           </div>
         <% end %>
-        <h2 class="font-semibold text-gray-900">{display_name(@other_profile)}</h2>
-      </div>
+      <% end %>
     </div>
+    """
+  end
+
+  defp back_chevron(assigns) do
+    ~H"""
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-6 w-6"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+    </svg>
+    """
+  end
+
+  attr :other_profile, :any, required: true
+
+  defp header_identity(assigns) do
+    ~H"""
+    <%= if @other_profile && @other_profile.profile_picture do %>
+      <img
+        src={@other_profile.profile_picture}
+        alt={"#{@other_profile.first_name}'s photo"}
+        class="w-10 h-10 rounded-full object-cover"
+      />
+    <% else %>
+      <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+        <span class="text-gray-400 text-lg">👤</span>
+      </div>
+    <% end %>
+    <h2 class="font-semibold text-gray-900">{display_name(@other_profile)}</h2>
     """
   end
 
@@ -168,6 +211,9 @@ defmodule LittleGrapeWeb.ChatComponents do
     "#{hour_12}:#{String.pad_leading(Integer.to_string(minute), 2, "0")} #{am_pm}"
   end
 
-  defp display_name(nil), do: "Unknown"
-  defp display_name(profile), do: profile.first_name || "Unknown"
+  @doc """
+  Returns the profile's first name, or "Unknown" for nil profiles/names.
+  """
+  def display_name(nil), do: "Unknown"
+  def display_name(profile), do: profile.first_name || "Unknown"
 end

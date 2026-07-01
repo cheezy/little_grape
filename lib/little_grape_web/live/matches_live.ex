@@ -2,7 +2,7 @@ defmodule LittleGrapeWeb.MatchesLive do
   use LittleGrapeWeb, :live_view
 
   import LittleGrapeWeb.ChatComponents,
-    only: [chat_header: 1, messages_list: 1, message_input: 1]
+    only: [chat_header: 1, display_name: 1, messages_list: 1, message_input: 1]
 
   alias LittleGrape.Discovery
   alias LittleGrape.Matches
@@ -171,7 +171,7 @@ defmodule LittleGrapeWeb.MatchesLive do
       <h1 class="text-2xl font-bold mb-6">{gettext("Matches")}</h1>
 
       <%= if @loading do %>
-        <.loading_spinner />
+        <.loading_spinner message={gettext("Loading your matches...")} />
       <% else %>
         <%= if @ai_match do %>
           <.ai_match_card ai_match={@ai_match} />
@@ -227,15 +227,6 @@ defmodule LittleGrapeWeb.MatchesLive do
           </div>
         <% end %>
       <% end %>
-    </div>
-    """
-  end
-
-  defp loading_spinner(assigns) do
-    ~H"""
-    <div class="flex flex-col items-center justify-center py-20">
-      <div class="w-12 h-12 border-4 border-red-200 border-t-red-500 rounded-full animate-spin"></div>
-      <p class="text-gray-500 mt-4">{gettext("Loading your matches...")}</p>
     </div>
     """
   end
@@ -386,9 +377,6 @@ defmodule LittleGrapeWeb.MatchesLive do
 
   defp ai_reason_text({:languages, %{list: list}}),
     do: gettext("Shared languages: %{list}", list: Enum.join(list, ", "))
-
-  defp display_name(nil), do: "Unknown"
-  defp display_name(profile), do: profile.first_name || "Unknown"
 
   defp message_preview(nil), do: gettext("Start a conversation!")
   defp message_preview(message), do: truncate_message(message.content)

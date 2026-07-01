@@ -1,6 +1,8 @@
 defmodule LittleGrapeWeb.DiscoverLive do
   use LittleGrapeWeb, :live_view
 
+  import LittleGrapeWeb.ProfileOptions, only: [translate_language: 1]
+
   alias LittleGrape.Accounts
   alias LittleGrape.Discovery
   alias LittleGrape.Messaging
@@ -140,7 +142,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
       <h1 class="text-2xl font-bold text-center mb-8">{gettext("Discover")}</h1>
 
       <%= if @loading do %>
-        <.loading_spinner />
+        <.loading_spinner message={gettext("Finding people near you...")} />
       <% else %>
         <%= if @current_candidate do %>
           <.profile_card profile={@current_candidate} swiping={@swiping} expanded={@expanded} />
@@ -212,15 +214,6 @@ defmodule LittleGrapeWeb.DiscoverLive do
         <% end %>
       </ul>
     </section>
-    """
-  end
-
-  defp loading_spinner(assigns) do
-    ~H"""
-    <div class="flex flex-col items-center justify-center py-20">
-      <div class="w-12 h-12 border-4 border-red-200 border-t-red-500 rounded-full animate-spin"></div>
-      <p class="text-gray-500 mt-4">{gettext("Finding people near you...")}</p>
-    </div>
     """
   end
 
@@ -377,7 +370,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
         <div>
           <h3 class="font-semibold text-gray-700 mb-1">{gettext("Languages")}</h3>
           <p class="text-gray-600">
-            {Enum.map(@profile.languages, &format_language/1) |> Enum.join(", ")}
+            {Enum.map(@profile.languages, &translate_language/1) |> Enum.join(", ")}
           </p>
         </div>
       <% end %>
@@ -393,17 +386,6 @@ defmodule LittleGrapeWeb.DiscoverLive do
     |> String.split(" ")
     |> Enum.map_join(" ", &String.capitalize/1)
   end
-
-  defp format_language("sq"), do: gettext("Albanian")
-  defp format_language("en"), do: gettext("English")
-  defp format_language("it"), do: gettext("Italian")
-  defp format_language("de"), do: gettext("German")
-  defp format_language("fr"), do: gettext("French")
-  defp format_language("sr"), do: gettext("Serbian")
-  defp format_language("mk"), do: gettext("Macedonian")
-  defp format_language("tr"), do: gettext("Turkish")
-  defp format_language("other"), do: gettext("Other")
-  defp format_language(code), do: code
 
   defp match_modal(assigns) do
     ~H"""

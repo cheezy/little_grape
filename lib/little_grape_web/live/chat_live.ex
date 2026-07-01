@@ -2,7 +2,7 @@ defmodule LittleGrapeWeb.ChatLive do
   use LittleGrapeWeb, :live_view
 
   import LittleGrapeWeb.ChatComponents,
-    only: [messages_list: 1, message_input: 1]
+    only: [chat_header: 1, display_name: 1, messages_list: 1, message_input: 1]
 
   alias LittleGrape.Matches
   alias LittleGrape.Messaging
@@ -114,8 +114,11 @@ defmodule LittleGrapeWeb.ChatLive do
     ~H"""
     <%= if @loading do %>
       <div class="flex flex-col h-screen max-w-lg mx-auto">
-        <.loading_header />
-        <.loading_spinner />
+        <.chat_header navigate_back={~p"/matches"} loading />
+        <.loading_spinner
+          message={gettext("Loading messages...")}
+          class="flex-1 flex flex-col items-center justify-center bg-gray-50"
+        />
       </div>
     <% else %>
       <div
@@ -123,7 +126,11 @@ defmodule LittleGrapeWeb.ChatLive do
         id="chat-container"
         phx-hook="ScrollToBottom"
       >
-        <.chat_header other_profile={@other_profile} />
+        <.chat_header
+          other_profile={@other_profile}
+          navigate_back={~p"/matches"}
+          on_profile_click="show_profile"
+        />
 
         <.messages_list
           messages={@messages}
@@ -138,37 +145,6 @@ defmodule LittleGrapeWeb.ChatLive do
         <% end %>
       </div>
     <% end %>
-    """
-  end
-
-  defp loading_header(assigns) do
-    ~H"""
-    <div class="flex items-center gap-3 px-4 py-3 bg-white border-b shadow-sm">
-      <.link navigate={~p"/matches"} class="text-gray-500 hover:text-gray-700">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
-      </.link>
-      <div class="flex items-center gap-3 flex-1">
-        <div class="w-10 h-10 rounded-full bg-gray-200 animate-pulse"></div>
-        <div class="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
-      </div>
-    </div>
-    """
-  end
-
-  defp loading_spinner(assigns) do
-    ~H"""
-    <div class="flex-1 flex flex-col items-center justify-center bg-gray-50">
-      <div class="w-12 h-12 border-4 border-red-200 border-t-red-500 rounded-full animate-spin"></div>
-      <p class="text-gray-500 mt-4">{gettext("Loading messages...")}</p>
-    </div>
     """
   end
 
@@ -209,39 +185,4 @@ defmodule LittleGrapeWeb.ChatLive do
     </div>
     """
   end
-
-  defp chat_header(assigns) do
-    ~H"""
-    <div class="flex items-center gap-3 px-4 py-3 bg-white border-b shadow-sm">
-      <.link navigate={~p"/matches"} class="text-gray-500 hover:text-gray-700">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
-      </.link>
-      <button phx-click="show_profile" class="flex items-center gap-3 flex-1 text-left">
-        <%= if @other_profile && @other_profile.profile_picture do %>
-          <img
-            src={@other_profile.profile_picture}
-            alt={"#{@other_profile.first_name}'s photo"}
-            class="w-10 h-10 rounded-full object-cover"
-          />
-        <% else %>
-          <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-            <span class="text-gray-400 text-lg">👤</span>
-          </div>
-        <% end %>
-        <h1 class="font-semibold text-gray-900">{display_name(@other_profile)}</h1>
-      </button>
-    </div>
-    """
-  end
-
-  defp display_name(nil), do: "Unknown"
-  defp display_name(profile), do: profile.first_name || "Unknown"
 end

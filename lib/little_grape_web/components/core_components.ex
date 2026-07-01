@@ -499,4 +499,27 @@ defmodule LittleGrapeWeb.CoreComponents do
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
+
+  @doc """
+  Renders a loading spinner with a message.
+
+  ## Examples
+
+      <.loading_spinner message={gettext("Loading your matches...")} />
+      <.loading_spinner
+        message={gettext("Loading messages...")}
+        class="flex-1 flex flex-col items-center justify-center bg-gray-50"
+      />
+  """
+  attr :message, :string, required: true
+  attr :class, :string, default: "flex flex-col items-center justify-center py-20"
+
+  def loading_spinner(assigns) do
+    ~H"""
+    <div class={@class}>
+      <div class="w-12 h-12 border-4 border-red-200 border-t-red-500 rounded-full animate-spin"></div>
+      <p class="text-gray-500 mt-4">{@message}</p>
+    </div>
+    """
+  end
 end
