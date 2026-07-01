@@ -98,6 +98,62 @@ defmodule LittleGrapeWeb.UserSettingsControllerTest do
     end
   end
 
+  describe "sudo mode" do
+    @stale_authenticated_at DateTime.utc_now(:second) |> DateTime.add(-15, :minute)
+
+    @tag token_authenticated_at: @stale_authenticated_at
+    test "GET /users/settings/email redirects when authentication is stale", %{conn: conn} do
+      conn = get(conn, ~p"/users/settings/email")
+      assert redirected_to(conn) == ~p"/users/log-in"
+      assert Phoenix.Flash.get(conn.assigns.flash, :error) =~ "must re-authenticate"
+    end
+
+    @tag token_authenticated_at: @stale_authenticated_at
+    test "GET /users/settings/password redirects when authentication is stale", %{conn: conn} do
+      conn = get(conn, ~p"/users/settings/password")
+      assert redirected_to(conn) == ~p"/users/log-in"
+      assert Phoenix.Flash.get(conn.assigns.flash, :error) =~ "must re-authenticate"
+    end
+
+    @tag token_authenticated_at: @stale_authenticated_at
+    test "PUT /users/settings/email redirects without invalidating the session", %{
+      conn: conn,
+      user: user
+    } do
+      conn = put(conn, ~p"/users/settings/email", %{"user" => %{"email" => unique_user_email()}})
+
+      assert redirected_to(conn) == ~p"/users/log-in"
+
+      session_token = get_session(conn, :user_token)
+      assert {session_user, _} = Accounts.get_user_by_session_token(session_token)
+
+      assert session_user.id == user.id
+      assert Accounts.get_user_by_email(user.email)
+    end
+
+    @tag token_authenticated_at: @stale_authenticated_at
+    test "PUT /users/settings/password redirects without invalidating the session", %{
+      conn: conn,
+      user: user
+    } do
+      conn =
+        put(conn, ~p"/users/settings/password", %{
+          "user" => %{
+            "password" => "NewValid1!",
+            "password_confirmation" => "NewValid1!"
+          }
+        })
+
+      assert redirected_to(conn) == ~p"/users/log-in"
+
+      session_token = get_session(conn, :user_token)
+      assert {session_user, _} = Accounts.get_user_by_session_token(session_token)
+
+      assert session_user.id == user.id
+      refute Accounts.get_user_by_email_and_password(user.email, "NewValid1!")
+    end
+  end
+
   describe "GET /users/settings/email/confirm/:token" do
     setup %{user: user} do
       email = unique_user_email()
@@ -142,6 +198,19 @@ defmodule LittleGrapeWeb.UserSettingsControllerTest do
       conn = build_conn()
       conn = get(conn, ~p"/users/settings/email/confirm/#{token}")
       assert redirected_to(conn) == ~p"/users/log-in"
+    end
+
+    @tag token_authenticated_at: DateTime.utc_now(:second) |> DateTime.add(-15, :minute)
+    test "works with stale authentication since the emailed token is the proof", %{
+      conn: conn,
+      user: user,
+      token: token,
+      email: email
+    } do
+      conn = get(conn, ~p"/users/settings/email/confirm/#{token}")
+      assert redirected_to(conn) == ~p"/users/settings/email"
+      refute Accounts.get_user_by_email(user.email)
+      assert Accounts.get_user_by_email(email)
     end
   end
 end

@@ -184,8 +184,12 @@ defmodule LittleGrapeWeb.UserAuth do
   end
 
   defp put_token_in_session(conn, token) do
-    put_session(conn, :user_token, token)
+    conn
+    |> put_session(:user_token, token)
+    |> put_session(:live_socket_id, user_session_topic(token))
   end
+
+  defp user_session_topic(token), do: "users_sessions:#{Base.url_encode64(token)}"
 
   @doc """
   Plug for routes that require sudo mode.
