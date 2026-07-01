@@ -5,6 +5,7 @@ defmodule LittleGrape.MatchesTest do
 
   alias LittleGrape.Matches
   alias LittleGrape.Matches.Match
+  alias LittleGrape.Messaging
   alias LittleGrape.Messaging.Conversation
   alias LittleGrape.Messaging.Message
 
@@ -312,6 +313,109 @@ defmodule LittleGrape.MatchesTest do
       # Second match - user2 unmatches
       {:ok, %{match: match2, conversation: _}} = Matches.create_match(user1.id, user2.id)
       assert :ok = Matches.unmatch(user2, match2.id)
+    end
+  end
+
+  describe "list_matches_with_details/1" do
+    test "returns the correct last message per conversation across multiple matches" do
+      user = user_fixture()
+      other1 = user_fixture()
+      other2 = user_fixture()
+      profile_fixture(other1)
+      profile_fixture(other2)
+
+      {:ok, %{conversation: conv1}} = Matches.create_match(user.id, other1.id)
+      {:ok, %{conversation: conv2}} = Matches.create_match(user.id, other2.id)
+
+      {:ok, _} = Messaging.create_message(conv1.id, other1.id, "first")
+      {:ok, _} = Messaging.create_message(conv1.id, user.id, "second")
+      {:ok, _} = Messaging.create_message(conv1.id, other1.id, "latest in conv1")
+      {:ok, _} = Messaging.create_message(conv2.id, other2.id, "latest in conv2")
+
+      details = Matches.list_matches_with_details(user)
+      assert length(details) == 2
+
+      by_conv = Map.new(details, &{&1.match.id, &1})
+      detail1 = Enum.find(details, &(&1.match.conversation.id == conv1.id))
+      detail2 = Enum.find(details, &(&1.match.conversation.id == conv2.id))
+
+      assert detail1.last_message.content == "latest in conv1"
+      assert detail2.last_message.content == "latest in conv2"
+      refute detail1.is_new_match
+      refute detail2.is_new_match
+      assert map_size(by_conv) == 2
+    end
+
+    test "returns nil last_message and is_new_match for a conversation with no messages" do
+      user = user_fixture()
+      other = user_fixture()
+      profile_fixture(other, %{first_name: "Quiet"})
+
+      {:ok, _result} = Matches.create_match(user.id, other.id)
+
+      assert [detail] = Matches.list_matches_with_details(user)
+      assert detail.last_message == nil
+      assert detail.is_new_match == true
+      assert detail.unread_count == 0
+      assert detail.other_profile.first_name == "Quiet"
+    end
+
+    test "handles a match with no conversation row" do
+      user = user_fixture()
+      other = user_fixture()
+      profile_fixture(other)
+
+      {a, b} = Match.normalize_user_ids(user.id, other.id)
+
+      Repo.insert!(%Match{
+        user_a_id: a,
+        user_b_id: b,
+        matched_at: DateTime.utc_now() |> DateTime.truncate(:second)
+      })
+
+      assert [detail] = Matches.list_matches_with_details(user)
+      assert detail.last_message == nil
+      assert detail.is_new_match == true
+      assert detail.unread_count == 0
+    end
+
+    test "executes a constant number of queries regardless of match count" do
+      user1 = user_fixture()
+      partner = user_fixture()
+      profile_fixture(partner)
+      {:ok, %{conversation: conv}} = Matches.create_match(user1.id, partner.id)
+      {:ok, _} = Messaging.create_message(conv.id, partner.id, "hi")
+
+      {_, count_with_one} =
+        count_queries(fn -> Matches.list_matches_with_details(user1) end)
+
+      user2 = user_fixture()
+
+      for _ <- 1..3 do
+        other = user_fixture()
+        profile_fixture(other)
+        {:ok, %{conversation: c}} = Matches.create_match(user2.id, other.id)
+        {:ok, _} = Messaging.create_message(c.id, other.id, "hello")
+      end
+
+      {details, count_with_three} =
+        count_queries(fn -> Matches.list_matches_with_details(user2) end)
+
+      assert length(details) == 3
+      assert count_with_one == count_with_three
+    end
+
+    test "returns unread counts scoped to the acting user" do
+      user = user_fixture()
+      other = user_fixture()
+      profile_fixture(other)
+
+      {:ok, %{conversation: conv}} = Matches.create_match(user.id, other.id)
+      {:ok, _} = Messaging.create_message(conv.id, other.id, "unread from other")
+      {:ok, _} = Messaging.create_message(conv.id, user.id, "my own message")
+
+      assert [detail] = Matches.list_matches_with_details(user)
+      assert detail.unread_count == 1
     end
   end
 end

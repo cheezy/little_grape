@@ -69,6 +69,50 @@ defmodule LittleGrape.DataCase do
   end
 
   @doc """
+  Runs `fun` and returns `{result, query_count}` where `query_count` is the
+  number of Ecto queries executed by (or on behalf of) the calling process,
+  including preload queries Ecto runs concurrently in `Task` processes
+  (attributed via the `$callers` chain).
+
+  Safe under `async: true`: events from other test processes are filtered out.
+
+      {result, count} = count_queries(fn -> Matches.list_matches_with_details(user) end)
+      assert count == 8
+
+  """
+  def count_queries(fun) do
+    ref = make_ref()
+    test_pid = self()
+    handler_id = {__MODULE__, :count_queries, ref}
+
+    :telemetry.attach(
+      handler_id,
+      [:little_grape, :repo, :query],
+      fn _event, _measurements, _metadata, _config ->
+        if test_pid == self() or test_pid in Process.get(:"$callers", []) do
+          send(test_pid, {:query_counted, ref})
+        end
+      end,
+      nil
+    )
+
+    try do
+      result = fun.()
+      {result, drain_query_counts(ref, 0)}
+    after
+      :telemetry.detach(handler_id)
+    end
+  end
+
+  defp drain_query_counts(ref, count) do
+    receive do
+      {:query_counted, ^ref} -> drain_query_counts(ref, count + 1)
+    after
+      0 -> count
+    end
+  end
+
+  @doc """
   A helper that transforms changeset errors into a map of messages.
 
       assert {:error, changeset} = Accounts.create_user(%{password: "short"})

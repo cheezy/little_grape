@@ -8,6 +8,7 @@ defmodule LittleGrape.Matches do
   alias Ecto.Multi
   alias LittleGrape.Accounts.User
   alias LittleGrape.Matches.Match
+  alias LittleGrape.Messaging
   alias LittleGrape.Messaging.Conversation
   alias LittleGrape.Repo
 
@@ -248,51 +249,42 @@ defmodule LittleGrape.Matches do
   """
   def list_matches_with_details(%User{id: user_id}) do
     matches = fetch_matches_with_preloads(user_id)
-    unread_counts = fetch_unread_counts(matches, user_id)
+    conversation_ids = conversation_ids(matches)
+    unread_counts = Messaging.unread_counts_for_conversations(conversation_ids, user_id)
+    last_messages = Messaging.last_messages_for_conversations(conversation_ids)
 
     matches
-    |> Enum.map(&build_match_details(&1, user_id, unread_counts))
+    |> Enum.map(&build_match_details(&1, user_id, unread_counts, last_messages))
     |> sort_matches_by_priority()
   end
 
   defp fetch_matches_with_preloads(user_id) do
     from(m in Match,
       where: m.user_a_id == ^user_id or m.user_b_id == ^user_id,
-      preload: [
-        :user_a,
-        :user_b,
-        conversation: ^from(c in Conversation, preload: [:messages])
-      ],
+      preload: [:conversation, user_a: :profile, user_b: :profile],
       order_by: [desc: m.matched_at]
     )
     |> Repo.all()
   end
 
-  defp fetch_unread_counts(matches, user_id) do
-    alias LittleGrape.Messaging
-
-    conversation_ids =
-      matches
-      |> Enum.map(& &1.conversation)
-      |> Enum.reject(&is_nil/1)
-      |> Enum.map(& &1.id)
-
-    Messaging.unread_counts_for_conversations(conversation_ids, user_id)
+  defp conversation_ids(matches) do
+    matches
+    |> Enum.map(& &1.conversation)
+    |> Enum.reject(&is_nil/1)
+    |> Enum.map(& &1.id)
   end
 
-  defp build_match_details(match, user_id, unread_counts) do
+  defp build_match_details(match, user_id, unread_counts, last_messages) do
     other_user = get_other_user(match, user_id)
-    other_profile = Repo.preload(other_user, :profile).profile
-    {last_message, is_new_match} = extract_message_info(match)
-    unread_count = get_unread_count(match, unread_counts)
+    last_message = get_last_message(match, last_messages)
 
     %{
       match: match,
       other_user: other_user,
-      other_profile: other_profile,
+      other_profile: other_user.profile,
       last_message: last_message,
-      unread_count: unread_count,
-      is_new_match: is_new_match
+      unread_count: get_unread_count(match, unread_counts),
+      is_new_match: is_nil(last_message)
     }
   end
 
@@ -300,18 +292,10 @@ defmodule LittleGrape.Matches do
     if match.user_a_id == user_id, do: match.user_b, else: match.user_a
   end
 
-  defp extract_message_info(%{conversation: nil}), do: {nil, true}
-  defp extract_message_info(%{conversation: %{messages: nil}}), do: {nil, true}
-  defp extract_message_info(%{conversation: %{messages: []}}), do: {nil, true}
+  defp get_last_message(%{conversation: nil}, _last_messages), do: nil
 
-  defp extract_message_info(%{conversation: %{messages: messages}}) do
-    last_message =
-      messages
-      |> Enum.sort_by(& &1.inserted_at, {:desc, DateTime})
-      |> List.first()
-
-    {last_message, false}
-  end
+  defp get_last_message(%{conversation: conv}, last_messages),
+    do: Map.get(last_messages, conv.id)
 
   defp get_unread_count(%{conversation: nil}, _unread_counts), do: 0
 

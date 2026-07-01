@@ -59,19 +59,22 @@ defmodule LittleGrape.Messaging do
 
     if conversation && conversation.match do
       match = conversation.match
-
-      Phoenix.PubSub.broadcast(
-        LittleGrape.PubSub,
-        "user:#{match.user_a_id}",
-        {:message_received, message}
-      )
-
-      Phoenix.PubSub.broadcast(
-        LittleGrape.PubSub,
-        "user:#{match.user_b_id}",
-        {:message_received, message}
-      )
+      broadcast_message_to_participants(message, match.user_a_id, match.user_b_id)
     end
+  end
+
+  defp broadcast_message_to_participants(message, user_a_id, user_b_id) do
+    Phoenix.PubSub.broadcast(
+      LittleGrape.PubSub,
+      "user:#{user_a_id}",
+      {:message_received, message}
+    )
+
+    Phoenix.PubSub.broadcast(
+      LittleGrape.PubSub,
+      "user:#{user_b_id}",
+      {:message_received, message}
+    )
   end
 
   @doc """
@@ -136,6 +139,37 @@ defmodule LittleGrape.Messaging do
     )
     |> Repo.all()
     |> Map.new()
+  end
+
+  @doc """
+  Gets the latest message for multiple conversations in a single query.
+
+  Conversations with no messages are omitted from the result map. The caller
+  is responsible for passing only conversation IDs the acting user may access.
+
+  ## Parameters
+
+    * `conversation_ids` - List of conversation IDs
+
+  ## Returns
+
+    * Map of conversation_id => latest `%Message{}` (by inserted_at, with id
+      as tie-breaker)
+
+  ## Examples
+
+      iex> last_messages_for_conversations([1, 2, 3])
+      %{1 => %Message{}, 3 => %Message{}}
+
+  """
+  def last_messages_for_conversations(conversation_ids) when is_list(conversation_ids) do
+    from(m in Message,
+      where: m.conversation_id in ^conversation_ids,
+      distinct: m.conversation_id,
+      order_by: [desc: m.inserted_at, desc: m.id]
+    )
+    |> Repo.all()
+    |> Map.new(&{&1.conversation_id, &1})
   end
 
   @doc """
@@ -254,11 +288,11 @@ defmodule LittleGrape.Messaging do
   """
   def send_message(%User{id: user_id} = _user, conversation_id, content) do
     case authorize_conversation_access(user_id, conversation_id) do
-      {:ok, _conversation, other_user_id} ->
+      {:ok, _conversation, %{other_user_id: other_user_id} = participants} ->
         if Blocks.blocked?(user_id, other_user_id) do
           {:error, :blocked}
         else
-          insert_and_broadcast_message(conversation_id, user_id, content)
+          insert_and_broadcast_message(conversation_id, user_id, content, participants)
         end
 
       {:error, :not_found} ->
@@ -266,7 +300,7 @@ defmodule LittleGrape.Messaging do
     end
   end
 
-  defp insert_and_broadcast_message(conversation_id, user_id, content) do
+  defp insert_and_broadcast_message(conversation_id, user_id, content, participants) do
     result =
       %Message{}
       |> Message.changeset(%{
@@ -279,7 +313,7 @@ defmodule LittleGrape.Messaging do
     case result do
       {:ok, message} = success ->
         broadcast_to_conversation(conversation_id, message)
-        broadcast_new_message(conversation_id, message)
+        broadcast_message_to_participants(message, participants.user_a_id, participants.user_b_id)
         success
 
       error ->
@@ -304,7 +338,8 @@ defmodule LittleGrape.Messaging do
 
       {conv, user_a_id, user_b_id} ->
         other_user_id = if user_a_id == user_id, do: user_b_id, else: user_a_id
-        {:ok, conv, other_user_id}
+
+        {:ok, conv, %{user_a_id: user_a_id, user_b_id: user_b_id, other_user_id: other_user_id}}
     end
   end
 
@@ -340,7 +375,7 @@ defmodule LittleGrape.Messaging do
   """
   def mark_as_read(%User{id: user_id}, conversation_id) do
     case authorize_conversation_access(user_id, conversation_id) do
-      {:ok, _conversation, _other_user_id} ->
+      {:ok, _conversation, _participants} ->
         read_at = DateTime.utc_now() |> DateTime.truncate(:second)
 
         {count, _} =

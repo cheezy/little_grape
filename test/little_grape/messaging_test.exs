@@ -166,6 +166,37 @@ defmodule LittleGrape.MessagingTest do
     end
   end
 
+  describe "last_messages_for_conversations/1" do
+    test "returns the latest message per conversation" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      user3 = user_fixture()
+      {:ok, %{conversation: conv1}} = Matches.create_match(user1.id, user2.id)
+      {:ok, %{conversation: conv2}} = Matches.create_match(user1.id, user3.id)
+
+      {:ok, _} = Messaging.create_message(conv1.id, user1.id, "older")
+      {:ok, latest1} = Messaging.create_message(conv1.id, user2.id, "latest one")
+      {:ok, latest2} = Messaging.create_message(conv2.id, user3.id, "only one")
+
+      result = Messaging.last_messages_for_conversations([conv1.id, conv2.id])
+
+      assert result[conv1.id].id == latest1.id
+      assert result[conv2.id].id == latest2.id
+    end
+
+    test "omits conversations with no messages" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conv}} = Matches.create_match(user1.id, user2.id)
+
+      assert Messaging.last_messages_for_conversations([conv.id]) == %{}
+    end
+
+    test "returns an empty map for an empty id list" do
+      assert Messaging.last_messages_for_conversations([]) == %{}
+    end
+  end
+
   describe "get_conversation/2" do
     test "returns conversation for match participant" do
       user1 = user_fixture()
@@ -412,6 +443,22 @@ defmodule LittleGrape.MessagingTest do
       assert_receive {:message_received, msg2}
       assert msg1.id == message.id
       assert msg2.id == message.id
+
+      # Exactly once per participant — no extra broadcasts
+      refute_receive {:message_received, _}
+    end
+
+    test "performs no redundant conversation re-query when broadcasting" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
+
+      {result, query_count} =
+        count_queries(fn -> Messaging.send_message(user1, conversation.id, "hi") end)
+
+      assert {:ok, _message} = result
+      # authorize (conversation+match) + Blocks.blocked? + message insert
+      assert query_count == 3
     end
 
     test "does not broadcast on validation error" do
