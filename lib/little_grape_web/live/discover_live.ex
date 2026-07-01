@@ -98,12 +98,14 @@ defmodule LittleGrapeWeb.DiscoverLive do
   def handle_event("reconsider", %{"target-user-id" => target_id}, socket) do
     user = socket.assigns.user
 
-    case Swipes.delete_pass(user, String.to_integer(target_id)) do
-      {:ok, _swipe} ->
-        send(self(), :load_candidates)
-        {:noreply, put_flash(socket, :info, gettext("Profile added back to your feed."))}
-
-      {:error, :not_found} ->
+    with {target_user_id, ""} when target_user_id in 1..9_223_372_036_854_775_807 <-
+           Integer.parse(target_id),
+         {:ok, _swipe} <- Swipes.delete_pass(user, target_user_id) do
+      send(self(), :load_candidates)
+      {:noreply, put_flash(socket, :info, gettext("Profile added back to your feed."))}
+    else
+      # Malformed client param or no matching pass — never crash the LiveView
+      _error ->
         {:noreply, put_flash(socket, :error, gettext("Could not undo that pass."))}
     end
   end
@@ -166,19 +168,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
     end
   end
 
-  defp calculate_age(nil), do: nil
-
-  defp calculate_age(birthdate) do
-    today = Date.utc_today()
-    years = today.year - birthdate.year
-
-    birthday_this_year = Date.new!(today.year, birthdate.month, birthdate.day)
-
-    case Date.compare(birthday_this_year, today) do
-      :gt -> years - 1
-      _ -> years
-    end
-  end
+  defp calculate_age(birthdate), do: Discovery.calculate_age(birthdate)
 
   @impl true
   def render(assigns) do

@@ -5,6 +5,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
   import LittleGrape.AccountsFixtures
 
   alias LittleGrape.Accounts.Profile
+  alias LittleGrape.Discovery
   alias LittleGrape.Matches
   alias LittleGrape.Messaging
   alias LittleGrape.Repo
@@ -104,6 +105,28 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       assert html =~ "Jane"
       # Age should be approximately 25 (could be 24 or 25 depending on day)
       assert html =~ ~r/Jane.*2[45]/s
+    end
+
+    test "displays age for a Feb-29 birthdate without crashing", %{conn: conn, user: user} do
+      profile_fixture(user, %{gender: "male", preferred_gender: "female"})
+      |> set_profile_picture()
+
+      leapling = user_fixture()
+
+      profile_fixture(leapling, %{
+        first_name: "Leapa",
+        gender: "female",
+        preferred_gender: "male",
+        birthdate: ~D[2000-02-29]
+      })
+      |> set_profile_picture()
+
+      {:ok, _view, html} = mount_and_render(conn, ~p"/discover")
+
+      assert html =~ "Leapa"
+      # Same Feb-28 convention as Discovery.calculate_age/2
+      expected_age = Discovery.calculate_age(~D[2000-02-29])
+      assert html =~ ~r/Leapa.*#{expected_age}/s
     end
 
     test "requires authentication", %{conn: _conn} do
@@ -768,6 +791,22 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
         render_hook(view, "reconsider", %{"target-user-id" => "999999"})
 
       assert html =~ "Could not undo that pass."
+    end
+
+    test "reconsider ignores a malformed target-user-id instead of crashing",
+         %{conn: conn, user: user} do
+      profile_fixture(user, %{gender: "male", preferred_gender: "female"})
+      |> set_profile_picture()
+
+      {:ok, view, _html} = mount_and_render(conn, ~p"/discover")
+
+      for bad_param <- ["abc", "", "12abc", "-", "-5", "0", "99999999999999999999"] do
+        html = render_hook(view, "reconsider", %{"target-user-id" => bad_param})
+        assert html =~ "Could not undo that pass."
+      end
+
+      # The LiveView process survived every malformed param
+      assert Process.alive?(view.pid)
     end
 
     test "header unread badge updates when a message arrives", %{conn: conn, user: user} do

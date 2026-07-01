@@ -110,15 +110,16 @@ defmodule LittleGrapeWeb.MatchesLive do
 
   @impl true
   def handle_event("select_match", %{"match-id" => match_id_str}, socket) do
-    match_id = String.to_integer(match_id_str)
     user = socket.assigns.user
 
-    case Matches.get_match(user, match_id) do
-      nil ->
+    with {match_id, ""} when match_id in 1..9_223_372_036_854_775_807 <-
+           Integer.parse(match_id_str),
+         %Matches.Match{} = match <- Matches.get_match(user, match_id) do
+      {:noreply, select_match(socket, match, user)}
+    else
+      # Malformed client param or unknown match — never crash the LiveView
+      _error ->
         {:noreply, put_flash(socket, :error, gettext("Conversation not found."))}
-
-      match ->
-        {:noreply, select_match(socket, match, user)}
     end
   end
 

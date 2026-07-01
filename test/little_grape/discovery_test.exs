@@ -622,6 +622,36 @@ defmodule LittleGrape.DiscoveryTest do
   # Soft Scoring Tests
   # ============================================================================
 
+  describe "calculate_age/2" do
+    test "returns nil for a nil birthdate" do
+      assert Discovery.calculate_age(nil) == nil
+    end
+
+    test "computes age for an ordinary birthdate before and after the birthday" do
+      assert Discovery.calculate_age(~D[1990-05-15], ~D[2026-05-14]) == 35
+      assert Discovery.calculate_age(~D[1990-05-15], ~D[2026-05-15]) == 36
+      assert Discovery.calculate_age(~D[1990-05-15], ~D[2026-05-16]) == 36
+    end
+
+    test "counts the birthday itself as having occurred" do
+      today = Date.utc_today()
+      birthdate = Date.new!(today.year - 30, today.month, today.day)
+      assert Discovery.calculate_age(birthdate) == 30
+    end
+
+    test "handles Feb-29 birthdates in a non-leap year without raising (Feb 28 convention)" do
+      # 2026 is not a leap year; the leapling's birthday counts as Feb 28
+      assert Discovery.calculate_age(~D[2000-02-29], ~D[2026-02-27]) == 25
+      assert Discovery.calculate_age(~D[2000-02-29], ~D[2026-02-28]) == 26
+      assert Discovery.calculate_age(~D[2000-02-29], ~D[2026-03-01]) == 26
+    end
+
+    test "handles Feb-29 birthdates in a leap year" do
+      assert Discovery.calculate_age(~D[2000-02-29], ~D[2028-02-28]) == 27
+      assert Discovery.calculate_age(~D[2000-02-29], ~D[2028-02-29]) == 28
+    end
+  end
+
   describe "score_age/3" do
     # Helper to create a birthdate for a specific age
     defp birthdate_for_age(age) do

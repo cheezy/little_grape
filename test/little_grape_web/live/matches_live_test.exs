@@ -469,6 +469,24 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       refute html =~ ~s(id="chat-container")
     end
 
+    test "select_match ignores a malformed match-id instead of crashing", %{
+      conn: conn,
+      user: user
+    } do
+      profile_fixture(user) |> set_profile_picture()
+
+      {:ok, view, _html} = mount_and_render(conn, ~p"/matches")
+
+      for bad_param <- ["abc", "", "42abc", "-", "-5", "0", "99999999999999999999"] do
+        html = render_hook(view, "select_match", %{"match-id" => bad_param})
+        assert html =~ "Conversation not found."
+        refute html =~ ~s(id="chat-container")
+      end
+
+      # The LiveView process survived every malformed param
+      assert Process.alive?(view.pid)
+    end
+
     test "selecting a match shows existing messages in the chat pane", %{conn: conn, user: user} do
       profile_fixture(user) |> set_profile_picture()
 

@@ -672,12 +672,18 @@ defmodule LittleGrape.Discovery do
     end
   end
 
-  # ============================================================================
-  # Private Helper Functions
-  # ============================================================================
+  @doc """
+  Calculates a person's age from their birthdate.
 
-  defp calculate_age(birthdate) do
-    today = Date.utc_today()
+  Feb-29 birthdates are treated as Feb 28 in non-leap years, so the
+  calculation never raises. Accepts an optional `today` for deterministic
+  results in tests.
+  """
+  def calculate_age(birthdate, today \\ Date.utc_today())
+
+  def calculate_age(nil, _today), do: nil
+
+  def calculate_age(birthdate, today) do
     years = today.year - birthdate.year
 
     # Check if birthday hasn't occurred yet this year
