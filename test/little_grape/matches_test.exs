@@ -52,16 +52,35 @@ defmodule LittleGrape.MatchesTest do
       assert conversation.match_id == match.id
     end
 
-    test "transaction rolls back on duplicate match attempt" do
+    test "resolves duplicate match attempt to the existing match" do
       user1 = user_fixture()
       user2 = user_fixture()
 
-      # Create first match
-      assert {:ok, _result} = Matches.create_match(user1.id, user2.id)
+      assert {:ok, %{match: match, conversation: conversation}} =
+               Matches.create_match(user1.id, user2.id)
 
-      # Attempt duplicate match
-      assert {:error, :match, changeset, %{}} = Matches.create_match(user1.id, user2.id)
-      assert "has already been taken" in errors_on(changeset).user_a_id
+      assert {:ok, %{match: match2, conversation: conversation2}} =
+               Matches.create_match(user1.id, user2.id)
+
+      assert match2.id == match.id
+      assert conversation2.id == conversation.id
+      assert Repo.aggregate(Match, :count) == 1
+      assert Repo.aggregate(Conversation, :count) == 1
+    end
+
+    test "broadcasts :new_match exactly once per match" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+
+      Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user1.id}")
+
+      assert {:ok, %{match: match}} = Matches.create_match(user1.id, user2.id)
+      assert_receive {:new_match, %Match{id: match_id}}
+      assert match_id == match.id
+
+      # Duplicate attempt resolves without broadcasting again
+      assert {:ok, _result} = Matches.create_match(user1.id, user2.id)
+      refute_receive {:new_match, _match}, 100
     end
 
     test "returns error when a user does not exist" do
@@ -70,7 +89,7 @@ defmodule LittleGrape.MatchesTest do
 
       # After normalization, the non_existent_id (999_999) will be user_b_id
       # since it's larger than any real user ID
-      assert {:error, :match, changeset, %{}} = Matches.create_match(non_existent_id, user.id)
+      assert {:error, changeset} = Matches.create_match(non_existent_id, user.id)
       assert "does not exist" in errors_on(changeset).user_b_id
     end
 
@@ -78,7 +97,7 @@ defmodule LittleGrape.MatchesTest do
       user = user_fixture()
       non_existent_id = 999_999
 
-      assert {:error, :match, changeset, %{}} = Matches.create_match(user.id, non_existent_id)
+      assert {:error, changeset} = Matches.create_match(user.id, non_existent_id)
       assert "does not exist" in errors_on(changeset).user_b_id
     end
 

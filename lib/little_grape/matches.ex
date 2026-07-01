@@ -23,9 +23,10 @@ defmodule LittleGrape.Matches do
 
   ## Returns
 
-    * `{:ok, %{match: %Match{}, conversation: %Conversation{}}}` - Success
-    * `{:error, :match, %Ecto.Changeset{}, %{}}` - Match creation failed
-    * `{:error, :conversation, %Ecto.Changeset{}, %{}}` - Conversation creation failed
+    * `{:ok, %{match: %Match{}, conversation: %Conversation{}}}` - Success. When
+      the match already existed (duplicate attempt or concurrent creation), the
+      existing match and conversation are returned and no broadcast is fired.
+    * `{:error, %Ecto.Changeset{}}` - Match or conversation creation failed
 
   ## Examples
 
@@ -35,38 +36,76 @@ defmodule LittleGrape.Matches do
       iex> create_match(2, 1)  # IDs are normalized
       {:ok, %{match: %Match{user_a_id: 1, user_b_id: 2}, conversation: %Conversation{}}}
 
-      iex> create_match(1, 2)  # duplicate attempt
-      {:error, :match, %Ecto.Changeset{}, %{}}
+      iex> create_match(1, 2)  # duplicate attempt resolves to the existing match
+      {:ok, %{match: %Match{}, conversation: %Conversation{}}}
 
   """
   def create_match(user_a_id, user_b_id) do
-    {normalized_a, normalized_b} = Match.normalize_user_ids(user_a_id, user_b_id)
-
-    result =
-      Multi.new()
-      |> Multi.insert(:match, fn _changes ->
-        Match.changeset(%Match{}, %{
-          user_a_id: normalized_a,
-          user_b_id: normalized_b,
-          matched_at: DateTime.utc_now()
-        })
-      end)
-      |> Multi.insert(:conversation, fn %{match: match} ->
-        Conversation.changeset(%Conversation{}, %{match_id: match.id})
-      end)
-      |> Repo.transaction()
-
-    case result do
-      {:ok, %{match: match}} = success ->
+    match_multi(user_a_id, user_b_id)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{match: {:created, match}, conversation: conversation}} ->
         broadcast_new_match(match)
-        success
+        {:ok, %{match: match, conversation: conversation}}
 
-      error ->
-        error
+      {:ok, %{match: {:existing, match}, conversation: conversation}} ->
+        {:ok, %{match: match, conversation: conversation}}
+
+      {:error, _step, %Ecto.Changeset{} = changeset, _changes} ->
+        {:error, changeset}
     end
   end
 
-  defp broadcast_new_match(match) do
+  @doc """
+  Returns an `Ecto.Multi` that inserts a match and its conversation, resolving
+  a unique-index collision (the match already exists) to the existing records.
+
+  Steps: `:match_insert` (insert with `on_conflict: :nothing`), `:match`
+  (returns `{:created, match}` or `{:existing, match}`), and `:conversation`.
+
+  Does NOT broadcast — the caller must broadcast after commit, and only when
+  the `:match` step returns `{:created, match}`, so the broadcast fires exactly
+  once per match (only from the transaction that actually inserted it).
+  """
+  def match_multi(user_a_id, user_b_id) do
+    {normalized_a, normalized_b} = Match.normalize_user_ids(user_a_id, user_b_id)
+
+    Multi.new()
+    |> Multi.insert(
+      :match_insert,
+      Match.changeset(%Match{}, %{
+        user_a_id: normalized_a,
+        user_b_id: normalized_b,
+        matched_at: DateTime.utc_now()
+      }),
+      on_conflict: :nothing,
+      conflict_target: [:user_a_id, :user_b_id]
+    )
+    |> Multi.run(:match, fn repo, %{match_insert: inserted} ->
+      if inserted.id do
+        {:ok, {:created, inserted}}
+      else
+        case repo.get_by(Match, user_a_id: normalized_a, user_b_id: normalized_b) do
+          nil -> {:error, :match_vanished}
+          match -> {:ok, {:existing, match}}
+        end
+      end
+    end)
+    |> Multi.run(:conversation, fn repo, %{match: match_result} ->
+      case match_result do
+        {:created, match} ->
+          %Conversation{}
+          |> Conversation.changeset(%{match_id: match.id})
+          |> repo.insert()
+
+        {:existing, match} ->
+          {:ok, repo.get_by(Conversation, match_id: match.id)}
+      end
+    end)
+  end
+
+  @doc false
+  def broadcast_new_match(match) do
     Phoenix.PubSub.broadcast(LittleGrape.PubSub, "user:#{match.user_a_id}", {:new_match, match})
     Phoenix.PubSub.broadcast(LittleGrape.PubSub, "user:#{match.user_b_id}", {:new_match, match})
   end

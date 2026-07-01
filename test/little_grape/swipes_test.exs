@@ -3,8 +3,98 @@ defmodule LittleGrape.SwipesTest do
 
   import LittleGrape.AccountsFixtures
 
+  alias LittleGrape.Matches
+  alias LittleGrape.Matches.Match
+  alias LittleGrape.Messaging.Conversation
   alias LittleGrape.Swipes
   alias LittleGrape.Swipes.Swipe
+
+  describe "swipe/3" do
+    test "returns {:ok, :no_match} on a like without reciprocity" do
+      user = user_fixture()
+      target = user_fixture()
+
+      assert {:ok, :no_match} = Swipes.swipe(user, target.id, "like")
+      assert Swipes.has_swiped?(user.id, target.id)
+      assert Repo.aggregate(Match, :count) == 0
+    end
+
+    test "returns {:ok, {:match, match}} on a mutual like and creates the conversation" do
+      user = user_fixture()
+      target = user_fixture()
+
+      assert {:ok, _swipe} = Swipes.create_swipe(target, user.id, "like")
+      assert {:ok, {:match, %Match{} = match}} = Swipes.swipe(user, target.id, "like")
+
+      assert match.user_a_id < match.user_b_id
+      assert Enum.sort([match.user_a_id, match.user_b_id]) == Enum.sort([user.id, target.id])
+      assert Repo.get_by(Conversation, match_id: match.id)
+    end
+
+    test "a pass never creates a match even with a reciprocal like" do
+      user = user_fixture()
+      target = user_fixture()
+
+      assert {:ok, _swipe} = Swipes.create_swipe(target, user.id, "like")
+      assert {:ok, :no_match} = Swipes.swipe(user, target.id, "pass")
+      assert Repo.aggregate(Match, :count) == 0
+    end
+
+    test "returns {:error, changeset} for an invalid action" do
+      user = user_fixture()
+      target = user_fixture()
+
+      assert {:error, changeset} = Swipes.swipe(user, target.id, "invalid")
+      assert "must be 'like' or 'pass'" in errors_on(changeset).action
+      refute Swipes.has_swiped?(user.id, target.id)
+    end
+
+    test "returns {:error, changeset} when swiping an already-swiped target" do
+      user = user_fixture()
+      target = user_fixture()
+
+      assert {:ok, _swipe} = Swipes.create_swipe(user, target.id, "like")
+      assert {:error, changeset} = Swipes.swipe(user, target.id, "like")
+      assert "has already been taken" in errors_on(changeset).user_id
+      assert Repo.aggregate(Match, :count) == 0
+    end
+
+    test "regression: resolves to the existing match when the match row already exists" do
+      user = user_fixture()
+      target = user_fixture()
+
+      # The other user's like plus an already-committed match simulates losing
+      # the race: the concurrent transaction inserted the match first.
+      assert {:ok, _swipe} = Swipes.create_swipe(target, user.id, "like")
+      assert {:ok, %{match: existing}} = Matches.create_match(user.id, target.id)
+
+      Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user.id}")
+
+      assert {:ok, {:match, match}} = Swipes.swipe(user, target.id, "like")
+      assert match.id == existing.id
+
+      # The swipe row survived the unique-index collision (no rollback)
+      assert Swipes.has_swiped?(user.id, target.id)
+      assert Repo.aggregate(Match, :count) == 1
+
+      # Only the transaction that inserted the match broadcasts
+      refute_receive {:new_match, _match}, 100
+    end
+
+    test "broadcasts :new_match exactly once on a mutual like" do
+      user = user_fixture()
+      target = user_fixture()
+
+      Phoenix.PubSub.subscribe(LittleGrape.PubSub, "user:#{user.id}")
+
+      assert {:ok, _swipe} = Swipes.create_swipe(target, user.id, "like")
+      assert {:ok, {:match, match}} = Swipes.swipe(user, target.id, "like")
+
+      assert_receive {:new_match, %Match{id: match_id}}
+      assert match_id == match.id
+      refute_receive {:new_match, _match}, 100
+    end
+  end
 
   describe "create_swipe/3" do
     test "creates a swipe with valid data" do

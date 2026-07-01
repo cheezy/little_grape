@@ -3,7 +3,6 @@ defmodule LittleGrapeWeb.DiscoverLive do
 
   alias LittleGrape.Accounts
   alias LittleGrape.Discovery
-  alias LittleGrape.Matches
   alias LittleGrape.Messaging
   alias LittleGrape.Repo
   alias LittleGrape.Swipes
@@ -60,9 +59,17 @@ defmodule LittleGrapeWeb.DiscoverLive do
       user = socket.assigns.user
       candidate = socket.assigns.current_candidate
 
-      case Swipes.create_swipe(user, candidate.user_id, action) do
-        {:ok, _swipe} ->
-          socket = handle_swipe_success(socket, action, user.id, candidate)
+      case Swipes.swipe(user, candidate.user_id, action) do
+        {:ok, :no_match} ->
+          {:noreply, advance_to_next_candidate(socket)}
+
+        {:ok, {:match, _match}} ->
+          socket =
+            socket
+            |> assign(:matched_profile, candidate)
+            |> assign(:show_match_modal, true)
+            |> advance_to_next_candidate()
+
           {:noreply, socket}
 
         {:error, _changeset} ->
@@ -134,29 +141,6 @@ defmodule LittleGrapeWeb.DiscoverLive do
      |> assign(:current_candidate, current_candidate)
      |> assign(:previously_passed, previously_passed)
      |> assign(:unread_count, unread_count)}
-  end
-
-  defp handle_swipe_success(socket, action, user_id, candidate) do
-    if action == "like" and Swipes.check_for_match(user_id, candidate.user_id) do
-      # It's a match! Create the match record
-      case Matches.create_match(user_id, candidate.user_id) do
-        {:ok, _result} ->
-          socket
-          |> assign(:matched_profile, candidate)
-          |> assign(:show_match_modal, true)
-          |> advance_to_next_candidate()
-
-        {:error, _reason} ->
-          socket
-          |> put_flash(
-            :error,
-            gettext("Something went wrong creating the match. Please try again.")
-          )
-          |> advance_to_next_candidate()
-      end
-    else
-      advance_to_next_candidate(socket)
-    end
   end
 
   defp advance_to_next_candidate(socket) do

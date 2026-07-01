@@ -254,6 +254,40 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       assert length(matches) == 1
     end
 
+    test "like when the match already exists shows the modal instead of crashing", %{
+      conn: conn,
+      user: user
+    } do
+      profile_fixture(user, %{gender: "male", preferred_gender: "female"})
+      |> set_profile_picture()
+
+      candidate = user_fixture()
+
+      profile_fixture(candidate, %{
+        first_name: "RaceCandidate",
+        gender: "female",
+        preferred_gender: "male"
+      })
+      |> set_profile_picture()
+
+      # The candidate liked the user AND the match already exists — the state
+      # a concurrent mutual like leaves behind when the other process wins the
+      # race on the matches unique index (previously a CaseClauseError crash).
+      {:ok, _swipe} = Swipes.create_swipe(candidate, user.id, "like")
+      {:ok, %{match: _existing}} = Matches.create_match(user.id, candidate.id)
+
+      {:ok, view, _html} = mount_and_render(conn, ~p"/discover")
+
+      html = view |> element("button[phx-value-action=like]") |> render_click()
+
+      assert html =~ "a Match"
+      assert html =~ "RaceCandidate"
+
+      # Still exactly one match — the collision resolved to the existing one
+      matches = Matches.list_matches(user)
+      assert length(matches) == 1
+    end
+
     test "shows no profiles message when last candidate is swiped", %{conn: conn, user: user} do
       # Create complete profile for current user
       profile_fixture(user, %{gender: "male", preferred_gender: "female"})

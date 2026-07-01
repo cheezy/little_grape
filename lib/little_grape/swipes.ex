@@ -5,12 +5,89 @@ defmodule LittleGrape.Swipes do
 
   import Ecto.Query, warn: false
 
+  alias Ecto.Multi
   alias LittleGrape.Accounts.User
+  alias LittleGrape.Matches
   alias LittleGrape.Repo
   alias LittleGrape.Swipes.Swipe
 
   @doc """
+  Records a swipe and, when it completes a reciprocal like, creates the match
+  and its conversation — all in a single transaction.
+
+  This is the orchestration entry point callers should use instead of chaining
+  `create_swipe/3`, `check_for_match/2`, and `Matches.create_match/2`. When two
+  users like each other near-simultaneously and both transactions race on the
+  matches unique index, the loser resolves to the existing match instead of
+  failing, and only the transaction that actually inserted the match broadcasts
+  `:new_match`.
+
+  ## Parameters
+
+    * `user` - The user performing the swipe (struct with id) — always taken
+      from the authenticated session, never from client params
+    * `target_user_id` - The ID of the user being swiped on
+    * `action` - Either "like" or "pass"
+
+  ## Returns
+
+    * `{:ok, :no_match}` - Swipe recorded, no reciprocal like
+    * `{:ok, {:match, %Match{}}}` - Mutual like; the match was created (or
+      already existed and was resolved)
+    * `{:error, %Ecto.Changeset{}}` - Invalid action, duplicate swipe, or
+      missing target
+
+  ## Examples
+
+      iex> swipe(user, target_id, "like")
+      {:ok, :no_match}
+
+      iex> swipe(user, reciprocal_liker_id, "like")
+      {:ok, {:match, %Match{}}}
+
+      iex> swipe(user, target_id, "invalid")
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def swipe(%User{id: user_id}, target_user_id, action) do
+    Multi.new()
+    |> Multi.insert(
+      :swipe,
+      Swipe.changeset(%Swipe{}, %{
+        user_id: user_id,
+        target_user_id: target_user_id,
+        action: action
+      })
+    )
+    |> Multi.merge(fn %{swipe: swipe} ->
+      if swipe.action == "like" and check_for_match(user_id, target_user_id) do
+        Matches.match_multi(user_id, target_user_id)
+      else
+        Multi.new()
+      end
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{match: {:created, match}}} ->
+        Matches.broadcast_new_match(match)
+        {:ok, {:match, match}}
+
+      {:ok, %{match: {:existing, match}}} ->
+        {:ok, {:match, match}}
+
+      {:ok, _swipe_only} ->
+        {:ok, :no_match}
+
+      {:error, _step, %Ecto.Changeset{} = changeset, _changes} ->
+        {:error, changeset}
+    end
+  end
+
+  @doc """
   Creates a swipe record for a user swiping on another user.
+
+  Prefer `swipe/3` for the full swipe-to-match orchestration; this function
+  only inserts the swipe row.
 
   ## Parameters
 
