@@ -5,14 +5,15 @@ defmodule LittleGrape.MixProject do
     [
       app: :little_grape,
       version: "0.1.0",
-      elixir: "~> 1.19",
+      elixir: "~> 1.20",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
       compilers: [:phoenix_live_view] ++ Mix.compilers(),
       listeners: [Phoenix.CodeReloader],
-      test_coverage: test_coverage()
+      test_coverage: test_coverage(),
+      usage_rules: usage_rules()
     ]
   end
 
@@ -47,7 +48,7 @@ defmodule LittleGrape.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 1.1.0"},
+      {:phoenix_live_view, "~> 1.2.0"},
       {:lazy_html, ">= 0.1.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
@@ -70,7 +71,7 @@ defmodule LittleGrape.MixProject do
       {:bcrypt_elixir, "~> 3.0"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false},
-      {:usage_rules, "~> 0.1"},
+      {:usage_rules, "~> 1.0"},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
       {:tidewave, "~> 0.2", only: :dev}
     ]
@@ -118,6 +119,29 @@ defmodule LittleGrape.MixProject do
         LittleGrapeWeb.UserRegistrationHTML,
         LittleGrapeWeb.UserSessionHTML,
         LittleGrapeWeb.UserSettingsHTML
+      ]
+    ]
+  end
+
+  defp usage_rules do
+    [
+      file: "AGENTS.md",
+      usage_rules: [
+        ~r/^usage_rules/
+      ],
+
+      # or use skills
+      skills: [
+        location: ".claude/skills",
+        # build skills that combine multiple usage rules
+        build: [
+          "phoenix-framework": [
+            description:
+              "Use this skill working with Phoenix Framework. Consult this when working with the web layer, controllers, views, liveviews etc.",
+            # Include all Phoenix dependencies
+            usage_rules: [:phoenix, ~r/^phoenix\//]
+          ]
+        ]
       ]
     ]
   end
