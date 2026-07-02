@@ -10,6 +10,9 @@ defmodule LittleGrapeWeb.Plugs.Locale do
 
   @locales ~w(sq en it el de fr)
 
+  @doc "All supported locale codes, in display order."
+  def locales, do: @locales
+
   def init(opts), do: opts
 
   def call(conn, _opts) do

@@ -14,6 +14,19 @@ defmodule LittleGrapeWeb.UserSettingsControllerTest do
       assert response =~ ~s(name="user[email]")
     end
 
+    test "offers the full language switcher instead of the SQ/EN fork", %{conn: conn} do
+      conn = get(conn, ~p"/users/settings/email")
+      response = html_response(conn, 200)
+
+      assert response =~ "data-locale-switcher"
+
+      for code <- LittleGrapeWeb.Plugs.Locale.locales() do
+        assert response =~ ~s(value="#{code}")
+      end
+
+      refute response =~ ~s(href="?locale=sq")
+    end
+
     test "redirects if user is not logged in" do
       conn = build_conn()
       conn = get(conn, ~p"/users/settings/email")

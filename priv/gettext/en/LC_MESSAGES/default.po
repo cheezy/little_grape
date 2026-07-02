@@ -19,7 +19,7 @@ msgid "A Cultural Connection"
 msgstr "A Cultural Connection"
 
 #: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:228
-#: lib/little_grape_web/live/discover_live.ex:361
+#: lib/little_grape_web/live/discover_live.ex:293
 #, elixir-autogen, elixir-format
 msgid "About Me"
 msgstr "About Me"
@@ -41,14 +41,13 @@ msgid "Active Members"
 msgstr "Active Members"
 
 #: lib/little_grape_web/controllers/page_html/home.html.heex:253
-#: lib/little_grape_web/controllers/user_profile_html.ex:24
+#: lib/little_grape_web/controllers/user_profile_html.ex:27
 #, elixir-autogen, elixir-format
 msgid "Albania"
 msgstr "Albania"
 
 #: lib/little_grape_web/controllers/page_html/home.html.heex:28
-#: lib/little_grape_web/controllers/user_profile_html.ex:116
-#: lib/little_grape_web/live/discover_live.ex:458
+#: lib/little_grape_web/profile_options.ex:13
 #, elixir-autogen, elixir-format
 msgid "Albanian"
 msgstr "Albanian"
@@ -58,12 +57,12 @@ msgstr "Albanian"
 msgid "Albanian Proverb"
 msgstr "Albanian Proverb"
 
-#: lib/little_grape_web/controllers/user_registration_html/new.html.heex:14
+#: lib/little_grape_web/controllers/user_registration_html/new.html.heex:8
 #, elixir-autogen, elixir-format
 msgid "Already registered?"
 msgstr "Already registered?"
 
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:591
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:583
 #, elixir-autogen, elixir-format
 msgid "Any"
 msgstr "Any"
@@ -78,43 +77,43 @@ msgstr "App Store Rating"
 msgid "Are you sure you want to remove your profile picture?"
 msgstr "Are you sure you want to remove your profile picture?"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:134
+#: lib/little_grape_web/controllers/user_profile_html.ex:126
 #, elixir-autogen, elixir-format
 msgid "Art"
 msgstr "Art"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:111
+#: lib/little_grape_web/controllers/user_profile_html.ex:114
 #, elixir-autogen, elixir-format
 msgid "Atheist"
 msgstr "Atheist"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:56
+#: lib/little_grape_web/controllers/user_profile_html.ex:59
 #, elixir-autogen, elixir-format
 msgid "Athletic"
 msgstr "Athletic"
 
-#: lib/little_grape_web/components/layouts.ex:180
-#: lib/little_grape_web/components/layouts.ex:192
+#: lib/little_grape_web/components/layouts.ex:360
+#: lib/little_grape_web/components/layouts.ex:372
 #, elixir-autogen, elixir-format
 msgid "Attempting to reconnect"
 msgstr "Attempting to reconnect"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:43
+#: lib/little_grape_web/controllers/user_profile_html.ex:46
 #, elixir-autogen, elixir-format
 msgid "Australia"
 msgstr "Australia"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:34
+#: lib/little_grape_web/controllers/user_profile_html.ex:37
 #, elixir-autogen, elixir-format
 msgid "Austria"
 msgstr "Austria"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:57
+#: lib/little_grape_web/controllers/user_profile_html.ex:60
 #, elixir-autogen, elixir-format
 msgid "Average"
 msgstr "Average"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:102
+#: lib/little_grape_web/controllers/user_profile_html.ex:105
 #, elixir-autogen, elixir-format
 msgid "Bachelor's Degree"
 msgstr "Bachelor's Degree"
@@ -135,7 +134,7 @@ msgstr "Based on culture & compatibility"
 msgid "Basic Info"
 msgstr "Basic Info"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:37
+#: lib/little_grape_web/controllers/user_profile_html.ex:40
 #, elixir-autogen, elixir-format
 msgid "Belgium"
 msgstr "Belgium"
@@ -150,37 +149,37 @@ msgstr "Bio"
 msgid "Birthdate"
 msgstr "Birthdate"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:67
-#: lib/little_grape_web/controllers/user_profile_html.ex:69
+#: lib/little_grape_web/controllers/user_profile_html.ex:70
+#: lib/little_grape_web/controllers/user_profile_html.ex:72
 #, elixir-autogen, elixir-format
 msgid "Black"
 msgstr "Black"
 
 ## Hair Color Options
-#: lib/little_grape_web/controllers/user_profile_html.ex:71
+#: lib/little_grape_web/controllers/user_profile_html.ex:74
 #, elixir-autogen, elixir-format
 msgid "Blonde"
 msgstr "Blonde"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:63
+#: lib/little_grape_web/controllers/user_profile_html.ex:66
 #, elixir-autogen, elixir-format
 msgid "Blue"
 msgstr "Blue"
 
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:489
-#: lib/little_grape_web/live/discover_live.ex:403
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:481
+#: lib/little_grape_web/live/discover_live.ex:335
 #, elixir-autogen, elixir-format
 msgid "Body Type"
 msgstr "Body Type"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:29
+#: lib/little_grape_web/controllers/user_profile_html.ex:32
 #, elixir-autogen, elixir-format
 msgid "Bosnia and Herzegovina"
 msgstr "Bosnia and Herzegovina"
 
 ## Eye Color Options
-#: lib/little_grape_web/controllers/user_profile_html.ex:62
-#: lib/little_grape_web/controllers/user_profile_html.ex:70
+#: lib/little_grape_web/controllers/user_profile_html.ex:65
+#: lib/little_grape_web/controllers/user_profile_html.ex:73
 #, elixir-autogen, elixir-format
 msgid "Brown"
 msgstr "Brown"
@@ -190,7 +189,7 @@ msgstr "Brown"
 msgid "Built by Albanians, for Albanians. We understand our culture, traditions, and what matters in finding a life partner."
 msgstr "Built by Albanians, for Albanians. We understand our culture, traditions, and what matters in finding a life partner."
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:42
+#: lib/little_grape_web/controllers/user_profile_html.ex:45
 #, elixir-autogen, elixir-format
 msgid "Canada"
 msgstr "Canada"
@@ -200,28 +199,28 @@ msgstr "Canada"
 msgid "Careers"
 msgstr "Careers"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:110
+#: lib/little_grape_web/controllers/user_profile_html.ex:113
 #, elixir-autogen, elixir-format
 msgid "Catholic"
 msgstr "Catholic"
 
-#: lib/little_grape_web/controllers/user_settings_html/edit_email.html.heex:10
-#: lib/little_grape_web/controllers/user_settings_html/edit_email.html.heex:32
+#: lib/little_grape_web/controllers/user_settings_html/edit_email.html.heex:5
+#: lib/little_grape_web/controllers/user_settings_html/edit_email.html.heex:22
 #, elixir-autogen, elixir-format
 msgid "Change Email"
 msgstr "Change Email"
 
-#: lib/little_grape_web/controllers/user_settings_html/edit_password.html.heex:60
+#: lib/little_grape_web/controllers/user_settings_html/edit_password.html.heex:8
 #, elixir-autogen, elixir-format
 msgid "Change Email instead"
 msgstr "Change Email instead"
 
-#: lib/little_grape_web/controllers/user_settings_html/edit_password.html.heex:10
+#: lib/little_grape_web/controllers/user_settings_html/edit_password.html.heex:5
 #, elixir-autogen, elixir-format
 msgid "Change Password"
 msgstr "Change Password"
 
-#: lib/little_grape_web/controllers/user_settings_html/edit_email.html.heex:43
+#: lib/little_grape_web/controllers/user_settings_html/edit_email.html.heex:8
 #, elixir-autogen, elixir-format
 msgid "Change Password instead"
 msgstr "Change Password instead"
@@ -241,17 +240,17 @@ msgstr "Community Guidelines"
 msgid "Company"
 msgstr "Company"
 
-#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:59
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:46
 #, elixir-autogen, elixir-format
 msgid "Complete registration"
 msgstr "Complete registration"
 
-#: lib/little_grape_web/controllers/user_settings_html/edit_password.html.heex:34
+#: lib/little_grape_web/controllers/user_settings_html/edit_password.html.heex:26
 #, elixir-autogen, elixir-format
 msgid "Confirm new password"
 msgstr "Confirm new password"
 
-#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:41
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:33
 #, elixir-autogen, elixir-format
 msgid "Confirm password"
 msgstr "Confirm password"
@@ -282,7 +281,7 @@ msgstr "Contact"
 msgid "Cookie Policy"
 msgstr "Cookie Policy"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:131
+#: lib/little_grape_web/controllers/user_profile_html.ex:123
 #, elixir-autogen, elixir-format
 msgid "Cooking"
 msgstr "Cooking"
@@ -302,42 +301,42 @@ msgstr "Country"
 msgid "Create Free Account"
 msgstr "Create Free Account"
 
-#: lib/little_grape_web/controllers/user_registration_html/new.html.heex:40
+#: lib/little_grape_web/controllers/user_registration_html/new.html.heex:29
 #, elixir-autogen, elixir-format
 msgid "Create an account"
 msgstr "Create an account"
 
-#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:56
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:43
 #, elixir-autogen, elixir-format
 msgid "Creating account..."
 msgstr "Creating account..."
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:30
+#: lib/little_grape_web/controllers/user_profile_html.ex:33
 #, elixir-autogen, elixir-format
 msgid "Croatia"
 msgstr "Croatia"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:58
+#: lib/little_grape_web/controllers/user_profile_html.ex:61
 #, elixir-autogen, elixir-format
 msgid "Curvy"
 msgstr "Curvy"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:51
+#: lib/little_grape_web/controllers/user_profile_html.ex:54
 #, elixir-autogen, elixir-format
 msgid "Cyprus"
 msgstr "Cyprus"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:139
+#: lib/little_grape_web/controllers/user_profile_html.ex:131
 #, elixir-autogen, elixir-format
 msgid "Dancing"
 msgstr "Dancing"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:78
+#: lib/little_grape_web/controllers/user_profile_html.ex:81
 #, elixir-autogen, elixir-format
 msgid "Dating"
 msgstr "Dating"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:46
+#: lib/little_grape_web/controllers/user_profile_html.ex:49
 #, elixir-autogen, elixir-format
 msgid "Denmark"
 msgstr "Denmark"
@@ -347,42 +346,42 @@ msgstr "Denmark"
 msgid "Diaspora"
 msgstr "Diaspora"
 
-#: lib/little_grape_web/components/layouts.ex:94
-#: lib/little_grape_web/live/discover_live.ex:200
+#: lib/little_grape_web/components/layouts.ex:107
+#: lib/little_grape_web/components/layouts.ex:160
+#: lib/little_grape_web/live/discover_live.ex:142
 #, elixir-autogen, elixir-format
 msgid "Discover"
 msgstr "Discover"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:104
+#: lib/little_grape_web/controllers/user_profile_html.ex:107
 #, elixir-autogen, elixir-format
 msgid "Doctorate"
 msgstr "Doctorate"
 
-#: lib/little_grape_web/controllers/user_session_html/new.html.heex:15
+#: lib/little_grape_web/controllers/user_session_html/new.html.heex:11
 #, elixir-autogen, elixir-format
 msgid "Don't have an account?"
 msgstr "Don't have an account?"
 
 #: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:295
-#: lib/little_grape_web/live/discover_live.ex:431
+#: lib/little_grape_web/live/discover_live.ex:363
 #, elixir-autogen, elixir-format
 msgid "Drinking"
 msgstr "Drinking"
 
 #: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:372
-#: lib/little_grape_web/live/discover_live.ex:410
+#: lib/little_grape_web/live/discover_live.ex:342
 #, elixir-autogen, elixir-format
 msgid "Education"
 msgstr "Education"
 
-#: lib/little_grape_web/controllers/user_registration_html/new.html.heex:24
-#: lib/little_grape_web/controllers/user_session_html/new.html.heex:30
+#: lib/little_grape_web/controllers/user_registration_html/new.html.heex:19
+#: lib/little_grape_web/controllers/user_session_html/new.html.heex:24
 #, elixir-autogen, elixir-format
 msgid "Email"
 msgstr "Email"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:117
-#: lib/little_grape_web/live/discover_live.ex:459
+#: lib/little_grape_web/profile_options.ex:14
 #, elixir-autogen, elixir-format
 msgid "English"
 msgstr "English"
@@ -392,17 +391,17 @@ msgstr "English"
 msgid "Every profile is verified. Your privacy and security are our top priority with advanced safety features."
 msgstr "Every profile is verified. Your privacy and security are our top priority with advanced safety features."
 
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:505
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:497
 #, elixir-autogen, elixir-format
 msgid "Eye Color"
 msgstr "Eye Color"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:140
+#: lib/little_grape_web/controllers/user_profile_html.ex:132
 #, elixir-autogen, elixir-format
 msgid "Fashion"
 msgstr "Fashion"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:21
+#: lib/little_grape_web/controllers/user_profile_html.ex:24
 #, elixir-autogen, elixir-format
 msgid "Female"
 msgstr "Female"
@@ -417,7 +416,7 @@ msgstr "Find Your"
 msgid "Find Your Perfect Match"
 msgstr "Find Your Perfect Match"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:47
+#: lib/little_grape_web/controllers/user_profile_html.ex:50
 #, elixir-autogen, elixir-format
 msgid "Finland"
 msgstr "Finland"
@@ -427,29 +426,28 @@ msgstr "Finland"
 msgid "First Name"
 msgstr "First Name"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:133
+#: lib/little_grape_web/controllers/user_profile_html.ex:125
 #, elixir-autogen, elixir-format
 msgid "Fitness"
 msgstr "Fitness"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:39
+#: lib/little_grape_web/controllers/user_profile_html.ex:42
 #, elixir-autogen, elixir-format
 msgid "France"
 msgstr "France"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:120
-#: lib/little_grape_web/live/discover_live.ex:462
+#: lib/little_grape_web/profile_options.ex:17
 #, elixir-autogen, elixir-format
 msgid "French"
 msgstr "French"
 
 ## Looking For Options
-#: lib/little_grape_web/controllers/user_profile_html.ex:77
+#: lib/little_grape_web/controllers/user_profile_html.ex:80
 #, elixir-autogen, elixir-format
 msgid "Friendship"
 msgstr "Friendship"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:137
+#: lib/little_grape_web/controllers/user_profile_html.ex:129
 #, elixir-autogen, elixir-format
 msgid "Gaming"
 msgstr "Gaming"
@@ -459,13 +457,12 @@ msgstr "Gaming"
 msgid "Gender"
 msgstr "Gender"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:119
-#: lib/little_grape_web/live/discover_live.ex:461
+#: lib/little_grape_web/profile_options.ex:16
 #, elixir-autogen, elixir-format
 msgid "German"
 msgstr "German"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:35
+#: lib/little_grape_web/controllers/user_profile_html.ex:38
 #, elixir-autogen, elixir-format
 msgid "Germany"
 msgstr "Germany"
@@ -475,23 +472,23 @@ msgstr "Germany"
 msgid "Global Albanian Community"
 msgstr "Global Albanian Community"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:66
-#: lib/little_grape_web/controllers/user_profile_html.ex:73
+#: lib/little_grape_web/controllers/user_profile_html.ex:69
+#: lib/little_grape_web/controllers/user_profile_html.ex:76
 #, elixir-autogen, elixir-format
 msgid "Gray"
 msgstr "Gray"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:32
+#: lib/little_grape_web/controllers/user_profile_html.ex:35
 #, elixir-autogen, elixir-format
 msgid "Greece"
 msgstr "Greece"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:64
+#: lib/little_grape_web/controllers/user_profile_html.ex:67
 #, elixir-autogen, elixir-format
 msgid "Green"
 msgstr "Green"
 
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:521
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:513
 #, elixir-autogen, elixir-format
 msgid "Hair Color"
 msgstr "Hair Color"
@@ -501,17 +498,17 @@ msgstr "Hair Color"
 msgid "Has Children"
 msgstr "Has Children"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:97
+#: lib/little_grape_web/controllers/user_profile_html.ex:100
 #, elixir-autogen, elixir-format
 msgid "Have children, want more"
 msgstr "Have children, want more"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:65
+#: lib/little_grape_web/controllers/user_profile_html.ex:68
 #, elixir-autogen, elixir-format
 msgid "Hazel"
 msgstr "Hazel"
 
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:475
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:467
 #, elixir-autogen, elixir-format
 msgid "Height (cm)"
 msgstr "Height (cm)"
@@ -521,12 +518,13 @@ msgstr "Height (cm)"
 msgid "Help Center"
 msgstr "Help Center"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:100
+#: lib/little_grape_web/controllers/user_profile_html.ex:103
 #, elixir-autogen, elixir-format
 msgid "High School"
 msgstr "High School"
 
-#: lib/little_grape_web/components/layouts.ex:93
+#: lib/little_grape_web/components/layouts.ex:106
+#: lib/little_grape_web/components/layouts.ex:159
 #, elixir-autogen, elixir-format
 msgid "Home"
 msgstr "Home"
@@ -537,25 +535,24 @@ msgid "How It Works"
 msgstr "How It Works"
 
 ## Preferences Section
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:578
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:570
 #, elixir-autogen, elixir-format
 msgid "Interested In"
 msgstr "Interested In"
 
 ## Interests Section
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:667
-#: lib/little_grape_web/live/discover_live.ex:368
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:659
+#: lib/little_grape_web/live/discover_live.ex:300
 #, elixir-autogen, elixir-format
 msgid "Interests"
 msgstr "Interests"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:118
-#: lib/little_grape_web/live/discover_live.ex:460
+#: lib/little_grape_web/profile_options.ex:15
 #, elixir-autogen, elixir-format
 msgid "Italian"
 msgstr "Italian"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:33
+#: lib/little_grape_web/controllers/user_profile_html.ex:36
 #, elixir-autogen, elixir-format
 msgid "Italy"
 msgstr "Italy"
@@ -576,13 +573,13 @@ msgstr "Join 50,000+ Albanians worldwide"
 msgid "Join thousands of Albanians who have found love, friendship, and meaningful connections on Zemra Ime."
 msgstr "Join thousands of Albanians who have found love, friendship, and meaningful connections on Zemra Ime."
 
-#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:87
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:74
 #, elixir-autogen, elixir-format
 msgid "Keep me logged in on this device"
 msgstr "Keep me logged in on this device"
 
 #: lib/little_grape_web/controllers/page_html/home.html.heex:257
-#: lib/little_grape_web/controllers/user_profile_html.ex:25
+#: lib/little_grape_web/controllers/user_profile_html.ex:28
 #, elixir-autogen, elixir-format
 msgid "Kosovo"
 msgstr "Kosovo"
@@ -613,53 +610,54 @@ msgstr "Legal"
 msgid "Lifestyle"
 msgstr "Lifestyle"
 
-#: lib/little_grape_web/components/layouts.ex:109
+#: lib/little_grape_web/components/layouts.ex:122
+#: lib/little_grape_web/components/layouts.ex:175
 #, elixir-autogen, elixir-format
 msgid "Log In"
 msgstr "Log In"
 
-#: lib/little_grape_web/controllers/user_registration_html/new.html.heex:16
-#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:77
-#: lib/little_grape_web/controllers/user_session_html/new.html.heex:10
+#: lib/little_grape_web/controllers/user_registration_html/new.html.heex:10
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:64
+#: lib/little_grape_web/controllers/user_session_html/new.html.heex:5
 #, elixir-autogen, elixir-format
 msgid "Log in"
 msgstr "Log in"
 
-#: lib/little_grape_web/controllers/user_session_html/new.html.heex:57
+#: lib/little_grape_web/controllers/user_session_html/new.html.heex:43
 #, elixir-autogen, elixir-format
 msgid "Log in and stay logged in"
 msgstr "Log in and stay logged in"
 
-#: lib/little_grape_web/controllers/user_session_html/new.html.heex:63
+#: lib/little_grape_web/controllers/user_session_html/new.html.heex:49
 #, elixir-autogen, elixir-format
 msgid "Log in only this time"
 msgstr "Log in only this time"
 
-#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:94
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:81
 #, elixir-autogen, elixir-format
 msgid "Log me in only this time"
 msgstr "Log me in only this time"
 
-#: lib/little_grape_web/components/layouts.ex:106
+#: lib/little_grape_web/components/layouts.ex:119
+#: lib/little_grape_web/components/layouts.ex:172
 #, elixir-autogen, elixir-format
 msgid "Log out"
 msgstr "Log out"
 
-#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:74
-#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:84
-#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:91
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:61
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:71
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:78
 #, elixir-autogen, elixir-format
 msgid "Logging in..."
 msgstr "Logging in..."
 
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:561
-#: lib/little_grape_web/live/discover_live.ex:388
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:553
+#: lib/little_grape_web/live/discover_live.ex:320
 #, elixir-autogen, elixir-format
 msgid "Looking For"
 msgstr "Looking For"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:122
-#: lib/little_grape_web/live/discover_live.ex:464
+#: lib/little_grape_web/profile_options.ex:19
 #, elixir-autogen, elixir-format
 msgid "Macedonian"
 msgstr "Macedonian"
@@ -670,38 +668,39 @@ msgid "Made with love for Albanians everywhere."
 msgstr "Made with love for Albanians everywhere."
 
 ## Gender Options
-#: lib/little_grape_web/controllers/user_profile_html.ex:20
+#: lib/little_grape_web/controllers/user_profile_html.ex:23
 #, elixir-autogen, elixir-format
 msgid "Male"
 msgstr "Male"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:52
+#: lib/little_grape_web/controllers/user_profile_html.ex:55
 #, elixir-autogen, elixir-format
 msgid "Malta"
 msgstr "Malta"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:80
+#: lib/little_grape_web/controllers/user_profile_html.ex:83
 #, elixir-autogen, elixir-format
 msgid "Marriage"
 msgstr "Marriage"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:103
+#: lib/little_grape_web/controllers/user_profile_html.ex:106
 #, elixir-autogen, elixir-format
 msgid "Master's Degree"
 msgstr "Master's Degree"
 
-#: lib/little_grape_web/components/layouts.ex:97
-#: lib/little_grape_web/live/matches_live.ex:229
+#: lib/little_grape_web/components/layouts.ex:110
+#: lib/little_grape_web/components/layouts.ex:163
+#: lib/little_grape_web/live/matches_live.ex:171
 #, elixir-autogen, elixir-format
 msgid "Matches"
 msgstr "Matches"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:96
+#: lib/little_grape_web/controllers/user_profile_html.ex:99
 #, elixir-autogen, elixir-format
 msgid "Maybe"
 msgstr "Maybe"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:27
+#: lib/little_grape_web/controllers/user_profile_html.ex:30
 #, elixir-autogen, elixir-format
 msgid "Montenegro"
 msgstr "Montenegro"
@@ -712,22 +711,22 @@ msgstr "Montenegro"
 msgid "More Than Dating —"
 msgstr "More Than Dating —"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:132
+#: lib/little_grape_web/controllers/user_profile_html.ex:124
 #, elixir-autogen, elixir-format
 msgid "Movies"
 msgstr "Movies"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:59
+#: lib/little_grape_web/controllers/user_profile_html.ex:62
 #, elixir-autogen, elixir-format
 msgid "Muscular"
 msgstr "Muscular"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:128
+#: lib/little_grape_web/controllers/user_profile_html.ex:120
 #, elixir-autogen, elixir-format
 msgid "Music"
 msgstr "Music"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:108
+#: lib/little_grape_web/controllers/user_profile_html.ex:111
 #, elixir-autogen, elixir-format
 msgid "Muslim"
 msgstr "Muslim"
@@ -737,86 +736,85 @@ msgstr "Muslim"
 msgid "My Profile"
 msgstr "My Profile"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:135
+#: lib/little_grape_web/controllers/user_profile_html.ex:127
 #, elixir-autogen, elixir-format
 msgid "Nature"
 msgstr "Nature"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:38
+#: lib/little_grape_web/controllers/user_profile_html.ex:41
 #, elixir-autogen, elixir-format
 msgid "Netherlands"
 msgstr "Netherlands"
 
-#: lib/little_grape_web/controllers/user_settings_html/edit_email.html.heex:17
+#: lib/little_grape_web/controllers/user_settings_html/edit_email.html.heex:14
 #, elixir-autogen, elixir-format
 msgid "New Email"
 msgstr "New Email"
 
-#: lib/little_grape_web/controllers/user_settings_html/edit_password.html.heex:22
+#: lib/little_grape_web/controllers/user_settings_html/edit_password.html.heex:19
 #, elixir-autogen, elixir-format
 msgid "New password"
 msgstr "New password"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:95
+#: lib/little_grape_web/controllers/user_profile_html.ex:98
 #: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:323
 #, elixir-autogen, elixir-format
 msgid "No"
 msgstr "No"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:89
+#: lib/little_grape_web/controllers/user_profile_html.ex:92
 #, elixir-autogen, elixir-format
 msgid "Non-drinker"
 msgstr "Non-drinker"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:84
+#: lib/little_grape_web/controllers/user_profile_html.ex:87
 #, elixir-autogen, elixir-format
 msgid "Non-smoker"
 msgstr "Non-smoker"
 
 #: lib/little_grape_web/controllers/page_html/home.html.heex:261
-#: lib/little_grape_web/controllers/user_profile_html.ex:26
+#: lib/little_grape_web/controllers/user_profile_html.ex:29
 #, elixir-autogen, elixir-format
 msgid "North Macedonia"
 msgstr "North Macedonia"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:45
+#: lib/little_grape_web/controllers/user_profile_html.ex:48
 #, elixir-autogen, elixir-format
 msgid "Norway"
 msgstr "Norway"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:81
+#: lib/little_grape_web/controllers/user_profile_html.ex:84
 #, elixir-autogen, elixir-format
 msgid "Not Sure"
 msgstr "Not Sure"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:85
+#: lib/little_grape_web/controllers/user_profile_html.ex:88
 #, elixir-autogen, elixir-format
 msgid "Occasional smoker"
 msgstr "Occasional smoker"
 
 #: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:244
-#: lib/little_grape_web/live/discover_live.ex:381
+#: lib/little_grape_web/live/discover_live.ex:313
 #, elixir-autogen, elixir-format
 msgid "Occupation"
 msgstr "Occupation"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:109
+#: lib/little_grape_web/controllers/user_profile_html.ex:112
 #, elixir-autogen, elixir-format
 msgid "Orthodox Christian"
 msgstr "Orthodox Christian"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:22
-#: lib/little_grape_web/controllers/user_profile_html.ex:53
-#: lib/little_grape_web/controllers/user_profile_html.ex:75
-#: lib/little_grape_web/controllers/user_profile_html.ex:105
-#: lib/little_grape_web/controllers/user_profile_html.ex:112
-#: lib/little_grape_web/controllers/user_profile_html.ex:124
-#: lib/little_grape_web/live/discover_live.ex:466
+#: lib/little_grape_web/controllers/user_profile_html.ex:25
+#: lib/little_grape_web/controllers/user_profile_html.ex:56
+#: lib/little_grape_web/controllers/user_profile_html.ex:78
+#: lib/little_grape_web/controllers/user_profile_html.ex:108
+#: lib/little_grape_web/controllers/user_profile_html.ex:115
+#: lib/little_grape_web/profile_options.ex:21
 #, elixir-autogen, elixir-format
 msgid "Other"
 msgstr "Other"
 
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:436
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:428
 #, elixir-autogen, elixir-format
 msgid "Other Languages"
 msgstr "Other Languages"
@@ -826,53 +824,53 @@ msgstr "Other Languages"
 msgid "Our algorithm considers cultural values, family traditions, and personal preferences for meaningful connections."
 msgstr "Our algorithm considers cultural values, family traditions, and personal preferences for meaningful connections."
 
-#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:29
-#: lib/little_grape_web/controllers/user_session_html/new.html.heex:42
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:26
+#: lib/little_grape_web/controllers/user_session_html/new.html.heex:32
 #, elixir-autogen, elixir-format
 msgid "Password"
 msgstr "Password"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:138
+#: lib/little_grape_web/controllers/user_profile_html.ex:130
 #, elixir-autogen, elixir-format
 msgid "Photography"
 msgstr "Photography"
 
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:470
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:462
 #, elixir-autogen, elixir-format
 msgid "Physical Attributes"
 msgstr "Physical Attributes"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:60
+#: lib/little_grape_web/controllers/user_profile_html.ex:63
 #, elixir-autogen, elixir-format
 msgid "Plus Size"
 msgstr "Plus Size"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:49
+#: lib/little_grape_web/controllers/user_profile_html.ex:52
 #, elixir-autogen, elixir-format
 msgid "Portugal"
 msgstr "Portugal"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:113
+#: lib/little_grape_web/controllers/user_profile_html.ex:116
 #, elixir-autogen, elixir-format
 msgid "Prefer not to say"
 msgstr "Prefer not to say"
 
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:556
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:548
 #, elixir-autogen, elixir-format
 msgid "Preferences"
 msgstr "Preferences"
 
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:615
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:607
 #, elixir-autogen, elixir-format
 msgid "Preferred Age (Max)"
 msgstr "Preferred Age (Max)"
 
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:599
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:591
 #, elixir-autogen, elixir-format
 msgid "Preferred Age (Min)"
 msgstr "Preferred Age (Min)"
 
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:631
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:623
 #, elixir-autogen, elixir-format
 msgid "Preferred Country"
 msgstr "Preferred Country"
@@ -888,7 +886,8 @@ msgid "Privacy Policy"
 msgstr "Privacy Policy"
 
 ## Profile
-#: lib/little_grape_web/components/layouts.ex:100
+#: lib/little_grape_web/components/layouts.ex:113
+#: lib/little_grape_web/components/layouts.ex:166
 #, elixir-autogen, elixir-format
 msgid "Profile"
 msgstr "Profile"
@@ -905,7 +904,7 @@ msgstr "Profile"
 msgid "Profile picture"
 msgstr "Profile"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:130
+#: lib/little_grape_web/controllers/user_profile_html.ex:122
 #, elixir-autogen, elixir-format
 msgid "Reading"
 msgstr "Reading"
@@ -916,33 +915,33 @@ msgstr "Reading"
 msgid "Ready to Find Your Albanian Match?"
 msgstr "Ready to Find Your Albanian Match?"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:72
+#: lib/little_grape_web/controllers/user_profile_html.ex:75
 #, elixir-autogen, elixir-format
 msgid "Red"
 msgstr "Red"
 
-#: lib/little_grape_web/controllers/user_registration_html/new.html.heex:11
+#: lib/little_grape_web/controllers/user_registration_html/new.html.heex:5
 #, elixir-autogen, elixir-format
 msgid "Register for an account"
 msgstr "Register for an account"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:91
+#: lib/little_grape_web/controllers/user_profile_html.ex:94
 #, elixir-autogen, elixir-format
 msgid "Regular drinker"
 msgstr "Regular drinker"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:86
+#: lib/little_grape_web/controllers/user_profile_html.ex:89
 #, elixir-autogen, elixir-format
 msgid "Regular smoker"
 msgstr "Regular smoker"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:79
+#: lib/little_grape_web/controllers/user_profile_html.ex:82
 #, elixir-autogen, elixir-format
 msgid "Relationship"
 msgstr "Relationship"
 
 #: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:388
-#: lib/little_grape_web/live/discover_live.ex:417
+#: lib/little_grape_web/live/discover_live.ex:349
 #, elixir-autogen, elixir-format
 msgid "Religion"
 msgstr "Religion"
@@ -957,17 +956,17 @@ msgstr "Report an Issue"
 msgid "Safety Tips"
 msgstr "Safety Tips"
 
-#: lib/little_grape_web/controllers/user_settings_html/edit_password.html.heex:49
+#: lib/little_grape_web/controllers/user_settings_html/edit_password.html.heex:35
 #, elixir-autogen, elixir-format
 msgid "Save Password"
 msgstr "Save Password"
 
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:697
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:689
 #, elixir-autogen, elixir-format
 msgid "Save Profile"
 msgstr "Save Profile"
 
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:671
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:663
 #, elixir-autogen, elixir-format
 msgid "Select your interests to help find better matches"
 msgstr "Select your interests to help find better matches"
@@ -980,49 +979,49 @@ msgstr "Select your interests to help find better matches"
 #: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:337
 #: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:377
 #: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:393
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:494
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:510
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:526
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:566
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:584
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:637
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:486
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:502
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:518
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:558
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:576
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:629
 #, elixir-autogen, elixir-format
 msgid "Select..."
 msgstr "Select..."
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:28
+#: lib/little_grape_web/controllers/user_profile_html.ex:31
 #, elixir-autogen, elixir-format
 msgid "Serbia"
 msgstr "Serbia"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:121
-#: lib/little_grape_web/live/discover_live.ex:463
+#: lib/little_grape_web/profile_options.ex:18
 #, elixir-autogen, elixir-format
 msgid "Serbian"
 msgstr "Serbian"
 
-#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:12
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:8
 #, elixir-autogen, elixir-format
 msgid "Set your password to complete registration."
 msgstr "Set your password to complete registration."
 
-#: lib/little_grape_web/components/layouts.ex:114
+#: lib/little_grape_web/components/layouts.ex:127
+#: lib/little_grape_web/components/layouts.ex:180
 #, elixir-autogen, elixir-format
 msgid "Sign Up"
 msgstr "Sign Up"
 
-#: lib/little_grape_web/controllers/user_session_html/new.html.heex:20
+#: lib/little_grape_web/controllers/user_session_html/new.html.heex:13
 #, elixir-autogen, elixir-format
 msgid "Sign up"
 msgstr "Sign up"
 
 ## Body Type Options
-#: lib/little_grape_web/controllers/user_profile_html.ex:55
+#: lib/little_grape_web/controllers/user_profile_html.ex:58
 #, elixir-autogen, elixir-format
 msgid "Slim"
 msgstr "Slim"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:31
+#: lib/little_grape_web/controllers/user_profile_html.ex:34
 #, elixir-autogen, elixir-format
 msgid "Slovenia"
 msgstr "Slovenia"
@@ -1033,22 +1032,22 @@ msgid "Smart Matching"
 msgstr "Smart Matching"
 
 #: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:279
-#: lib/little_grape_web/live/discover_live.ex:424
+#: lib/little_grape_web/live/discover_live.ex:356
 #, elixir-autogen, elixir-format
 msgid "Smoking"
 msgstr "Smoking"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:90
+#: lib/little_grape_web/controllers/user_profile_html.ex:93
 #, elixir-autogen, elixir-format
 msgid "Social drinker"
 msgstr "Social drinker"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:101
+#: lib/little_grape_web/controllers/user_profile_html.ex:104
 #, elixir-autogen, elixir-format
 msgid "Some College"
 msgstr "Some College"
 
-#: lib/little_grape_web/components/layouts.ex:187
+#: lib/little_grape_web/components/layouts.ex:367
 #, elixir-autogen, elixir-format
 msgid "Something went wrong!"
 msgstr "Something went wrong!"
@@ -1058,12 +1057,12 @@ msgstr "Something went wrong!"
 msgid "Soulmate"
 msgstr "Soulmate"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:48
+#: lib/little_grape_web/controllers/user_profile_html.ex:51
 #, elixir-autogen, elixir-format
 msgid "Spain"
 msgstr "Spain"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:127
+#: lib/little_grape_web/controllers/user_profile_html.ex:119
 #, elixir-autogen, elixir-format
 msgid "Sports"
 msgstr "Sports"
@@ -1083,17 +1082,17 @@ msgstr "Successful Matches"
 msgid "Support"
 msgstr "Support"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:44
+#: lib/little_grape_web/controllers/user_profile_html.ex:47
 #, elixir-autogen, elixir-format
 msgid "Sweden"
 msgstr "Sweden"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:36
+#: lib/little_grape_web/controllers/user_profile_html.ex:39
 #, elixir-autogen, elixir-format
 msgid "Switzerland"
 msgstr "Switzerland"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:136
+#: lib/little_grape_web/controllers/user_profile_html.ex:128
 #, elixir-autogen, elixir-format
 msgid "Technology"
 msgstr "Technology"
@@ -1118,38 +1117,37 @@ msgstr "Terms of Service"
 msgid "Traditional Wisdom"
 msgstr "Traditional Wisdom"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:129
+#: lib/little_grape_web/controllers/user_profile_html.ex:121
 #, elixir-autogen, elixir-format
 msgid "Travel"
 msgstr "Travel"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:50
+#: lib/little_grape_web/controllers/user_profile_html.ex:53
 #, elixir-autogen, elixir-format
 msgid "Turkey"
 msgstr "Turkey"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:123
-#: lib/little_grape_web/live/discover_live.ex:465
+#: lib/little_grape_web/profile_options.ex:20
 #, elixir-autogen, elixir-format
 msgid "Turkish"
 msgstr "Turkish"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:40
+#: lib/little_grape_web/controllers/user_profile_html.ex:43
 #, elixir-autogen, elixir-format
 msgid "United Kingdom"
 msgstr "United Kingdom"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:41
+#: lib/little_grape_web/controllers/user_profile_html.ex:44
 #, elixir-autogen, elixir-format
 msgid "United States"
 msgstr "United States"
 
-#: lib/little_grape_web/controllers/user_settings_html/edit_email.html.heex:11
+#: lib/little_grape_web/controllers/user_settings_html/edit_email.html.heex:6
 #, elixir-autogen, elixir-format
 msgid "Update your email address"
 msgstr "Update your email address"
 
-#: lib/little_grape_web/controllers/user_settings_html/edit_password.html.heex:11
+#: lib/little_grape_web/controllers/user_settings_html/edit_password.html.heex:6
 #, elixir-autogen, elixir-format
 msgid "Update your password"
 msgstr "Update your password"
@@ -1174,12 +1172,12 @@ msgstr "Verified Profiles"
 msgid "Wants Children"
 msgstr "Wants Children"
 
-#: lib/little_grape_web/components/layouts.ex:175
+#: lib/little_grape_web/components/layouts.ex:355
 #, elixir-autogen, elixir-format
 msgid "We can't find the internet"
 msgstr "We can't find the internet"
 
-#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:10
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:5
 #, elixir-autogen, elixir-format
 msgid "Welcome"
 msgstr "Welcome"
@@ -1194,7 +1192,7 @@ msgstr "Where there's smoke, there's fire. Where there's love, there's family."
 msgid "Whether you're looking for someone who appreciates our traditions, speaks the language, or simply shares your Albanian heritage, you'll find them here."
 msgstr "Whether you're looking for someone who appreciates our traditions, speaks the language, or simply shares your Albanian heritage, you'll find them here."
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:74
+#: lib/little_grape_web/controllers/user_profile_html.ex:77
 #, elixir-autogen, elixir-format
 msgid "White"
 msgstr "White"
@@ -1205,18 +1203,18 @@ msgstr "White"
 msgid "Why Choose Zemra Ime?"
 msgstr "Why Choose Zemra Ime?"
 
-#: lib/little_grape_web/controllers/user_profile_html.ex:94
+#: lib/little_grape_web/controllers/user_profile_html.ex:97
 #: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:320
 #, elixir-autogen, elixir-format
 msgid "Yes"
 msgstr "Yes"
 
-#: lib/little_grape_web/controllers/user_session_html/new.html.heex:13
+#: lib/little_grape_web/controllers/user_session_html/new.html.heex:9
 #, elixir-autogen, elixir-format
 msgid "You need to reauthenticate to perform sensitive actions on your account."
 msgstr "You need to reauthenticate to perform sensitive actions on your account."
 
-#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:15
+#: lib/little_grape_web/controllers/user_session_html/confirm.html.heex:11
 #, elixir-autogen, elixir-format
 msgid "Your account is confirmed. Click below to log in."
 msgstr "Your account is confirmed. Click below to log in."
@@ -1236,17 +1234,17 @@ msgstr "Zemra Ime (meaning \"My Heart\" in Albanian) captures the essence of wha
 msgid "close"
 msgstr "close"
 
-#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:442
+#: lib/little_grape_web/controllers/user_profile_html/edit.html.heex:434
 #, elixir-autogen, elixir-format
 msgid "e.g., Greek, Spanish, Portuguese"
 msgstr "e.g., Greek, Spanish, Portuguese"
 
-#: lib/little_grape_web/controllers/user_session_html/new.html.heex:22
+#: lib/little_grape_web/controllers/user_session_html/new.html.heex:15
 #, elixir-autogen, elixir-format
 msgid "for an account now."
 msgstr "for an account now."
 
-#: lib/little_grape_web/controllers/user_registration_html/new.html.heex:18
+#: lib/little_grape_web/controllers/user_registration_html/new.html.heex:12
 #, elixir-autogen, elixir-format
 msgid "to your account now."
 msgstr "to your account now."
@@ -1256,22 +1254,23 @@ msgstr "to your account now."
 msgid "An email was sent to %{email}, please access it to confirm your account."
 msgstr "An email was sent to %{email}, please access it to confirm your account."
 
-#: lib/little_grape_web/components/chat_components.ex:21
+#: lib/little_grape_web/components/chat_components.ex:27
+#: lib/little_grape_web/components/chat_components.ex:37
 #, elixir-autogen, elixir-format
 msgid "Back"
 msgstr "Back"
 
-#: lib/little_grape_web/live/chat_live.ex:50
+#: lib/little_grape_web/live/chat_live.ex:42
 #, elixir-autogen, elixir-format
 msgid "Conversation not found"
 msgstr "Conversation not found"
 
-#: lib/little_grape_web/live/matches_live.ex:130
+#: lib/little_grape_web/live/matches_live.ex:105
 #, elixir-autogen, elixir-format
 msgid "Conversation not found."
 msgstr "Conversation not found."
 
-#: lib/little_grape_web/live/discover_live.ex:100
+#: lib/little_grape_web/live/discover_live.ex:101
 #, elixir-autogen, elixir-format
 msgid "Could not undo that pass."
 msgstr "Could not undo that pass."
@@ -1291,18 +1290,17 @@ msgstr "Email changed successfully."
 msgid "Failed to remove profile picture."
 msgstr "Failed to remove profile picture."
 
-#: lib/little_grape_web/live/chat_live.ex:94
-#: lib/little_grape_web/live/matches_live.ex:188
+#: lib/little_grape_web/live/message_sending.ex:38
 #, elixir-autogen, elixir-format
 msgid "Failed to send message. Please try again."
 msgstr "Failed to send message. Please try again."
 
-#: lib/little_grape_web/live/discover_live.ex:283
+#: lib/little_grape_web/live/discover_live.ex:145
 #, elixir-autogen, elixir-format
 msgid "Finding people near you..."
 msgstr "Finding people near you..."
 
-#: lib/little_grape_web/live/discover_live.ex:396
+#: lib/little_grape_web/live/discover_live.ex:328
 #, elixir-autogen, elixir-format
 msgid "Height"
 msgstr "Height"
@@ -1312,32 +1310,32 @@ msgstr "Height"
 msgid "Invalid email or password"
 msgstr "Invalid email or password"
 
-#: lib/little_grape_web/live/discover_live.ex:473
+#: lib/little_grape_web/live/discover_live.ex:394
 #, elixir-autogen, elixir-format
 msgid "It's a Match!"
 msgstr "It's a Match!"
 
-#: lib/little_grape_web/live/discover_live.ex:497
+#: lib/little_grape_web/live/discover_live.ex:418
 #, elixir-autogen, elixir-format
 msgid "Keep Swiping"
 msgstr "Keep Swiping"
 
-#: lib/little_grape_web/live/matches_live.ex:307
+#: lib/little_grape_web/live/matches_live.ex:239
 #, elixir-autogen, elixir-format
 msgid "Keep swiping to find your perfect match!"
 msgstr "Keep swiping to find your perfect match!"
 
-#: lib/little_grape_web/live/discover_live.ex:439
+#: lib/little_grape_web/live/discover_live.ex:371
 #, elixir-autogen, elixir-format
 msgid "Languages"
 msgstr "Languages"
 
-#: lib/little_grape_web/live/chat_live.ex:234
+#: lib/little_grape_web/live/chat_live.ex:119
 #, elixir-autogen, elixir-format
 msgid "Loading messages..."
 msgstr "Loading messages..."
 
-#: lib/little_grape_web/live/matches_live.ex:297
+#: lib/little_grape_web/live/matches_live.ex:174
 #, elixir-autogen, elixir-format
 msgid "Loading your matches..."
 msgstr "Loading your matches..."
@@ -1352,22 +1350,22 @@ msgstr "Logged out successfully."
 msgid "Magic link is invalid or it has expired."
 msgstr "Magic link is invalid or it has expired."
 
-#: lib/little_grape_web/live/matches_live.ex:369
+#: lib/little_grape_web/live/matches_live.ex:304
 #, elixir-autogen, elixir-format
 msgid "NEW MATCH"
 msgstr "NEW MATCH"
 
-#: lib/little_grape_web/live/matches_live.ex:306
+#: lib/little_grape_web/live/matches_live.ex:238
 #, elixir-autogen, elixir-format
 msgid "No matches yet"
 msgstr "No matches yet"
 
-#: lib/little_grape_web/components/chat_components.ex:73
+#: lib/little_grape_web/components/chat_components.ex:122
 #, elixir-autogen, elixir-format
 msgid "No messages yet"
 msgstr "No messages yet"
 
-#: lib/little_grape_web/live/discover_live.ex:210
+#: lib/little_grape_web/live/discover_live.ex:152
 #, elixir-autogen, elixir-format
 msgid "No more profiles right now"
 msgstr "No more profiles right now"
@@ -1377,12 +1375,12 @@ msgstr "No more profiles right now"
 msgid "Password updated successfully."
 msgstr "Password updated successfully."
 
-#: lib/little_grape_web/live/matches_live.ex:322
+#: lib/little_grape_web/live/matches_live.ex:254
 #, elixir-autogen, elixir-format
 msgid "Pick a match to chat"
 msgstr "Pick a match to chat"
 
-#: lib/little_grape_web/live/discover_live.ex:238
+#: lib/little_grape_web/live/discover_live.ex:180
 #, elixir-autogen, elixir-format
 msgid "Previously passed"
 msgstr "Previously passed"
@@ -1403,133 +1401,139 @@ msgstr "Profile"
 msgid "Profile updated successfully."
 msgstr "Profile updated successfully."
 
-#: lib/little_grape_web/live/discover_live.ex:269
+#: lib/little_grape_web/live/discover_live.ex:211
 #, elixir-autogen, elixir-format
 msgid "Reconsider"
 msgstr "Reconsider"
 
-#: lib/little_grape_web/live/discover_live.ex:240
+#: lib/little_grape_web/live/discover_live.ex:182
 #, elixir-autogen, elixir-format
 msgid "Reconsider someone — they'll re-enter your discovery feed."
 msgstr "Reconsider someone — they'll re-enter your discovery feed."
 
-#: lib/little_grape_web/components/chat_components.ex:75
+#: lib/little_grape_web/components/chat_components.ex:124
 #, elixir-autogen, elixir-format
 msgid "Say hello to %{name}!"
 msgstr "Say hello to %{name}!"
 
-#: lib/little_grape_web/live/discover_live.ex:151
-#, elixir-autogen, elixir-format
-msgid "Something went wrong creating the match. Please try again."
-msgstr "Something went wrong creating the match. Please try again."
-
-#: lib/little_grape_web/live/discover_live.ex:72
+#: lib/little_grape_web/live/discover_live.ex:71
 #, elixir-autogen, elixir-format
 msgid "Something went wrong. Please try again."
 msgstr "Something went wrong. Please try again."
 
-#: lib/little_grape_web/live/matches_live.ex:312
+#: lib/little_grape_web/live/matches_live.ex:244
 #, elixir-autogen, elixir-format
 msgid "Start Discovering"
 msgstr "Start Discovering"
 
-#: lib/little_grape_web/live/matches_live.ex:446
+#: lib/little_grape_web/live/matches_live.ex:381
 #, elixir-autogen, elixir-format
 msgid "Start a conversation!"
 msgstr "Start a conversation!"
 
-#: lib/little_grape_web/live/discover_live.ex:446
+#: lib/little_grape_web/live/discover_live.ex:378
 #, elixir-autogen, elixir-format
 msgid "Tap photo to collapse"
 msgstr "Tap photo to collapse"
 
-#: lib/little_grape_web/live/discover_live.ex:325
+#: lib/little_grape_web/live/discover_live.ex:257
 #, elixir-autogen, elixir-format
 msgid "Tap to see more"
 msgstr "Tap to see more"
 
-#: lib/little_grape_web/controllers/user_session_controller.ex:87
+#: lib/little_grape_web/controllers/user_session_controller.ex:89
 #, elixir-autogen, elixir-format
 msgid "The link is invalid or it has expired."
 msgstr "The link is invalid or it has expired."
 
-#: lib/little_grape_web/live/matches_live.ex:323
+#: lib/little_grape_web/live/matches_live.ex:255
 #, elixir-autogen, elixir-format
 msgid "Their conversation will appear here."
 msgstr "Their conversation will appear here."
 
-#: lib/little_grape_web/live/discover_live.ex:212
+#: lib/little_grape_web/live/discover_live.ex:154
 #, elixir-autogen, elixir-format
 msgid "Try broadening your preferences to see more people!"
 msgstr "Try broadening your preferences to see more people!"
 
-#: lib/little_grape_web/components/chat_components.ex:127
+#: lib/little_grape_web/components/chat_components.ex:176
 #, elixir-autogen, elixir-format
 msgid "Type a message..."
 msgstr "Type a message..."
 
-#: lib/little_grape_web/live/discover_live.ex:218
+#: lib/little_grape_web/live/discover_live.ex:160
 #, elixir-autogen, elixir-format
 msgid "Update Preferences"
 msgstr "Update Preferences"
 
-#: lib/little_grape_web/controllers/user_session_controller.ex:70
+#: lib/little_grape_web/controllers/user_session_controller.ex:71
 #, elixir-autogen, elixir-format
 msgid "User confirmed successfully."
 msgstr "User confirmed successfully."
 
 #: lib/little_grape_web/controllers/user_session_controller.ex:37
-#: lib/little_grape_web/controllers/user_session_controller.ex:71
+#: lib/little_grape_web/controllers/user_session_controller.ex:73
 #, elixir-autogen, elixir-format
 msgid "Welcome back!"
 msgstr "Welcome back!"
 
-#: lib/little_grape_web/live/discover_live.ex:490
+#: lib/little_grape_web/live/discover_live.ex:411
 #, elixir-autogen, elixir-format
 msgid "You and %{name} liked each other!"
 msgstr "You and %{name} liked each other!"
 
-#: lib/little_grape_web/user_auth.ex:228
+#: lib/little_grape_web/user_auth.ex:107
+#: lib/little_grape_web/user_auth.ex:248
 #, elixir-autogen, elixir-format
 msgid "You must log in to access this page."
 msgstr "You must log in to access this page."
 
-#: lib/little_grape_web/user_auth.ex:198
+#: lib/little_grape_web/user_auth.ex:218
 #, elixir-autogen, elixir-format
 msgid "You must re-authenticate to access this page."
 msgstr "You must re-authenticate to access this page."
 
-#: lib/little_grape_web/live/matches_live.ex:407
+#: lib/little_grape_web/live/matches_live.ex:342
 #, elixir-autogen, elixir-format
 msgid "AI Match"
 msgstr "AI Match"
 
-#: lib/little_grape_web/live/matches_live.ex:434
+#: lib/little_grape_web/live/matches_live.ex:371
 #, elixir-autogen, elixir-format
 msgid "Lives in %{country}"
 msgstr "Lives in %{country}"
 
-#: lib/little_grape_web/live/matches_live.ex:435
+#: lib/little_grape_web/live/matches_live.ex:373
 #, elixir-autogen, elixir-format
 msgid "Same religion"
 msgstr "Same religion"
 
-#: lib/little_grape_web/live/matches_live.ex:438
+#: lib/little_grape_web/live/matches_live.ex:376
 #, elixir-autogen, elixir-format
 msgid "Shared interests: %{list}"
 msgstr "Shared interests: %{list}"
 
-#: lib/little_grape_web/live/matches_live.ex:441
+#: lib/little_grape_web/live/matches_live.ex:379
 #, elixir-autogen, elixir-format
 msgid "Shared languages: %{list}"
 msgstr "Shared languages: %{list}"
 
-#: lib/little_grape_web/live/matches_live.ex:433
+#: lib/little_grape_web/live/matches_live.ex:368
 #, elixir-autogen, elixir-format
 msgid "Within your preferred age range"
 msgstr "Within your preferred age range"
 
-#: lib/little_grape_web/live/matches_live.ex:409
+#: lib/little_grape_web/live/matches_live.ex:344
 #, elixir-autogen, elixir-format
 msgid "picked just for you"
 msgstr "picked just for you"
+
+#: lib/little_grape_web/components/layouts.ex:221
+#, elixir-autogen, elixir-format
+msgid "Change language"
+msgstr ""
+
+#: lib/little_grape_web/components/layouts.ex:140
+#, elixir-autogen, elixir-format
+msgid "Toggle menu"
+msgstr ""

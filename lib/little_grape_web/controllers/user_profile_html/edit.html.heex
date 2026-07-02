@@ -414,15 +414,7 @@
                       checked={option in (f[:languages].value || [])}
                       class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
                       id={"language_#{option}"}
-                      phx-click={
-                        if option == "other",
-                          do: Phoenix.LiveView.JS.toggle(to: "#other_languages_input")
-                      }
-                      onclick={
-                        if option == "other",
-                          do:
-                            "document.getElementById('other_languages_input').classList.toggle('hidden')"
-                      }
+                      data-toggle-hidden={if option == "other", do: "#other_languages_input"}
                     />
                     <span class="text-gray-700">{translate_option(option, :language)}</span>
                   </label>
@@ -702,41 +694,14 @@
 
     <!-- Language Switcher -->
     <div class="mt-6 text-center">
-      <div class="inline-flex items-center gap-2">
-        <a
-          href="?locale=sq"
-          class={"px-3 py-1.5 text-sm font-medium rounded-full transition #{if Gettext.get_locale(LittleGrapeWeb.Gettext) == "sq", do: "bg-red-600 text-white", else: "text-gray-500 hover:bg-red-50"}"}
-        >
-          SQ
-        </a>
-        <span class="text-gray-300">|</span>
-        <a
-          href="?locale=en"
-          class={"px-3 py-1.5 text-sm font-medium rounded-full transition #{if Gettext.get_locale(LittleGrapeWeb.Gettext) == "en", do: "bg-red-600 text-white", else: "text-gray-500 hover:bg-red-50"}"}
-        >
-          EN
-        </a>
-      </div>
+      <Layouts.language_switcher locale={@locale} />
     </div>
   </div>
 </div>
 
-<!-- Flatpickr Date Picker -->
+<!-- Flatpickr Date Picker (initialized from assets/js/app.js — no inline JS) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/flatpickr">
-</script>
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const currentYear = new Date().getFullYear();
-    flatpickr("#birthdate-picker", {
-      dateFormat: "Y-m-d",
-      defaultDate: document.getElementById("birthdate-picker").value || null,
-      minDate: (currentYear - 100) + "-01-01",
-      maxDate: (currentYear - 18) + "-12-31",
-      monthSelectorType: "dropdown",
-      yearSelectorType: "dropdown"
-    });
-  });
 </script>
 <style>
   .flatpickr-months .flatpickr-month {

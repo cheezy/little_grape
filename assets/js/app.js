@@ -107,3 +107,41 @@ if (process.env.NODE_ENV === "development") {
   })
 }
 
+
+// --- CSP-safe delegated handlers (replace inline on* attributes) ---
+
+// Language switcher: preserve the current path AND all query params.
+document.addEventListener("change", e => {
+  const switcher = e.target.closest("[data-locale-switcher]")
+  if (!switcher) return
+  const url = new URL(window.location.href)
+  url.searchParams.set("locale", switcher.value)
+  window.location.assign(url.toString())
+})
+
+// Generic visibility toggler: data-toggle-hidden holds a selector list;
+// clicking toggles the `hidden` class on every match. Used by the mobile
+// menu button (layouts.ex) and the "other languages" checkbox (profile edit).
+document.addEventListener("click", e => {
+  const toggler = e.target.closest("[data-toggle-hidden]")
+  if (!toggler) return
+  document
+    .querySelectorAll(toggler.getAttribute("data-toggle-hidden"))
+    .forEach(el => el.classList.toggle("hidden"))
+})
+
+// Flatpickr init for the profile edit page (was an inline <script>).
+// app.js is deferred, so the parser-blocking flatpickr CDN script at the end
+// of that template has already executed; guard anyway in case the CDN fails.
+const birthdatePicker = document.getElementById("birthdate-picker")
+if (birthdatePicker && typeof window.flatpickr === "function") {
+  const currentYear = new Date().getFullYear()
+  window.flatpickr(birthdatePicker, {
+    dateFormat: "Y-m-d",
+    defaultDate: birthdatePicker.value || null,
+    minDate: (currentYear - 100) + "-01-01",
+    maxDate: (currentYear - 18) + "-12-31",
+    monthSelectorType: "dropdown",
+    yearSelectorType: "dropdown",
+  })
+}

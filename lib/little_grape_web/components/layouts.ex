@@ -11,6 +11,19 @@ defmodule LittleGrapeWeb.Layouts do
   # and other static content.
   embed_templates "layouts/*"
 
+  @locale_labels %{
+    "sq" => "Shqip",
+    "en" => "English",
+    "it" => "Italiano",
+    "el" => "Ελληνικά",
+    "de" => "Deutsch",
+    "fr" => "Français"
+  }
+  @locale_options Enum.map(
+                    LittleGrapeWeb.Plugs.Locale.locales(),
+                    &{&1, Map.fetch!(@locale_labels, &1)}
+                  )
+
   @doc """
   Renders your app layout.
 
@@ -123,7 +136,7 @@ defmodule LittleGrapeWeb.Layouts do
           <button
             type="button"
             class="p-2 rounded-lg text-gray-600 hover:text-red-600 hover:bg-gray-100 transition"
-            onclick="['mobile-menu','mobile-menu-open-icon','mobile-menu-close-icon'].forEach(id => document.getElementById(id).classList.toggle('hidden'))"
+            data-toggle-hidden="#mobile-menu, #mobile-menu-open-icon, #mobile-menu-close-icon"
             aria-label={gettext("Toggle menu")}
             aria-controls="mobile-menu"
           >
@@ -190,21 +203,133 @@ defmodule LittleGrapeWeb.Layouts do
     """
   end
 
+  @doc """
+  Locale selector offering every supported locale.
+
+  Navigation is handled by a delegated `change` listener in assets/js/app.js
+  (keyed on `data-locale-switcher`) that preserves the current path and query
+  params. No inline JS (CSP-safe).
+  """
   attr :locale, :string, required: true
 
-  defp language_switcher(assigns) do
+  def language_switcher(assigns) do
+    assigns = assign(assigns, :locale_options, @locale_options)
+
     ~H"""
     <select
-      onchange="window.location.href = window.location.pathname + '?locale=' + this.value"
+      data-locale-switcher
+      aria-label={gettext("Change language")}
       class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
     >
-      <option value="sq" selected={@locale == "sq"}>Shqip</option>
-      <option value="en" selected={@locale == "en"}>English</option>
-      <option value="it" selected={@locale == "it"}>Italiano</option>
-      <option value="el" selected={@locale == "el"}>Ελληνικά</option>
-      <option value="de" selected={@locale == "de"}>Deutsch</option>
-      <option value="fr" selected={@locale == "fr"}>Français</option>
+      <option :for={{code, label} <- @locale_options} value={code} selected={@locale == code}>
+        {label}
+      </option>
     </select>
+    """
+  end
+
+  @doc """
+  Card shell for the auth pages (log in, register, confirm): top nav, gradient
+  backdrop, centered white card with flash and a title/subtitle header.
+  """
+  attr :flash, :map, required: true
+  attr :current_scope, :map, default: nil
+  attr :locale, :string, default: "sq"
+  attr :title, :string, required: true
+  slot :subtitle
+  slot :inner_block, required: true
+
+  def auth_card(assigns) do
+    ~H"""
+    <.top_nav current_scope={@current_scope} locale={@locale} />
+
+    <div class="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-100 flex items-center justify-center px-4 py-12">
+      <div class="w-full max-w-md">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
+          <.flash_group flash={@flash} />
+
+          <div class="text-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">{@title}</h1>
+            <p :if={@subtitle != []} class="text-gray-600">{render_slot(@subtitle)}</p>
+          </div>
+
+          {render_slot(@inner_block)}
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  @doc """
+  Card shell for the account settings pages: like `auth_card` but wider and
+  top-aligned, with a divider, a cross-link to the sibling settings page, and
+  the language switcher below the card.
+  """
+  attr :flash, :map, required: true
+  attr :current_scope, :map, default: nil
+  attr :locale, :string, default: "sq"
+  attr :title, :string, required: true
+  attr :subtitle, :string, default: nil
+  attr :link_href, :string, required: true
+  attr :link_text, :string, required: true
+  slot :inner_block, required: true
+
+  def settings_card(assigns) do
+    ~H"""
+    <.top_nav current_scope={@current_scope} locale={@locale} />
+
+    <div class="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-100 py-12">
+      <div class="max-w-2xl mx-auto px-4">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
+          <.flash_group flash={@flash} />
+
+          <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">{@title}</h1>
+            <p :if={@subtitle} class="text-gray-600">{@subtitle}</p>
+          </div>
+
+          {render_slot(@inner_block)}
+
+          <div class="border-t border-gray-200 my-8"></div>
+
+          <div class="text-center">
+            <.link href={@link_href} class="text-red-600 hover:text-red-700 font-medium">
+              {@link_text}
+            </.link>
+          </div>
+        </div>
+
+        <div class="mt-6 text-center">
+          <.language_switcher locale={@locale} />
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  @doc """
+  Labeled input matching the auth/settings pages' visual style, with inline
+  error rendering for the given form field.
+  """
+  attr :field, Phoenix.HTML.FormField, required: true
+  attr :label, :string, required: true
+  attr :type, :string, default: "text"
+  attr :wrapper_class, :string, default: "mb-4"
+  attr :rest, :global, include: ~w(autocomplete required readonly placeholder)
+
+  def auth_input(assigns) do
+    ~H"""
+    <div class={@wrapper_class}>
+      <label class="block text-gray-700 font-medium mb-2">{@label}</label>
+      <input
+        type={@type}
+        name={@field.name}
+        value={if @type != "password", do: Phoenix.HTML.Form.normalize_value(@type, @field.value)}
+        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-500 focus:ring-2 focus:ring-red-100 transition outline-none"
+        {@rest}
+      />
+      <.error :for={msg <- @field.errors}>{translate_error(msg)}</.error>
+    </div>
     """
   end
 
