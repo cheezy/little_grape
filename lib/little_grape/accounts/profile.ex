@@ -119,6 +119,17 @@ defmodule LittleGrape.Accounts.Profile do
     "fashion"
   ]
 
+  # Canonical list of fields a profile must have to be considered complete.
+  # Consumed by Accounts.profile_complete?/1, Accounts.missing_profile_fields/1,
+  # and Discovery.require_complete_profile/1.
+  @required_profile_fields [
+    {:profile_picture, "Profile photo"},
+    {:first_name, "First name"},
+    {:birthdate, "Birthdate"},
+    {:gender, "Gender"},
+    {:preferred_gender, "Gender preference"}
+  ]
+
   def gender_options, do: @gender_options
   def body_type_options, do: @body_type_options
   def eye_color_options, do: @eye_color_options
@@ -132,6 +143,7 @@ defmodule LittleGrape.Accounts.Profile do
   def religion_options, do: @religion_options
   def language_options, do: @language_options
   def interest_options, do: @interest_options
+  def required_profile_fields, do: @required_profile_fields
 
   @doc """
   A profile changeset for creating or updating profile information.

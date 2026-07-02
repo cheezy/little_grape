@@ -294,6 +294,19 @@ defmodule LittleGrape.DiscoveryTest do
       assert complete_user.id in result_ids
       refute no_profile_user.id in result_ids
     end
+
+    test "excludes users without preferred_gender" do
+      complete_user = create_user_with_complete_profile()
+      incomplete_user = create_user_with_complete_profile(%{preferred_gender: nil})
+
+      result_ids =
+        Discovery.base_query()
+        |> Discovery.require_complete_profile()
+        |> get_user_ids()
+
+      assert complete_user.id in result_ids
+      refute incomplete_user.id in result_ids
+    end
   end
 
   describe "filter_by_mutual_gender_preferences/3" do
@@ -909,6 +922,7 @@ defmodule LittleGrape.DiscoveryTest do
         preferred_age_min: 25,
         preferred_age_max: 35,
         country: "US",
+        preferred_country: "US",
         interests: ["music", "travel"],
         languages: ["en", "es"],
         religion: "other",
@@ -940,6 +954,7 @@ defmodule LittleGrape.DiscoveryTest do
         preferred_age_min: 25,
         preferred_age_max: 35,
         country: "US",
+        preferred_country: "US",
         interests: ["music", "travel"],
         languages: ["en"],
         religion: "muslim",
@@ -1100,10 +1115,38 @@ defmodule LittleGrape.DiscoveryTest do
       assert liked_score != nil
       assert no_like_score != nil
     end
+
+    test "bounds the candidate pool via SQL limit" do
+      user =
+        create_user_with_complete_profile(%{gender: "male", preferred_gender: "female"})
+
+      for _ <- 1..5 do
+        create_user_with_complete_profile(%{gender: "female", preferred_gender: "male"})
+      end
+
+      query = Discovery.apply_hard_filters(user)
+      ranked = Discovery.score_and_rank(user, query, pool_size: 2)
+
+      assert length(ranked) == 2
+    end
+
+    test "returns all candidates when fewer than the pool size" do
+      user =
+        create_user_with_complete_profile(%{gender: "male", preferred_gender: "female"})
+
+      for _ <- 1..3 do
+        create_user_with_complete_profile(%{gender: "female", preferred_gender: "male"})
+      end
+
+      query = Discovery.apply_hard_filters(user)
+      ranked = Discovery.score_and_rank(user, query)
+
+      assert length(ranked) == 3
+    end
   end
 
-  describe "get_discovery_feed/2" do
-    test "returns ranked list of candidates" do
+  describe "get_candidates/2" do
+    test "returns Profile structs" do
       user =
         create_user_with_complete_profile(%{
           gender: "male",
@@ -1116,62 +1159,35 @@ defmodule LittleGrape.DiscoveryTest do
           preferred_gender: "male"
         })
 
-      feed = Discovery.get_discovery_feed(user)
-
-      assert length(feed) == 1
-      assert hd(feed).id == candidate.id
-    end
-
-    test "respects limit option" do
-      user =
-        create_user_with_complete_profile(%{
-          gender: "male",
-          preferred_gender: "female"
-        })
-
-      for _ <- 1..5 do
-        create_user_with_complete_profile(%{
-          gender: "female",
-          preferred_gender: "male"
-        })
-      end
-
-      feed = Discovery.get_discovery_feed(user, limit: 3)
-
-      assert length(feed) == 3
-    end
-
-    test "returns empty list when no candidates match" do
-      user =
-        create_user_with_complete_profile(%{
-          gender: "male",
-          preferred_gender: "female"
-        })
-
-      feed = Discovery.get_discovery_feed(user)
-
-      assert feed == []
-    end
-  end
-
-  describe "get_candidates/2" do
-    test "returns Profile structs" do
-      user =
-        create_user_with_complete_profile(%{
-          gender: "male",
-          preferred_gender: "female"
-        })
-
-      _candidate =
-        create_user_with_complete_profile(%{
-          gender: "female",
-          preferred_gender: "male"
-        })
-
       candidates = Discovery.get_candidates(user)
 
       assert length(candidates) == 1
       assert [%Profile{}] = candidates
+      assert hd(candidates).user_id == candidate.id
+    end
+
+    test "end-to-end feed excludes blocked and swiped users" do
+      user =
+        create_user_with_complete_profile(%{
+          gender: "male",
+          preferred_gender: "female"
+        })
+
+      blocked =
+        create_user_with_complete_profile(%{gender: "female", preferred_gender: "male"})
+
+      swiped =
+        create_user_with_complete_profile(%{gender: "female", preferred_gender: "male"})
+
+      remaining =
+        create_user_with_complete_profile(%{gender: "female", preferred_gender: "male"})
+
+      {:ok, _block} = LittleGrape.Blocks.block_user(user, blocked.id)
+      {:ok, _swipe} = LittleGrape.Swipes.create_swipe(user, swiped.id, "like")
+
+      candidates = Discovery.get_candidates(user)
+
+      assert Enum.map(candidates, & &1.user_id) == [remaining.id]
     end
 
     test "returns profiles ordered by compatibility score descending" do
@@ -1415,6 +1431,51 @@ defmodule LittleGrape.DiscoveryTest do
       assert is_nil(user.profile.gender)
       assert is_nil(user.profile.preferred_gender)
       assert Discovery.ai_pick(user) == nil
+    end
+
+    test "country scoring and pick reasons use preferred_country consistently" do
+      # The user LIVES in DE but PREFERS matches from US — the ranker and the
+      # displayed reasons must both honor the preference field.
+      user =
+        create_user_with_complete_profile(%{
+          gender: "male",
+          preferred_gender: "female",
+          country: "DE",
+          preferred_country: "US",
+          religion: "muslim",
+          interests: ["gaming"],
+          languages: ["sq"]
+        })
+
+      matching =
+        create_user_with_complete_profile(%{
+          gender: "female",
+          preferred_gender: "male",
+          country: "US",
+          religion: "orthodox",
+          interests: ["cooking"],
+          languages: ["it"]
+        })
+
+      _non_matching =
+        create_user_with_complete_profile(%{
+          gender: "female",
+          preferred_gender: "male",
+          country: "FR",
+          religion: "orthodox",
+          interests: ["cooking"],
+          languages: ["it"]
+        })
+
+      # Ranker: the preferred-country candidate must rank first (the 0.20
+      # country-weight gap strictly dominates the ±0.10 random variance)
+      assert [first, _second] = Discovery.get_candidates(user)
+      assert first.user_id == matching.id
+
+      # Reasons: ai_pick must select the same candidate and cite the country
+      assert {profile, _score, reasons} = Discovery.ai_pick(user)
+      assert profile.user_id == matching.id
+      assert {:country, %{country: "US"}} in reasons
     end
   end
 

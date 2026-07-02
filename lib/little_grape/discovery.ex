@@ -42,6 +42,11 @@ defmodule LittleGrape.Discovery do
   @liked_you_weight 0.05
   @randomization_variance 0.10
 
+  # Upper bound on candidates loaded into memory for scoring. The pool is
+  # intentionally unordered — hard filters define eligibility and scoring
+  # happens in Elixir, so any bounded subset is acceptable.
+  @candidate_pool_size 500
+
   @doc """
   Returns a base query for users that can be filtered further.
   """
@@ -128,11 +133,11 @@ defmodule LittleGrape.Discovery do
 
   @doc """
   Excludes users with incomplete profiles.
-  A profile is considered incomplete if it's missing any of:
-  - profile_picture
-  - first_name
-  - birthdate
-  - gender
+
+  A profile is considered incomplete if any of the canonical required fields
+  in `Profile.required_profile_fields/0` is missing (profile_picture,
+  first_name, birthdate, gender, preferred_gender) — the same list
+  `Accounts.profile_complete?/1` checks.
 
   ## Examples
 
@@ -141,14 +146,15 @@ defmodule LittleGrape.Discovery do
 
   """
   def require_complete_profile(query) do
-    from [user: u] in query,
-      join: p in Profile,
-      on: p.user_id == u.id,
-      as: :profile,
-      where: not is_nil(p.profile_picture),
-      where: not is_nil(p.first_name),
-      where: not is_nil(p.birthdate),
-      where: not is_nil(p.gender)
+    joined =
+      from [user: u] in query,
+        join: p in Profile,
+        on: p.user_id == u.id,
+        as: :profile
+
+    Enum.reduce(Profile.required_profile_fields(), joined, fn {field, _label}, q ->
+      from [profile: p] in q, where: not is_nil(field(p, ^field))
+    end)
   end
 
   @doc """
@@ -422,7 +428,9 @@ defmodule LittleGrape.Discovery do
         user_profile.preferred_age_max
       )
 
-    country_score = score_country(user_profile.country, candidate_profile.country)
+    # Preference field, matching compute_scores/2 — the user's own country is
+    # not a preference (score_age likewise uses preferred_age_min/max).
+    country_score = score_country(user_profile.preferred_country, candidate_profile.country)
     interests_score = score_interests(user_profile.interests, candidate_profile.interests)
     languages_score = score_languages(user_profile.languages, candidate_profile.languages)
     religion_score = score_religion(user_profile.religion, candidate_profile.religion)
@@ -453,13 +461,20 @@ defmodule LittleGrape.Discovery do
     * `user` - The current user with profile preloaded
     * `query` - A query of filtered candidates (usually from apply_hard_filters/1)
 
+  ## Options
+    * `:pool_size` - Upper bound on candidates loaded for scoring
+      (default: #{@candidate_pool_size}). Override only in tests.
+
   ## Returns
     A list of `{user, score}` tuples sorted by score descending
   """
-  def score_and_rank(%User{id: user_id, profile: user_profile}, query) do
-    # Get all candidate users with their profiles
+  def score_and_rank(%User{id: user_id, profile: user_profile}, query, opts \\ []) do
+    pool_size = Keyword.get(opts, :pool_size, @candidate_pool_size)
+
+    # Get a bounded pool of candidate users with their profiles
     candidates =
       query
+      |> limit(^pool_size)
       |> Repo.all()
       |> Repo.preload(:profile)
 
@@ -480,32 +495,6 @@ defmodule LittleGrape.Discovery do
       {candidate, score}
     end)
     |> Enum.sort_by(fn {_candidate, score} -> score end, :desc)
-  end
-
-  @doc """
-  Returns the discovery feed for a user.
-
-  Applies hard filters, scores candidates, and returns them ranked
-  by compatibility score.
-
-  ## Parameters
-    * `user` - The current user with profile preloaded
-
-  ## Options
-    * `:limit` - Maximum number of candidates to return (default: 50)
-
-  ## Returns
-    A list of user structs sorted by compatibility score
-  """
-  def get_discovery_feed(%User{} = user, opts \\ []) do
-    limit = Keyword.get(opts, :limit, 50)
-
-    query = apply_hard_filters(user)
-
-    user
-    |> score_and_rank(query)
-    |> Enum.take(limit)
-    |> Enum.map(fn {candidate, _score} -> candidate end)
   end
 
   @doc """
@@ -659,17 +648,14 @@ defmodule LittleGrape.Discovery do
   Each profile carries a `:user_id` so the LiveView can act on it.
   """
   def list_previously_passed(%User{} = user) do
-    target_ids = LittleGrape.Swipes.list_passed_target_ids(user)
-
-    if target_ids == [] do
-      []
-    else
-      from(p in Profile,
-        where: p.user_id in ^target_ids
-      )
-      |> Repo.all()
-      |> Enum.sort_by(fn profile -> Enum.find_index(target_ids, &(&1 == profile.user_id)) end)
-    end
+    from(p in Profile,
+      join: s in Swipe,
+      on: s.target_user_id == p.user_id,
+      where: s.user_id == ^user.id and s.action == "pass",
+      order_by: [desc: s.inserted_at, desc: s.id],
+      select: p
+    )
+    |> Repo.all()
   end
 
   @doc """
