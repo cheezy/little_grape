@@ -1,4 +1,4 @@
-# Find eligible builder and runner images on Docker Hub. We use Ubuntu/Debian
+# Find eligible builder and runner images on Docker Hub. We use Ubuntu
 # instead of Alpine to avoid DNS resolution issues in production.
 #
 # https://hub.docker.com/r/hexpm/elixir/tags?name=ubuntu
@@ -7,9 +7,9 @@
 # This file is based on these images:
 #
 #   - https://hub.docker.com/r/hexpm/elixir/tags - for the build image
-#   - https://hub.docker.com/_/debian/tags?name=trixie-20260202-slim - for the release image
+#   - https://hub.docker.com/_/ubuntu/tags?name=noble - for the release image
 #   - https://pkgs.org/ - resource for finding needed packages
-#   - Ex: docker.io/hexpm/elixir:1.19.4-erlang-28.2-debian-trixie-20260202-slim
+#   - Ex: docker.io/hexpm/elixir:1.20.2-erlang-28.5.0.2-ubuntu-noble-20260509.1
 #
 
 ARG ELIXIR_VERSION=1.20.2
@@ -22,6 +22,11 @@ ARG RUNNER_IMAGE="docker.io/ubuntu:${UBUNTU_VERSION}"
 FROM ${BUILDER_IMAGE} AS builder
 
 # install build dependencies
+# nodejs/npm are retained conservatively: assets are built with the standalone
+# esbuild/tailwind binaries (the :esbuild and :tailwind Hex packages) and there
+# is no package.json or npm build step, so these are very likely unused — but
+# removal must be confirmed with a real `docker build -f Dockerfile.review .`
+# (and a review-app deploy) before dropping them, per the review-image contract.
 RUN apt-get update \
   && apt-get install -y --no-install-recommends build-essential git nodejs npm \
   && rm -rf /var/lib/apt/lists/*

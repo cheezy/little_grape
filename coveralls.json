@@ -1,0 +1,20 @@
+{
+  "coverage_options": {
+    "minimum_coverage": 85,
+    "treat_no_relevant_lines_as_covered": true
+  },
+  "skip_files": [
+    "test/",
+    "lib/little_grape/application.ex",
+    "lib/little_grape/release.ex",
+    "lib/little_grape/repo.ex",
+    "lib/little_grape_web/telemetry.ex",
+    "lib/little_grape_web/router.ex",
+    "lib/little_grape_web/components/layouts.ex",
+    "lib/little_grape_web/controllers/error_html.ex",
+    "lib/little_grape_web/controllers/page_html.ex",
+    "lib/little_grape_web/controllers/user_registration_html.ex",
+    "lib/little_grape_web/controllers/user_session_html.ex",
+    "lib/little_grape_web/controllers/user_settings_html.ex"
+  ]
+}

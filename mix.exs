@@ -13,6 +13,7 @@ defmodule LittleGrape.MixProject do
       compilers: [:phoenix_live_view] ++ Mix.compilers(),
       listeners: [Phoenix.CodeReloader],
       test_coverage: test_coverage(),
+      dialyzer: dialyzer(),
       usage_rules: usage_rules()
     ]
   end
@@ -29,7 +30,12 @@ defmodule LittleGrape.MixProject do
 
   def cli do
     [
-      preferred_envs: [precommit: :test]
+      preferred_envs: [
+        precommit: :test,
+        dialyzer: :test,
+        coveralls: :test,
+        "coveralls.html": :test
+      ]
     ]
   end
 
@@ -73,6 +79,8 @@ defmodule LittleGrape.MixProject do
       {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false},
       {:usage_rules, "~> 1.0"},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:excoveralls, "~> 0.18", only: :test, runtime: false},
       {:tidewave, "~> 0.2", only: :dev}
     ]
   end
@@ -96,31 +104,38 @@ defmodule LittleGrape.MixProject do
         "esbuild little_grape --minify",
         "phx.digest"
       ],
-      precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"]
+      # Mirrors the CI job and the .stride.md after_doing hook so a green
+      # precommit means a green CI run.
+      precommit: [
+        "compile --warnings-as-errors",
+        "deps.unlock --unused",
+        "format --check-formatted",
+        "deps.audit",
+        # hex.audit lives in the Hex archive, which Mix does not resolve as an
+        # in-process alias step — shell out so it still runs here.
+        "cmd mix hex.audit",
+        "sobelow --config .sobelow-conf",
+        "credo --strict",
+        "coveralls"
+      ]
     ]
   end
 
-  defp test_coverage do
+  defp dialyzer do
     [
-      ignore_modules: [
-        LittleGrape.AccountsFixtures,
-        LittleGrape.Application,
-        LittleGrape.MatchesFixtures,
-        LittleGrape.MessagingFixtures,
-        LittleGrape.Release,
-        LittleGrape.Repo,
-        LittleGrape.TestLogFilter,
-        LittleGrapeWeb.ConnCase,
-        LittleGrapeWeb.ErrorHTML,
-        LittleGrapeWeb.Layouts,
-        LittleGrapeWeb.PageHTML,
-        LittleGrapeWeb.Router,
-        LittleGrapeWeb.Telemetry,
-        LittleGrapeWeb.UserRegistrationHTML,
-        LittleGrapeWeb.UserSessionHTML,
-        LittleGrapeWeb.UserSettingsHTML
-      ]
+      plt_local_path: "priv/plts",
+      plt_core_path: "priv/plts",
+      plt_add_apps: [:mix, :ex_unit],
+      ignore_warnings: ".dialyzer_ignore.exs"
     ]
+  end
+
+  # ExCoveralls is the coverage tool; the threshold (minimum_coverage) and the
+  # skip list live in coveralls.json (ExCoveralls does not read the built-in
+  # `ignore_modules`). `mix coveralls` fails CI when total coverage drops below
+  # the floor.
+  defp test_coverage do
+    [tool: ExCoveralls]
   end
 
   defp usage_rules do

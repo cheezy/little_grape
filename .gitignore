@@ -38,9 +38,16 @@ npm-debug.log
 .expert/
 .claude/settings.local.json
 
+# Playwright MCP server scratch output
+/.playwright-mcp/
+
 # Stride authentication (contains secrets)
 .stride_auth.md
 
 # Stride runtime state (orchestrator markers, env cache)
 .stride/
 .stride-env-cache
+
+# Dialyzer PLT cache (rebuilt per-environment; cached in CI)
+/priv/plts/*.plt
+/priv/plts/*.plt.hash
