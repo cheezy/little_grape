@@ -139,6 +139,7 @@ defmodule LittleGrapeWeb.Layouts do
             data-toggle-hidden="#mobile-menu, #mobile-menu-open-icon, #mobile-menu-close-icon"
             aria-label={gettext("Toggle menu")}
             aria-controls="mobile-menu"
+            aria-expanded="false"
           >
             <span id="mobile-menu-open-icon" class="block">
               <.icon name="hero-bars-3" class="size-6" />

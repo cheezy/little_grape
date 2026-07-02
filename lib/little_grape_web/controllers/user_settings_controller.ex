@@ -25,7 +25,7 @@ defmodule LittleGrapeWeb.UserSettingsController do
         conn
         |> put_flash(
           :info,
-          "A link to confirm your email change has been sent to the new address."
+          gettext("A link to confirm your email change has been sent to the new address.")
         )
         |> redirect(to: ~p"/users/settings/email")
 

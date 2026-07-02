@@ -295,7 +295,7 @@ defmodule LittleGrapeWeb.MatchesLive do
           />
         <% else %>
           <div class="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center">
-            <span class="text-gray-400 text-2xl">👤</span>
+            <span class="text-gray-400 text-2xl" aria-hidden="true">👤</span>
           </div>
         <% end %>
         <%= if @match_data.unread_count > 0 do %>
@@ -342,7 +342,7 @@ defmodule LittleGrapeWeb.MatchesLive do
             />
           <% else %>
             <div class="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center border-4 border-red-200">
-              <span class="text-gray-400 text-3xl">👤</span>
+              <span class="text-gray-400 text-3xl" aria-hidden="true">👤</span>
             </div>
           <% end %>
         </div>

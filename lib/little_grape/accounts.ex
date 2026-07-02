@@ -504,4 +504,18 @@ defmodule LittleGrape.Accounts do
     |> Enum.filter(fn {field, _label} -> Map.get(profile, field) == nil end)
     |> Enum.map(fn {_field, label} -> label end)
   end
+
+  @doc """
+  Like `missing_profile_fields/1` but returns the field atoms, for callers
+  that translate the labels at the render boundary.
+  """
+  def missing_profile_field_keys(nil) do
+    Enum.map(Profile.required_profile_fields(), fn {field, _label} -> field end)
+  end
+
+  def missing_profile_field_keys(%Profile{} = profile) do
+    Profile.required_profile_fields()
+    |> Enum.filter(fn {field, _label} -> Map.get(profile, field) == nil end)
+    |> Enum.map(fn {field, _label} -> field end)
+  end
 end

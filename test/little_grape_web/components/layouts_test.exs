@@ -6,6 +6,13 @@ defmodule LittleGrapeWeb.LayoutsTest do
 
   alias LittleGrapeWeb.Layouts
 
+  # Pin the locale so translated-error assertions stay stable regardless of
+  # the Gettext backend default (which is "sq").
+  setup do
+    Gettext.put_locale(LittleGrapeWeb.Gettext, "en")
+    :ok
+  end
+
   describe "language_switcher/1" do
     test "offers every supported locale with no inline JS" do
       html = render_component(&Layouts.language_switcher/1, locale: "en")

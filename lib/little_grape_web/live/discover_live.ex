@@ -30,10 +30,15 @@ defmodule LittleGrapeWeb.DiscoverLive do
        |> assign(:matched_profile, nil)
        |> assign(:expanded, false)}
     else
-      missing = Accounts.missing_profile_fields(user.profile)
+      missing =
+        user.profile
+        |> Accounts.missing_profile_field_keys()
+        |> Enum.map_join(", ", &field_label/1)
 
       message =
-        "Please complete your profile to start discovering matches. Missing: #{Enum.join(missing, ", ")}"
+        gettext("Please complete your profile to start discovering matches. Missing: %{fields}",
+          fields: missing
+        )
 
       {:ok,
        socket
@@ -41,6 +46,14 @@ defmodule LittleGrapeWeb.DiscoverLive do
        |> redirect(to: ~p"/users/profile")}
     end
   end
+
+  # Literal gettext calls per field so the extractor sees each label
+  # (dynamic gettext(label) would never reach the .pot file).
+  defp field_label(:profile_picture), do: gettext("Profile photo")
+  defp field_label(:first_name), do: gettext("First name")
+  defp field_label(:birthdate), do: gettext("Birthdate")
+  defp field_label(:gender), do: gettext("Gender")
+  defp field_label(:preferred_gender), do: gettext("Gender preference")
 
   @impl true
   def handle_event("swipe", %{"action" => action}, socket) do
@@ -192,7 +205,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
               />
             <% else %>
               <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                <span class="text-gray-400 text-xl">👤</span>
+                <span class="text-gray-400 text-xl" aria-hidden="true">👤</span>
               </div>
             <% end %>
             <div class="flex-1 min-w-0">
@@ -237,7 +250,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
           />
         <% else %>
           <div class="w-full h-full bg-gray-200 flex items-center justify-center">
-            <span class="text-gray-400 text-6xl">👤</span>
+            <span class="text-gray-400 text-6xl" aria-hidden="true">👤</span>
           </div>
         <% end %>
 
@@ -268,17 +281,19 @@ defmodule LittleGrapeWeb.DiscoverLive do
           phx-click="swipe"
           phx-value-action="pass"
           disabled={@swiping}
+          aria-label={gettext("Pass")}
           class="w-16 h-16 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-3xl shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          ✕
+          <span aria-hidden="true">✕</span>
         </button>
         <button
           phx-click="swipe"
           phx-value-action="like"
           disabled={@swiping}
+          aria-label={gettext("Like")}
           class="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center text-3xl text-white shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          ♥
+          <span aria-hidden="true">♥</span>
         </button>
       </div>
     </div>
@@ -402,7 +417,7 @@ defmodule LittleGrapeWeb.DiscoverLive do
             />
           <% else %>
             <div class="w-32 h-32 rounded-full bg-gray-200 mx-auto flex items-center justify-center border-4 border-red-500">
-              <span class="text-gray-400 text-4xl">👤</span>
+              <span class="text-gray-400 text-4xl" aria-hidden="true">👤</span>
             </div>
           <% end %>
         </div>

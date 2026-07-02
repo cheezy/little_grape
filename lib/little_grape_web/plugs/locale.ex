@@ -8,7 +8,9 @@ defmodule LittleGrapeWeb.Plugs.Locale do
   """
   import Plug.Conn
 
-  @locales ~w(sq en it el de fr)
+  # Derived from the single authoritative list in config/config.exs
+  # (the Gettext backend's :allowed_locales).
+  @locales Application.compile_env!(:little_grape, [LittleGrapeWeb.Gettext, :allowed_locales])
 
   @doc "All supported locale codes, in display order."
   def locales, do: @locales

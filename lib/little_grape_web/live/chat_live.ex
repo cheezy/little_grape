@@ -167,7 +167,7 @@ defmodule LittleGrapeWeb.ChatLive do
             />
           <% else %>
             <div class="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-4">
-              <span class="text-gray-400 text-5xl">👤</span>
+              <span class="text-gray-400 text-5xl" aria-hidden="true">👤</span>
             </div>
           <% end %>
           <h2 class="text-2xl font-bold text-gray-900 mb-2">{display_name(@other_profile)}</h2>
@@ -179,7 +179,7 @@ defmodule LittleGrapeWeb.ChatLive do
           phx-click="close_profile"
           class="mt-6 w-full py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
         >
-          Close
+          {gettext("Close")}
         </button>
       </div>
     </div>

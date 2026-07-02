@@ -73,10 +73,14 @@ config :logger, :default_formatter,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-# Configure Gettext - Albanian as default
+# Configure Gettext - Albanian as default.
+# allowed_locales is the single authoritative supported-locale list: the
+# Gettext backend compiles exactly these, and Plugs.Locale derives its
+# accepted set from this key at compile time. It must match the locale
+# directories shipped under priv/gettext.
 config :little_grape, LittleGrapeWeb.Gettext,
   default_locale: "sq",
-  locales: ~w(sq en)
+  allowed_locales: ~w(sq en it el de fr)
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

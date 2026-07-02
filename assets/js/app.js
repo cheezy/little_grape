@@ -128,6 +128,11 @@ document.addEventListener("click", e => {
   document
     .querySelectorAll(toggler.getAttribute("data-toggle-hidden"))
     .forEach(el => el.classList.toggle("hidden"))
+  // Keep assistive tech in sync — only for togglers that declare the attribute
+  if (toggler.hasAttribute("aria-expanded")) {
+    const expanded = toggler.getAttribute("aria-expanded") === "true"
+    toggler.setAttribute("aria-expanded", String(!expanded))
+  }
 })
 
 // Flatpickr init for the profile edit page (was an inline <script>).

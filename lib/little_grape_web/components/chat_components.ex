@@ -86,7 +86,7 @@ defmodule LittleGrapeWeb.ChatComponents do
       />
     <% else %>
       <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-        <span class="text-gray-400 text-lg">👤</span>
+        <span class="text-gray-400 text-lg" aria-hidden="true">👤</span>
       </div>
     <% end %>
     <h2 class="font-semibold text-gray-900">{display_name(@other_profile)}</h2>
