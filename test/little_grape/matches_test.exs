@@ -2,6 +2,7 @@ defmodule LittleGrape.MatchesTest do
   use LittleGrape.DataCase, async: true
 
   import LittleGrape.AccountsFixtures
+  import LittleGrape.MessagingFixtures
 
   alias LittleGrape.Matches
   alias LittleGrape.Matches.Match
@@ -270,6 +271,19 @@ defmodule LittleGrape.MatchesTest do
       assert {:error, :not_found} = Matches.unmatch(user, non_existent_id)
     end
 
+    test "returns error when the match was already deleted" do
+      # A stale id resolves to :not_found. (The {:error, changeset} branch of
+      # Repo.delete is unreachable without failure injection — a stale struct
+      # raises Ecto.StaleEntryError rather than returning an error tuple.)
+      user1 = user_fixture()
+      user2 = user_fixture()
+
+      {:ok, %{match: match, conversation: _}} = Matches.create_match(user1.id, user2.id)
+      Repo.delete!(match)
+
+      assert {:error, :not_found} = Matches.unmatch(user1, match.id)
+    end
+
     test "cascade deletes conversation when match is deleted" do
       user1 = user_fixture()
       user2 = user_fixture()
@@ -367,10 +381,10 @@ defmodule LittleGrape.MatchesTest do
       {:ok, %{conversation: conv1}} = Matches.create_match(user.id, other1.id)
       {:ok, %{conversation: conv2}} = Matches.create_match(user.id, other2.id)
 
-      {:ok, _} = Messaging.create_message(conv1.id, other1.id, "first")
-      {:ok, _} = Messaging.create_message(conv1.id, user.id, "second")
-      {:ok, _} = Messaging.create_message(conv1.id, other1.id, "latest in conv1")
-      {:ok, _} = Messaging.create_message(conv2.id, other2.id, "latest in conv2")
+      {:ok, _} = message_fixture(conv1.id, other1.id, "first")
+      {:ok, _} = message_fixture(conv1.id, user.id, "second")
+      {:ok, _} = message_fixture(conv1.id, other1.id, "latest in conv1")
+      {:ok, _} = message_fixture(conv2.id, other2.id, "latest in conv2")
 
       details = Matches.list_matches_with_details(user)
       assert length(details) == 2
@@ -424,7 +438,7 @@ defmodule LittleGrape.MatchesTest do
       partner = user_fixture()
       profile_fixture(partner)
       {:ok, %{conversation: conv}} = Matches.create_match(user1.id, partner.id)
-      {:ok, _} = Messaging.create_message(conv.id, partner.id, "hi")
+      {:ok, _} = message_fixture(conv.id, partner.id, "hi")
 
       {_, count_with_one} =
         count_queries(fn -> Matches.list_matches_with_details(user1) end)
@@ -435,7 +449,7 @@ defmodule LittleGrape.MatchesTest do
         other = user_fixture()
         profile_fixture(other)
         {:ok, %{conversation: c}} = Matches.create_match(user2.id, other.id)
-        {:ok, _} = Messaging.create_message(c.id, other.id, "hello")
+        {:ok, _} = message_fixture(c.id, other.id, "hello")
       end
 
       {details, count_with_three} =
@@ -451,8 +465,8 @@ defmodule LittleGrape.MatchesTest do
       profile_fixture(other)
 
       {:ok, %{conversation: conv}} = Matches.create_match(user.id, other.id)
-      {:ok, _} = Messaging.create_message(conv.id, other.id, "unread from other")
-      {:ok, _} = Messaging.create_message(conv.id, user.id, "my own message")
+      {:ok, _} = message_fixture(conv.id, other.id, "unread from other")
+      {:ok, _} = message_fixture(conv.id, user.id, "my own message")
 
       assert [detail] = Matches.list_matches_with_details(user)
       assert detail.unread_count == 1

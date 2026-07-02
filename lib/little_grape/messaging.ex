@@ -12,57 +12,6 @@ defmodule LittleGrape.Messaging do
   alias LittleGrape.Messaging.Message
   alias LittleGrape.Repo
 
-  @doc """
-  Creates a message in a conversation.
-
-  ## Parameters
-
-    * `conversation_id` - The ID of the conversation
-    * `sender_id` - The ID of the user sending the message
-    * `content` - The message content
-
-  ## Returns
-
-    * `{:ok, %Message{}}` - Successfully created message
-    * `{:error, %Ecto.Changeset{}}` - Validation error
-
-  ## Examples
-
-      iex> create_message(conversation_id, sender_id, "Hello!")
-      {:ok, %Message{}}
-
-  """
-  def create_message(conversation_id, sender_id, content) do
-    result =
-      %Message{}
-      |> Message.changeset(%{
-        conversation_id: conversation_id,
-        sender_id: sender_id,
-        content: content
-      })
-      |> Repo.insert()
-
-    case result do
-      {:ok, message} = success ->
-        broadcast_new_message(conversation_id, message)
-        success
-
-      error ->
-        error
-    end
-  end
-
-  defp broadcast_new_message(conversation_id, message) do
-    conversation =
-      Repo.get(Conversation, conversation_id)
-      |> Repo.preload(:match)
-
-    if conversation && conversation.match do
-      match = conversation.match
-      broadcast_message_to_participants(message, match.user_a_id, match.user_b_id)
-    end
-  end
-
   defp broadcast_message_to_participants(message, user_a_id, user_b_id) do
     Phoenix.PubSub.broadcast(
       LittleGrape.PubSub,
@@ -75,38 +24,6 @@ defmodule LittleGrape.Messaging do
       "user:#{user_b_id}",
       {:message_received, message}
     )
-  end
-
-  @doc """
-  Counts unread messages in a conversation for a specific user.
-
-  A message is considered unread if:
-  - It was sent by someone other than the user
-  - It has a nil read_at timestamp
-
-  ## Parameters
-
-    * `conversation_id` - The ID of the conversation
-    * `user_id` - The ID of the user checking for unread messages
-
-  ## Returns
-
-    * Integer count of unread messages
-
-  ## Examples
-
-      iex> unread_count(conversation_id, user_id)
-      3
-
-  """
-  def unread_count(conversation_id, user_id) do
-    from(m in Message,
-      where: m.conversation_id == ^conversation_id,
-      where: m.sender_id != ^user_id,
-      where: is_nil(m.read_at),
-      select: count(m.id)
-    )
-    |> Repo.one()
   end
 
   @doc """
@@ -199,13 +116,9 @@ defmodule LittleGrape.Messaging do
   """
   def get_conversation(%User{id: user_id}, match_id) do
     conversation =
-      from(c in Conversation,
-        join: m in Match,
-        on: c.match_id == m.id,
-        where: m.id == ^match_id,
-        where: m.user_a_id == ^user_id or m.user_b_id == ^user_id,
-        select: c
-      )
+      conversation_participant_query(user_id)
+      |> where([_c, match: m], m.id == ^match_id)
+      |> select([c], c)
       |> Repo.one()
 
     case conversation do
@@ -323,13 +236,9 @@ defmodule LittleGrape.Messaging do
 
   defp authorize_conversation_access(user_id, conversation_id) do
     result =
-      from(c in Conversation,
-        join: m in Match,
-        on: c.match_id == m.id,
-        where: c.id == ^conversation_id,
-        where: m.user_a_id == ^user_id or m.user_b_id == ^user_id,
-        select: {c, m.user_a_id, m.user_b_id}
-      )
+      conversation_participant_query(user_id)
+      |> where([c], c.id == ^conversation_id)
+      |> select([c, match: m], {c, m.user_a_id, m.user_b_id})
       |> Repo.one()
 
     case result do
@@ -341,6 +250,17 @@ defmodule LittleGrape.Messaging do
 
         {:ok, conv, %{user_a_id: user_a_id, user_b_id: user_b_id, other_user_id: other_user_id}}
     end
+  end
+
+  # Conversations joined to their match, scoped to the given participant.
+  # Callers add their own filter (conversation id or match id) and select.
+  defp conversation_participant_query(user_id) do
+    from(c in Conversation,
+      join: m in Match,
+      as: :match,
+      on: c.match_id == m.id,
+      where: ^Match.participant_condition(user_id)
+    )
   end
 
   defp broadcast_to_conversation(conversation_id, message) do
@@ -430,8 +350,9 @@ defmodule LittleGrape.Messaging do
       join: c in Conversation,
       on: m.conversation_id == c.id,
       join: match in Match,
+      as: :match,
       on: c.match_id == match.id,
-      where: match.user_a_id == ^user_id or match.user_b_id == ^user_id,
+      where: ^Match.participant_condition(user_id),
       where: m.sender_id != ^user_id,
       where: is_nil(m.read_at),
       select: count(m.id)

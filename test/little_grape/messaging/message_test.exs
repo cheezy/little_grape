@@ -191,24 +191,26 @@ defmodule LittleGrape.Messaging.MessageTest do
 
       assert changeset.valid?
     end
-  end
 
-  describe "mark_read_changeset/2" do
-    test "sets read_at to provided timestamp" do
-      message = %Message{}
-      read_time = DateTime.utc_now()
+    test "counts codepoints so multi-codepoint graphemes cannot exceed the column limit" do
+      {conversation, sender, _receiver} = create_conversation_with_users()
 
-      changeset = Message.mark_read_changeset(message, read_time)
+      # "👩‍🚀" is one grapheme but three codepoints: 1998 + 3 = 2001 codepoints,
+      # which the varchar(2000) column would reject even though the grapheme
+      # count (1999) is under the limit.
+      content = String.duplicate("a", 1998) <> "👩‍🚀"
+      assert String.length(content) == 1999
 
-      assert changeset.changes.read_at == read_time
-    end
+      attrs = %{
+        conversation_id: conversation.id,
+        sender_id: sender.id,
+        content: content
+      }
 
-    test "sets read_at to current time when not provided" do
-      message = %Message{}
+      changeset = Message.changeset(%Message{}, attrs)
 
-      changeset = Message.mark_read_changeset(message)
-
-      assert changeset.changes.read_at != nil
+      refute changeset.valid?
+      assert "should be at most 2000 character(s)" in errors_on(changeset).content
     end
   end
 
@@ -380,7 +382,7 @@ defmodule LittleGrape.Messaging.MessageTest do
 
       {:ok, updated_message} =
         message
-        |> Message.mark_read_changeset(read_time)
+        |> Ecto.Changeset.change(read_at: read_time)
         |> Repo.update()
 
       assert updated_message.read_at == read_time

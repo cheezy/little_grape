@@ -3,6 +3,7 @@ defmodule LittleGrapeWeb.Hooks.UnreadCountHookTest do
 
   import Phoenix.LiveViewTest
   import LittleGrape.AccountsFixtures
+  import LittleGrape.MessagingFixtures
 
   alias LittleGrape.Accounts.Profile
   alias LittleGrape.Matches
@@ -55,7 +56,7 @@ defmodule LittleGrapeWeb.Hooks.UnreadCountHookTest do
       other: other,
       conversation: conversation
     } do
-      {:ok, _message} = Messaging.create_message(conversation.id, other.id, "unread one")
+      {:ok, _message} = message_fixture(conversation.id, other.id, "unread one")
 
       {:ok, view, html} = mount_and_render(conn, ~p"/discover")
       assert html =~ "bg-pink-500"

@@ -321,16 +321,25 @@ defmodule LittleGrape.Accounts do
 
   @doc """
   Gets a user's profile or creates an empty one if it doesn't exist.
+
+  Concurrency-safe: two simultaneous first requests both return `{:ok, profile}`
+  for the same row (the insert uses `on_conflict: :nothing` against the unique
+  index on `user_id`).
   """
   def get_or_create_profile(user) do
     case get_profile(user) do
       nil ->
-        %Profile{}
-        |> Ecto.Changeset.change(user_id: user.id)
-        |> Repo.insert!()
+        changeset = Ecto.Changeset.change(%Profile{}, user_id: user.id)
+
+        case Repo.insert(changeset, on_conflict: :nothing, conflict_target: :user_id) do
+          # Lost the race: on_conflict: :nothing returns a struct without an id
+          {:ok, %Profile{id: nil}} -> {:ok, Repo.get_by!(Profile, user_id: user.id)}
+          {:ok, profile} -> {:ok, profile}
+          {:error, _changeset} = error -> error
+        end
 
       profile ->
-        profile
+        {:ok, profile}
     end
   end
 
@@ -387,13 +396,19 @@ defmodule LittleGrape.Accounts do
 
       case File.cp(upload.path, dest_path) do
         :ok ->
-          delete_old_picture(profile, uploads_dir)
+          result =
+            profile
+            |> Profile.profile_picture_changeset(%{
+              profile_picture: "/uploads/profile_pictures/#{filename}"
+            })
+            |> Repo.update()
 
-          profile
-          |> Profile.profile_picture_changeset(%{
-            profile_picture: "/uploads/profile_pictures/#{filename}"
-          })
-          |> Repo.update()
+          # Only remove the old file once the DB points at the new one
+          with {:ok, _updated} <- result do
+            delete_old_picture(profile, uploads_dir)
+          end
+
+          result
 
         {:error, reason} ->
           changeset =

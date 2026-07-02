@@ -230,8 +230,9 @@ defmodule LittleGrape.Accounts.Profile do
 
       birthdate ->
         today = Date.utc_today()
-        min_date = Date.add(today, -100 * 365)
-        max_date = Date.add(today, -18 * 365)
+        # Calendar-exact bounds (Date.shift clamps Feb-29 to Feb-28 as needed)
+        min_date = Date.shift(today, year: -100)
+        max_date = Date.shift(today, year: -18)
 
         cond do
           Date.compare(birthdate, min_date) == :lt ->

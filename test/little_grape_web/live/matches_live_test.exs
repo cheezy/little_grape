@@ -3,6 +3,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
 
   import Phoenix.LiveViewTest
   import LittleGrape.AccountsFixtures
+  import LittleGrape.MessagingFixtures
 
   alias LittleGrape.Accounts.Profile
   alias LittleGrape.Matches
@@ -135,7 +136,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
 
       # Send a message
       {:ok, _message} =
-        Messaging.create_message(conversation.id, other_user.id, "Hello there!")
+        message_fixture(conversation.id, other_user.id, "Hello there!")
 
       {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
@@ -197,7 +198,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
 
       # Send a long message
       long_message = String.duplicate("a", 100)
-      {:ok, _message} = Messaging.create_message(conversation.id, other_user.id, long_message)
+      {:ok, _message} = message_fixture(conversation.id, other_user.id, long_message)
 
       {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
@@ -213,7 +214,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
 
       # Create another user with profile but no picture
       other_user = user_fixture()
-      profile = LittleGrape.Accounts.get_or_create_profile(other_user)
+      {:ok, profile} = LittleGrape.Accounts.get_or_create_profile(other_user)
 
       profile
       |> Profile.changeset(%{
@@ -248,7 +249,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       {:ok, _result} = Matches.create_match(user.id, other_user2.id)
 
       # Send a message to first match (makes it more recent)
-      {:ok, _message} = Messaging.create_message(conv1.id, other_user1.id, "Recent message")
+      {:ok, _message} = message_fixture(conv1.id, other_user1.id, "Recent message")
 
       {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
@@ -263,7 +264,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
 
       # Create another user with profile but no first_name
       other_user = user_fixture()
-      profile = LittleGrape.Accounts.get_or_create_profile(other_user)
+      {:ok, profile} = LittleGrape.Accounts.get_or_create_profile(other_user)
 
       profile
       |> Profile.changeset(%{
@@ -295,7 +296,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
 
       # Send a short message (under 50 chars)
       short_message = "Hi!"
-      {:ok, _message} = Messaging.create_message(conversation.id, other_user.id, short_message)
+      {:ok, _message} = message_fixture(conversation.id, other_user.id, short_message)
 
       {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
@@ -349,7 +350,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
 
       # Create a match and send a message
       {:ok, %{conversation: conversation}} = Matches.create_match(user.id, other_user.id)
-      {:ok, _message} = Messaging.create_message(conversation.id, other_user.id, "Hey there!")
+      {:ok, _message} = message_fixture(conversation.id, other_user.id, "Hey there!")
 
       {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
@@ -368,9 +369,9 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
 
       # Create a match and send unread messages from other user
       {:ok, %{conversation: conversation}} = Matches.create_match(user.id, other_user.id)
-      {:ok, _msg1} = Messaging.create_message(conversation.id, other_user.id, "Message 1")
-      {:ok, _msg2} = Messaging.create_message(conversation.id, other_user.id, "Message 2")
-      {:ok, _msg3} = Messaging.create_message(conversation.id, other_user.id, "Message 3")
+      {:ok, _msg1} = message_fixture(conversation.id, other_user.id, "Message 1")
+      {:ok, _msg2} = message_fixture(conversation.id, other_user.id, "Message 2")
+      {:ok, _msg3} = message_fixture(conversation.id, other_user.id, "Message 3")
 
       {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
@@ -390,8 +391,8 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
 
       # Create a match and send messages from current user
       {:ok, %{conversation: conversation}} = Matches.create_match(user.id, other_user.id)
-      {:ok, _msg1} = Messaging.create_message(conversation.id, user.id, "My message 1")
-      {:ok, _msg2} = Messaging.create_message(conversation.id, user.id, "My message 2")
+      {:ok, _msg1} = message_fixture(conversation.id, user.id, "My message 1")
+      {:ok, _msg2} = message_fixture(conversation.id, user.id, "My message 2")
 
       {:ok, _view, html} = mount_and_render(conn, ~p"/matches")
 
@@ -409,7 +410,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       other_user1 = user_fixture()
       profile_fixture(other_user1, %{first_name: "OldMatch"}) |> set_profile_picture()
       {:ok, %{conversation: conversation}} = Matches.create_match(user.id, other_user1.id)
-      {:ok, _msg} = Messaging.create_message(conversation.id, other_user1.id, "Old message")
+      {:ok, _msg} = message_fixture(conversation.id, other_user1.id, "Old message")
 
       # Create second match with no messages (newer, but should appear first)
       other_user2 = user_fixture()
@@ -494,7 +495,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
 
       # Send a message - this will broadcast to PubSub
       {:ok, _message} =
-        Messaging.create_message(conversation.id, other_user.id, "Hello from realtime!")
+        message_fixture(conversation.id, other_user.id, "Hello from realtime!")
 
       # Render should update with the new message
       html = render(view)
@@ -512,6 +513,30 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       assert html =~ "Conversation not found."
       # Chat pane should remain hidden (no chat container)
       refute html =~ ~s(id="chat-container")
+    end
+
+    test "select_match renders gracefully when the conversation row is missing", %{
+      conn: conn,
+      user: user
+    } do
+      profile_fixture(user) |> set_profile_picture()
+
+      other = user_fixture()
+      profile_fixture(other) |> set_profile_picture()
+
+      {:ok, %{match: match, conversation: conversation}} =
+        Matches.create_match(user.id, other.id)
+
+      # Simulate the drift: the match exists but its conversation is gone
+      Repo.delete!(conversation)
+
+      {:ok, view, _html} = mount_and_render(conn, ~p"/matches")
+
+      html = render_hook(view, "select_match", %{"match-id" => "#{match.id}"})
+
+      assert html =~ "Conversation not found."
+      refute html =~ ~s(id="chat-container")
+      assert Process.alive?(view.pid)
     end
 
     test "select_match ignores a malformed match-id instead of crashing", %{
@@ -542,7 +567,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
         Matches.create_match(user.id, other_user.id)
 
       {:ok, _msg} =
-        Messaging.create_message(conversation.id, other_user.id, "An earlier message")
+        message_fixture(conversation.id, other_user.id, "An earlier message")
 
       {:ok, view, _html} = mount_and_render(conn, ~p"/matches")
 
@@ -564,19 +589,19 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       {:ok, %{match: match, conversation: conversation}} =
         Matches.create_match(user.id, other_user.id)
 
-      {:ok, _msg} = Messaging.create_message(conversation.id, other_user.id, "Unread message")
+      {:ok, _msg} = message_fixture(conversation.id, other_user.id, "Unread message")
 
       {:ok, view, html} = mount_and_render(conn, ~p"/matches")
 
       # Before clicking: there's an unread badge with "1"
       assert html =~ ~r/>\s*1\s*</
-      assert Messaging.unread_count(conversation.id, user.id) == 1
+      assert Messaging.total_unread_count(user) == 1
 
       view
       |> element(~s(button[phx-value-match-id="#{match.id}"]))
       |> render_click()
 
-      assert Messaging.unread_count(conversation.id, user.id) == 0
+      assert Messaging.total_unread_count(user) == 0
     end
 
     test "close_chat clears the selection and hides the chat pane", %{conn: conn, user: user} do
@@ -704,7 +729,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       html = render(view)
       assert html =~ "Pinging you live"
       # Marked as read because sender is not the current user
-      assert Messaging.unread_count(conversation.id, user.id) == 0
+      assert Messaging.total_unread_count(user) == 0
     end
 
     test "ignores incoming message for a different conversation", %{conn: conn, user: user} do
@@ -752,7 +777,7 @@ defmodule LittleGrapeWeb.MatchesLiveTest do
       profile_fixture(other_user, %{first_name: "ReadBroadcaster"}) |> set_profile_picture()
 
       {:ok, %{conversation: conversation}} = Matches.create_match(user.id, other_user.id)
-      {:ok, _msg} = Messaging.create_message(conversation.id, other_user.id, "Unread one")
+      {:ok, _msg} = message_fixture(conversation.id, other_user.id, "Unread one")
 
       {:ok, view, html} = mount_and_render(conn, ~p"/matches")
 

@@ -3,6 +3,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
 
   import Phoenix.LiveViewTest
   import LittleGrape.AccountsFixtures
+  import LittleGrape.MessagingFixtures
 
   alias LittleGrape.Accounts.Profile
   alias LittleGrape.Matches
@@ -111,9 +112,9 @@ defmodule LittleGrapeWeb.ChatLiveTest do
         Matches.create_match(user.id, other_user.id)
 
       # Create some messages
-      {:ok, _msg1} = Messaging.create_message(conversation.id, other_user.id, "Hello there!")
-      {:ok, _msg2} = Messaging.create_message(conversation.id, user.id, "Hi! How are you?")
-      {:ok, _msg3} = Messaging.create_message(conversation.id, other_user.id, "Doing great!")
+      {:ok, _msg1} = message_fixture(conversation.id, other_user.id, "Hello there!")
+      {:ok, _msg2} = message_fixture(conversation.id, user.id, "Hi! How are you?")
+      {:ok, _msg3} = message_fixture(conversation.id, other_user.id, "Doing great!")
 
       {:ok, _view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
@@ -136,7 +137,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
         Matches.create_match(user.id, other_user.id)
 
       # Create a message from the current user
-      {:ok, _msg} = Messaging.create_message(conversation.id, user.id, "My own message")
+      {:ok, _msg} = message_fixture(conversation.id, user.id, "My own message")
 
       {:ok, _view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
@@ -159,7 +160,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
         Matches.create_match(user.id, other_user.id)
 
       # Create a message from the other user
-      {:ok, _msg} = Messaging.create_message(conversation.id, other_user.id, "Their message")
+      {:ok, _msg} = message_fixture(conversation.id, other_user.id, "Their message")
 
       {:ok, _view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
@@ -182,7 +183,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
         Matches.create_match(user.id, other_user.id)
 
       # Create a message
-      {:ok, _msg} = Messaging.create_message(conversation.id, user.id, "Timestamped message")
+      {:ok, _msg} = message_fixture(conversation.id, user.id, "Timestamped message")
 
       {:ok, _view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
@@ -230,7 +231,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
 
       # Create another user with profile but no picture
       other_user = user_fixture()
-      profile = LittleGrape.Accounts.get_or_create_profile(other_user)
+      {:ok, profile} = LittleGrape.Accounts.get_or_create_profile(other_user)
 
       profile
       |> Profile.changeset(%{
@@ -279,7 +280,7 @@ defmodule LittleGrapeWeb.ChatLiveTest do
         Matches.create_match(other_user.id, user.id)
 
       # Send a message
-      {:ok, _msg} = Messaging.create_message(conversation.id, other_user.id, "From UserA")
+      {:ok, _msg} = message_fixture(conversation.id, other_user.id, "From UserA")
 
       {:ok, _view, html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
@@ -442,17 +443,17 @@ defmodule LittleGrapeWeb.ChatLiveTest do
       {:ok, %{match: match, conversation: conversation}} =
         Matches.create_match(user.id, other_user.id)
 
-      {:ok, _msg1} = Messaging.create_message(conversation.id, other_user.id, "Unread message 1")
-      {:ok, _msg2} = Messaging.create_message(conversation.id, other_user.id, "Unread message 2")
+      {:ok, _msg1} = message_fixture(conversation.id, other_user.id, "Unread message 1")
+      {:ok, _msg2} = message_fixture(conversation.id, other_user.id, "Unread message 2")
 
       # Verify messages are unread before mounting
-      assert Messaging.unread_count(conversation.id, user.id) == 2
+      assert Messaging.total_unread_count(user) == 2
 
       # Mount the live view (this should mark messages as read)
       {:ok, _view, _html} = mount_and_render(conn, ~p"/chat/#{match.id}")
 
       # Messages should now be marked as read
-      assert Messaging.unread_count(conversation.id, user.id) == 0
+      assert Messaging.total_unread_count(user) == 0
     end
 
     test "clicking header shows profile modal", %{conn: conn, user: user} do

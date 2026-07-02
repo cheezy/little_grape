@@ -28,16 +28,10 @@ defmodule LittleGrape.Messaging.Message do
     message
     |> cast(attrs, [:conversation_id, :sender_id, :content, :read_at])
     |> validate_required([:conversation_id, :sender_id, :content])
-    |> validate_length(:content, min: 1, max: @max_content_length)
+    # The column is varchar(2000), which Postgres enforces in codepoints;
+    # grapheme counting (the default) admits values the column rejects.
+    |> validate_length(:content, min: 1, max: @max_content_length, count: :codepoints)
     |> foreign_key_constraint(:conversation_id)
     |> foreign_key_constraint(:sender_id)
-  end
-
-  @doc """
-  A changeset for marking a message as read.
-  """
-  def mark_read_changeset(message, read_at \\ DateTime.utc_now()) do
-    message
-    |> change(read_at: read_at)
   end
 end

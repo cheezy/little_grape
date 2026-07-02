@@ -30,7 +30,7 @@ defmodule LittleGrape.DiscoveryTest do
       )
 
     # Use Accounts context to properly create/update profile
-    profile = Accounts.get_or_create_profile(user)
+    {:ok, profile} = Accounts.get_or_create_profile(user)
     {:ok, profile} = Accounts.update_profile(profile, profile_attrs)
 
     # Update profile picture separately using profile_picture_changeset
@@ -1311,7 +1311,7 @@ defmodule LittleGrape.DiscoveryTest do
 
       # Create candidate with incomplete profile (no profile picture)
       incomplete_user = user_fixture()
-      profile = Accounts.get_or_create_profile(incomplete_user)
+      {:ok, profile} = Accounts.get_or_create_profile(incomplete_user)
 
       {:ok, _profile} =
         Accounts.update_profile(profile, %{
@@ -1425,7 +1425,7 @@ defmodule LittleGrape.DiscoveryTest do
       # ai_pick must short-circuit instead of building a query that compares
       # an Ecto field against nil — which Ecto refuses with ArgumentError.
       user = user_fixture()
-      _profile = Accounts.get_or_create_profile(user)
+      {:ok, _profile} = Accounts.get_or_create_profile(user)
       user = Repo.preload(user, :profile, force: true)
 
       assert is_nil(user.profile.gender)

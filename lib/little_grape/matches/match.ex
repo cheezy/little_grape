@@ -1,6 +1,7 @@
 defmodule LittleGrape.Matches.Match do
   use Ecto.Schema
   import Ecto.Changeset
+  import Ecto.Query, only: [dynamic: 2]
 
   alias LittleGrape.Accounts.User
   alias LittleGrape.Messaging.Conversation
@@ -27,6 +28,20 @@ defmodule LittleGrape.Matches.Match do
     |> foreign_key_constraint(:user_a_id)
     |> foreign_key_constraint(:user_b_id)
     |> unique_constraint([:user_a_id, :user_b_id])
+    |> check_constraint(:user_a_id,
+      name: :user_a_less_than_user_b,
+      message: "must be less than user_b_id"
+    )
+  end
+
+  @doc """
+  Query condition matching matches where the given user is a participant.
+
+  Requires the `Match` binding to be named `:match`
+  (`from(m in Match, as: :match)` or `join: m in Match, as: :match`).
+  """
+  def participant_condition(user_id) do
+    dynamic([match: m], m.user_a_id == ^user_id or m.user_b_id == ^user_id)
   end
 
   defp validate_user_ordering(changeset) do

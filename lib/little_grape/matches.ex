@@ -135,7 +135,8 @@ defmodule LittleGrape.Matches do
   """
   def list_matches(%User{id: user_id}) do
     from(m in Match,
-      where: m.user_a_id == ^user_id or m.user_b_id == ^user_id,
+      as: :match,
+      where: ^Match.participant_condition(user_id),
       order_by: [desc: m.matched_at]
     )
     |> Repo.all()
@@ -171,8 +172,9 @@ defmodule LittleGrape.Matches do
   """
   def get_match(%User{id: user_id}, match_id) do
     from(m in Match,
+      as: :match,
       where: m.id == ^match_id,
-      where: m.user_a_id == ^user_id or m.user_b_id == ^user_id
+      where: ^Match.participant_condition(user_id)
     )
     |> Repo.one()
   end
@@ -193,6 +195,7 @@ defmodule LittleGrape.Matches do
 
     * `:ok` if the match was deleted successfully
     * `{:error, :not_found}` if the match doesn't exist or user is not a participant
+    * `{:error, %Ecto.Changeset{}}` if the delete failed
 
   ## Examples
 
@@ -212,8 +215,10 @@ defmodule LittleGrape.Matches do
         {:error, :not_found}
 
       match ->
-        Repo.delete(match)
-        :ok
+        case Repo.delete(match) do
+          {:ok, _match} -> :ok
+          {:error, changeset} -> {:error, changeset}
+        end
     end
   end
 
@@ -299,7 +304,8 @@ defmodule LittleGrape.Matches do
 
   defp fetch_matches_with_preloads(user_id) do
     from(m in Match,
-      where: m.user_a_id == ^user_id or m.user_b_id == ^user_id,
+      as: :match,
+      where: ^Match.participant_condition(user_id),
       preload: [:conversation, user_a: :profile, user_b: :profile],
       order_by: [desc: m.matched_at]
     )

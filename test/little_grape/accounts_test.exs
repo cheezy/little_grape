@@ -589,7 +589,7 @@ defmodule LittleGrape.AccountsTest do
       user = user_fixture()
       refute Accounts.get_profile(user)
 
-      profile = Accounts.get_or_create_profile(user)
+      {:ok, profile} = Accounts.get_or_create_profile(user)
 
       assert %Profile{} = profile
       assert profile.user_id == user.id
@@ -597,23 +597,36 @@ defmodule LittleGrape.AccountsTest do
 
     test "returns existing profile if one exists" do
       user = user_fixture()
-      existing_profile = Accounts.get_or_create_profile(user)
+      {:ok, existing_profile} = Accounts.get_or_create_profile(user)
 
       # Update the profile so we can verify it's the same one
       {:ok, updated_profile} =
         Accounts.update_profile(existing_profile, %{first_name: "Test"})
 
-      fetched_profile = Accounts.get_or_create_profile(user)
+      {:ok, fetched_profile} = Accounts.get_or_create_profile(user)
 
       assert fetched_profile.id == updated_profile.id
       assert fetched_profile.first_name == "Test"
+    end
+
+    test "is idempotent and returns the same profile on repeated calls" do
+      # The insert uses on_conflict: :nothing against the unique user_id index,
+      # so a concurrent first request resolves to the same row. The true race
+      # path (nil-id re-fetch) is covered by on_conflict itself.
+      user = user_fixture()
+
+      {:ok, first} = Accounts.get_or_create_profile(user)
+      {:ok, second} = Accounts.get_or_create_profile(user)
+
+      assert first.id == second.id
+      assert Repo.aggregate(Profile, :count) == 1
     end
   end
 
   describe "change_profile/2" do
     test "returns a profile changeset" do
       user = user_fixture()
-      profile = Accounts.get_or_create_profile(user)
+      {:ok, profile} = Accounts.get_or_create_profile(user)
 
       assert %Ecto.Changeset{} = Accounts.change_profile(profile)
     end
@@ -622,7 +635,7 @@ defmodule LittleGrape.AccountsTest do
   describe "update_profile/2" do
     setup do
       user = user_fixture()
-      profile = Accounts.get_or_create_profile(user)
+      {:ok, profile} = Accounts.get_or_create_profile(user)
       %{user: user, profile: profile}
     end
 
@@ -775,6 +788,18 @@ defmodule LittleGrape.AccountsTest do
       assert "you must be at least 18 years old" in errors_on(changeset).birthdate
     end
 
+    test "uses calendar-exact 18-year boundary for birthdate", %{profile: profile} do
+      # Exactly 18 years old today is valid (Date.shift clamps Feb-29 birthdays
+      # to Feb-28 in non-leap years, so leaplings become adults on Feb 28)
+      exactly_18 = Date.shift(Date.utc_today(), year: -18)
+      assert {:ok, _profile} = Accounts.update_profile(profile, %{birthdate: exactly_18})
+
+      # One day younger than 18 is rejected
+      one_day_under = Date.add(exactly_18, 1)
+      {:error, changeset} = Accounts.update_profile(profile, %{birthdate: one_day_under})
+      assert "you must be at least 18 years old" in errors_on(changeset).birthdate
+    end
+
     test "validates birthdate is not too far in the past", %{profile: profile} do
       too_old = Date.add(Date.utc_today(), -101 * 365)
       {:error, changeset} = Accounts.update_profile(profile, %{birthdate: too_old})
@@ -911,7 +936,7 @@ defmodule LittleGrape.AccountsTest do
   describe "update_profile_picture/2" do
     setup do
       user = user_fixture()
-      profile = Accounts.get_or_create_profile(user)
+      {:ok, profile} = Accounts.get_or_create_profile(user)
       %{user: user, profile: profile}
     end
 
@@ -1075,7 +1100,7 @@ defmodule LittleGrape.AccountsTest do
   describe "delete_profile_picture/1" do
     setup do
       user = user_fixture()
-      profile = Accounts.get_or_create_profile(user)
+      {:ok, profile} = Accounts.get_or_create_profile(user)
       %{user: user, profile: profile}
     end
 
@@ -1175,7 +1200,7 @@ defmodule LittleGrape.AccountsTest do
   describe "change_profile/2 edge cases" do
     test "allows attrs to be passed" do
       user = user_fixture()
-      profile = Accounts.get_or_create_profile(user)
+      {:ok, profile} = Accounts.get_or_create_profile(user)
       changeset = Accounts.change_profile(profile, %{first_name: "NewName"})
       assert get_change(changeset, :first_name) == "NewName"
     end
@@ -1184,7 +1209,7 @@ defmodule LittleGrape.AccountsTest do
   describe "update_profile/2 additional validations" do
     setup do
       user = user_fixture()
-      profile = Accounts.get_or_create_profile(user)
+      {:ok, profile} = Accounts.get_or_create_profile(user)
       %{profile: profile}
     end
 

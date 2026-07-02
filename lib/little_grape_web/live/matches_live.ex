@@ -132,7 +132,18 @@ defmodule LittleGrapeWeb.MatchesLive do
   end
 
   defp select_match(socket, match, user) do
-    {:ok, conversation} = Messaging.get_conversation(user, match.id)
+    case Messaging.get_conversation(user, match.id) do
+      {:ok, conversation} ->
+        do_select_match(socket, match, user, conversation)
+
+      {:error, :not_found} ->
+        socket
+        |> put_flash(:error, gettext("Conversation not found."))
+        |> assign_no_selection()
+    end
+  end
+
+  defp do_select_match(socket, match, user, conversation) do
     messages = Messaging.list_messages(conversation)
     {_other_user, other_profile} = Matches.other_participant(match, user.id)
 

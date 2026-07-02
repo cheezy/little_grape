@@ -3,6 +3,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
 
   import Phoenix.LiveViewTest
   import LittleGrape.AccountsFixtures
+  import LittleGrape.MessagingFixtures
 
   alias LittleGrape.Accounts.Profile
   alias LittleGrape.Discovery
@@ -30,7 +31,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
 
     test "redirects to profile if profile is incomplete", %{conn: conn, user: user} do
       # User has no profile data set
-      _profile = LittleGrape.Accounts.get_or_create_profile(user)
+      {:ok, _profile} = LittleGrape.Accounts.get_or_create_profile(user)
 
       {:error, {:redirect, %{to: path, flash: flash}}} = live(conn, ~p"/discover")
 
@@ -825,7 +826,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       # Match + an unread message — created BEFORE the LV mounts so initial
       # unread_count reflects this state.
       {:ok, %{conversation: conversation}} = Matches.create_match(user.id, other_user.id)
-      {:ok, _msg} = Messaging.create_message(conversation.id, other_user.id, "hi")
+      {:ok, _msg} = message_fixture(conversation.id, other_user.id, "hi")
 
       {:ok, view, html} = mount_and_render(conn, ~p"/discover")
 
@@ -862,7 +863,7 @@ defmodule LittleGrapeWeb.DiscoverLiveTest do
       {:ok, %{match: match, conversation: conversation}} =
         Matches.create_match(user.id, other_user.id)
 
-      {:ok, _msg} = Messaging.create_message(conversation.id, other_user.id, "hello")
+      {:ok, _msg} = message_fixture(conversation.id, other_user.id, "hello")
 
       send(view.pid, {:new_match, match})
 

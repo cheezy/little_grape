@@ -2,6 +2,7 @@ defmodule LittleGrape.MessagingTest do
   use LittleGrape.DataCase, async: true
 
   import LittleGrape.AccountsFixtures
+  import LittleGrape.MessagingFixtures
 
   alias LittleGrape.Blocks
   alias LittleGrape.Matches
@@ -9,13 +10,13 @@ defmodule LittleGrape.MessagingTest do
   alias LittleGrape.Messaging.Message
   alias LittleGrape.Repo
 
-  describe "create_message/3" do
+  describe "message_fixture/3" do
     test "creates a message with valid attributes" do
       user1 = user_fixture()
       user2 = user_fixture()
       {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
 
-      assert {:ok, message} = Messaging.create_message(conversation.id, user1.id, "Hello!")
+      assert {:ok, message} = message_fixture(conversation.id, user1.id, "Hello!")
       assert message.content == "Hello!"
       assert message.conversation_id == conversation.id
       assert message.sender_id == user1.id
@@ -27,7 +28,7 @@ defmodule LittleGrape.MessagingTest do
       user2 = user_fixture()
       {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
 
-      assert {:error, changeset} = Messaging.create_message(conversation.id, user1.id, "")
+      assert {:error, changeset} = message_fixture(conversation.id, user1.id, "")
       assert "can't be blank" in errors_on(changeset).content
     end
 
@@ -39,82 +40,11 @@ defmodule LittleGrape.MessagingTest do
       long_content = String.duplicate("a", Message.max_content_length() + 1)
 
       assert {:error, changeset} =
-               Messaging.create_message(conversation.id, user1.id, long_content)
+               message_fixture(conversation.id, user1.id, long_content)
 
       assert "should be at most #{Message.max_content_length()} character(s)" in errors_on(
                changeset
              ).content
-    end
-  end
-
-  describe "unread_count/2" do
-    test "returns 0 when no messages" do
-      user1 = user_fixture()
-      user2 = user_fixture()
-      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
-
-      assert Messaging.unread_count(conversation.id, user1.id) == 0
-    end
-
-    test "returns count of unread messages from other user" do
-      user1 = user_fixture()
-      user2 = user_fixture()
-      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
-
-      # user2 sends messages to user1 (unread for user1)
-      {:ok, _} = Messaging.create_message(conversation.id, user2.id, "Message 1")
-      {:ok, _} = Messaging.create_message(conversation.id, user2.id, "Message 2")
-      {:ok, _} = Messaging.create_message(conversation.id, user2.id, "Message 3")
-
-      assert Messaging.unread_count(conversation.id, user1.id) == 3
-    end
-
-    test "does not count messages sent by self" do
-      user1 = user_fixture()
-      user2 = user_fixture()
-      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
-
-      # user1 sends messages (should not count as unread for user1)
-      {:ok, _} = Messaging.create_message(conversation.id, user1.id, "My message 1")
-      {:ok, _} = Messaging.create_message(conversation.id, user1.id, "My message 2")
-
-      assert Messaging.unread_count(conversation.id, user1.id) == 0
-    end
-
-    test "does not count read messages" do
-      user1 = user_fixture()
-      user2 = user_fixture()
-      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
-
-      # user2 sends messages
-      {:ok, msg1} = Messaging.create_message(conversation.id, user2.id, "Message 1")
-      {:ok, _msg2} = Messaging.create_message(conversation.id, user2.id, "Message 2")
-
-      # Mark first message as read (truncate to second for utc_datetime field)
-      read_at = DateTime.utc_now() |> DateTime.truncate(:second)
-
-      msg1
-      |> Message.mark_read_changeset(read_at)
-      |> Repo.update!()
-
-      assert Messaging.unread_count(conversation.id, user1.id) == 1
-    end
-
-    test "counts correctly with mixed sent and received messages" do
-      user1 = user_fixture()
-      user2 = user_fixture()
-      {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
-
-      # Mixed conversation
-      {:ok, _} = Messaging.create_message(conversation.id, user1.id, "From user1")
-      {:ok, _} = Messaging.create_message(conversation.id, user2.id, "From user2 - 1")
-      {:ok, _} = Messaging.create_message(conversation.id, user1.id, "From user1 again")
-      {:ok, _} = Messaging.create_message(conversation.id, user2.id, "From user2 - 2")
-
-      # user1 should see 2 unread (messages from user2)
-      assert Messaging.unread_count(conversation.id, user1.id) == 2
-      # user2 should see 2 unread (messages from user1)
-      assert Messaging.unread_count(conversation.id, user2.id) == 2
     end
   end
 
@@ -133,13 +63,13 @@ defmodule LittleGrape.MessagingTest do
       {:ok, %{conversation: conv2}} = Matches.create_match(user1.id, user3.id)
 
       # user2 sends 2 messages to conv1
-      {:ok, _} = Messaging.create_message(conv1.id, user2.id, "From user2 - 1")
-      {:ok, _} = Messaging.create_message(conv1.id, user2.id, "From user2 - 2")
+      {:ok, _} = message_fixture(conv1.id, user2.id, "From user2 - 1")
+      {:ok, _} = message_fixture(conv1.id, user2.id, "From user2 - 2")
 
       # user3 sends 3 messages to conv2
-      {:ok, _} = Messaging.create_message(conv2.id, user3.id, "From user3 - 1")
-      {:ok, _} = Messaging.create_message(conv2.id, user3.id, "From user3 - 2")
-      {:ok, _} = Messaging.create_message(conv2.id, user3.id, "From user3 - 3")
+      {:ok, _} = message_fixture(conv2.id, user3.id, "From user3 - 1")
+      {:ok, _} = message_fixture(conv2.id, user3.id, "From user3 - 2")
+      {:ok, _} = message_fixture(conv2.id, user3.id, "From user3 - 3")
 
       counts = Messaging.unread_counts_for_conversations([conv1.id, conv2.id], user1.id)
 
@@ -156,7 +86,7 @@ defmodule LittleGrape.MessagingTest do
       {:ok, %{conversation: conv2}} = Matches.create_match(user1.id, user3.id)
 
       # Only send messages in conv1
-      {:ok, _} = Messaging.create_message(conv1.id, user2.id, "Message")
+      {:ok, _} = message_fixture(conv1.id, user2.id, "Message")
 
       counts = Messaging.unread_counts_for_conversations([conv1.id, conv2.id], user1.id)
 
@@ -174,9 +104,9 @@ defmodule LittleGrape.MessagingTest do
       {:ok, %{conversation: conv1}} = Matches.create_match(user1.id, user2.id)
       {:ok, %{conversation: conv2}} = Matches.create_match(user1.id, user3.id)
 
-      {:ok, _} = Messaging.create_message(conv1.id, user1.id, "older")
-      {:ok, latest1} = Messaging.create_message(conv1.id, user2.id, "latest one")
-      {:ok, latest2} = Messaging.create_message(conv2.id, user3.id, "only one")
+      {:ok, _} = message_fixture(conv1.id, user1.id, "older")
+      {:ok, latest1} = message_fixture(conv1.id, user2.id, "latest one")
+      {:ok, latest2} = message_fixture(conv2.id, user3.id, "only one")
 
       result = Messaging.last_messages_for_conversations([conv1.id, conv2.id])
 
@@ -254,9 +184,9 @@ defmodule LittleGrape.MessagingTest do
       user2 = user_fixture()
       {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
 
-      {:ok, msg1} = Messaging.create_message(conversation.id, user1.id, "First")
-      {:ok, msg2} = Messaging.create_message(conversation.id, user2.id, "Second")
-      {:ok, msg3} = Messaging.create_message(conversation.id, user1.id, "Third")
+      {:ok, msg1} = message_fixture(conversation.id, user1.id, "First")
+      {:ok, msg2} = message_fixture(conversation.id, user2.id, "Second")
+      {:ok, msg3} = message_fixture(conversation.id, user1.id, "Third")
 
       messages = Messaging.list_messages(conversation)
 
@@ -273,7 +203,7 @@ defmodule LittleGrape.MessagingTest do
 
       # Create 5 messages
       for i <- 1..5 do
-        {:ok, _} = Messaging.create_message(conversation.id, user1.id, "Message #{i}")
+        {:ok, _} = message_fixture(conversation.id, user1.id, "Message #{i}")
       end
 
       messages = Messaging.list_messages(conversation, limit: 3)
@@ -292,7 +222,7 @@ defmodule LittleGrape.MessagingTest do
 
       # Create 5 messages
       for i <- 1..5 do
-        {:ok, _} = Messaging.create_message(conversation.id, user1.id, "Message #{i}")
+        {:ok, _} = message_fixture(conversation.id, user1.id, "Message #{i}")
       end
 
       messages = Messaging.list_messages(conversation, offset: 2)
@@ -311,7 +241,7 @@ defmodule LittleGrape.MessagingTest do
 
       # Create 10 messages
       for i <- 1..10 do
-        {:ok, _} = Messaging.create_message(conversation.id, user1.id, "Message #{i}")
+        {:ok, _} = message_fixture(conversation.id, user1.id, "Message #{i}")
       end
 
       messages = Messaging.list_messages(conversation, limit: 3, offset: 4)
@@ -328,7 +258,7 @@ defmodule LittleGrape.MessagingTest do
       user2 = user_fixture()
       {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
 
-      {:ok, _} = Messaging.create_message(conversation.id, user1.id, "Test message")
+      {:ok, _} = message_fixture(conversation.id, user1.id, "Test message")
 
       messages = Messaging.list_messages(conversation.id)
 
@@ -343,7 +273,7 @@ defmodule LittleGrape.MessagingTest do
 
       # Create 60 messages
       for i <- 1..60 do
-        {:ok, _} = Messaging.create_message(conversation.id, user1.id, "Message #{i}")
+        {:ok, _} = message_fixture(conversation.id, user1.id, "Message #{i}")
       end
 
       messages = Messaging.list_messages(conversation)
@@ -546,9 +476,9 @@ defmodule LittleGrape.MessagingTest do
       {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
 
       # user2 sends messages to user1
-      {:ok, msg1} = Messaging.create_message(conversation.id, user2.id, "Message 1")
-      {:ok, msg2} = Messaging.create_message(conversation.id, user2.id, "Message 2")
-      {:ok, msg3} = Messaging.create_message(conversation.id, user2.id, "Message 3")
+      {:ok, msg1} = message_fixture(conversation.id, user2.id, "Message 1")
+      {:ok, msg2} = message_fixture(conversation.id, user2.id, "Message 2")
+      {:ok, msg3} = message_fixture(conversation.id, user2.id, "Message 3")
 
       # user1 marks as read
       assert {:ok, 3} = Messaging.mark_as_read(user1, conversation.id)
@@ -578,8 +508,8 @@ defmodule LittleGrape.MessagingTest do
       {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
 
       # user1 sends messages (their own)
-      {:ok, msg1} = Messaging.create_message(conversation.id, user1.id, "My message 1")
-      {:ok, msg2} = Messaging.create_message(conversation.id, user1.id, "My message 2")
+      {:ok, msg1} = message_fixture(conversation.id, user1.id, "My message 1")
+      {:ok, msg2} = message_fixture(conversation.id, user1.id, "My message 2")
 
       # user1 marks as read - should not affect their own messages
       assert {:ok, 0} = Messaging.mark_as_read(user1, conversation.id)
@@ -598,8 +528,8 @@ defmodule LittleGrape.MessagingTest do
       {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
 
       # user2 sends messages
-      {:ok, _msg1} = Messaging.create_message(conversation.id, user2.id, "Message 1")
-      {:ok, _msg2} = Messaging.create_message(conversation.id, user2.id, "Message 2")
+      {:ok, _msg1} = message_fixture(conversation.id, user2.id, "Message 1")
+      {:ok, _msg2} = message_fixture(conversation.id, user2.id, "Message 2")
 
       # First call marks 2 messages
       assert {:ok, 2} = Messaging.mark_as_read(user1, conversation.id)
@@ -629,7 +559,7 @@ defmodule LittleGrape.MessagingTest do
       {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
 
       # user2 sends message
-      {:ok, _msg} = Messaging.create_message(conversation.id, user2.id, "Message")
+      {:ok, _msg} = message_fixture(conversation.id, user2.id, "Message")
 
       # Subscribe to conversation topic
       Phoenix.PubSub.subscribe(LittleGrape.PubSub, "conversation:#{conversation.id}")
@@ -683,13 +613,13 @@ defmodule LittleGrape.MessagingTest do
       {:ok, %{conversation: conv2}} = Matches.create_match(user1.id, user3.id)
 
       # user2 sends 2 messages in conv1
-      {:ok, _} = Messaging.create_message(conv1.id, user2.id, "From user2 - 1")
-      {:ok, _} = Messaging.create_message(conv1.id, user2.id, "From user2 - 2")
+      {:ok, _} = message_fixture(conv1.id, user2.id, "From user2 - 1")
+      {:ok, _} = message_fixture(conv1.id, user2.id, "From user2 - 2")
 
       # user3 sends 3 messages in conv2
-      {:ok, _} = Messaging.create_message(conv2.id, user3.id, "From user3 - 1")
-      {:ok, _} = Messaging.create_message(conv2.id, user3.id, "From user3 - 2")
-      {:ok, _} = Messaging.create_message(conv2.id, user3.id, "From user3 - 3")
+      {:ok, _} = message_fixture(conv2.id, user3.id, "From user3 - 1")
+      {:ok, _} = message_fixture(conv2.id, user3.id, "From user3 - 2")
+      {:ok, _} = message_fixture(conv2.id, user3.id, "From user3 - 3")
 
       # user1 should see 5 total unread messages
       assert Messaging.total_unread_count(user1) == 5
@@ -701,11 +631,11 @@ defmodule LittleGrape.MessagingTest do
       {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
 
       # user1 sends messages (should not count for user1)
-      {:ok, _} = Messaging.create_message(conversation.id, user1.id, "My message 1")
-      {:ok, _} = Messaging.create_message(conversation.id, user1.id, "My message 2")
+      {:ok, _} = message_fixture(conversation.id, user1.id, "My message 1")
+      {:ok, _} = message_fixture(conversation.id, user1.id, "My message 2")
 
       # user2 sends messages (should count for user1)
-      {:ok, _} = Messaging.create_message(conversation.id, user2.id, "From user2")
+      {:ok, _} = message_fixture(conversation.id, user2.id, "From user2")
 
       assert Messaging.total_unread_count(user1) == 1
     end
@@ -716,14 +646,14 @@ defmodule LittleGrape.MessagingTest do
       {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
 
       # user2 sends messages
-      {:ok, msg1} = Messaging.create_message(conversation.id, user2.id, "Message 1")
-      {:ok, _msg2} = Messaging.create_message(conversation.id, user2.id, "Message 2")
+      {:ok, msg1} = message_fixture(conversation.id, user2.id, "Message 1")
+      {:ok, _msg2} = message_fixture(conversation.id, user2.id, "Message 2")
 
       # Mark first message as read
       read_at = DateTime.utc_now() |> DateTime.truncate(:second)
 
       msg1
-      |> Message.mark_read_changeset(read_at)
+      |> Ecto.Changeset.change(read_at: read_at)
       |> Repo.update!()
 
       # Should only count 1 unread message
@@ -736,9 +666,9 @@ defmodule LittleGrape.MessagingTest do
       {:ok, %{conversation: conversation}} = Matches.create_match(user1.id, user2.id)
 
       # Both users send messages
-      {:ok, _} = Messaging.create_message(conversation.id, user1.id, "From user1 - 1")
-      {:ok, _} = Messaging.create_message(conversation.id, user1.id, "From user1 - 2")
-      {:ok, _} = Messaging.create_message(conversation.id, user2.id, "From user2")
+      {:ok, _} = message_fixture(conversation.id, user1.id, "From user1 - 1")
+      {:ok, _} = message_fixture(conversation.id, user1.id, "From user1 - 2")
+      {:ok, _} = message_fixture(conversation.id, user2.id, "From user2")
 
       # user1 sees 1 unread (message from user2)
       assert Messaging.total_unread_count(user1) == 1

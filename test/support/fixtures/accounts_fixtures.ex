@@ -119,7 +119,7 @@ defmodule LittleGrape.AccountsFixtures do
   end
 
   def profile_fixture(user, attrs \\ %{}) do
-    profile = Accounts.get_or_create_profile(user)
+    {:ok, profile} = Accounts.get_or_create_profile(user)
 
     {:ok, profile} =
       Accounts.update_profile(profile, valid_profile_attributes(attrs))

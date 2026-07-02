@@ -6,7 +6,7 @@ defmodule LittleGrapeWeb.UserProfileController do
 
   def edit(conn, _params) do
     user = conn.assigns.current_scope.user
-    profile = Accounts.get_or_create_profile(user)
+    {:ok, profile} = Accounts.get_or_create_profile(user)
     changeset = Accounts.change_profile(profile)
 
     render(conn, :edit, [profile: profile, changeset: changeset] ++ profile_options())
@@ -14,7 +14,7 @@ defmodule LittleGrapeWeb.UserProfileController do
 
   def update(conn, %{"profile" => profile_params}) do
     user = conn.assigns.current_scope.user
-    profile = Accounts.get_or_create_profile(user)
+    {:ok, profile} = Accounts.get_or_create_profile(user)
 
     # Handle profile picture upload separately
     {picture_upload, profile_params} = Map.pop(profile_params, "profile_picture")
@@ -32,7 +32,7 @@ defmodule LittleGrapeWeb.UserProfileController do
 
   def delete_picture(conn, _params) do
     user = conn.assigns.current_scope.user
-    profile = Accounts.get_or_create_profile(user)
+    {:ok, profile} = Accounts.get_or_create_profile(user)
 
     case Accounts.delete_profile_picture(profile) do
       {:ok, _profile} ->

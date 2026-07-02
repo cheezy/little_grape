@@ -41,6 +41,16 @@ defmodule LittleGrape.Swipes.SwipeTest do
       assert changeset.valid?
     end
 
+    test "invalid changeset when swiping yourself" do
+      user = user_fixture()
+
+      attrs = %{user_id: user.id, target_user_id: user.id, action: "like"}
+      changeset = Swipe.changeset(%Swipe{}, attrs)
+
+      refute changeset.valid?
+      assert "cannot swipe yourself" in errors_on(changeset).target_user_id
+    end
+
     test "invalid changeset with invalid action" do
       user = user_fixture()
       target_user = user_fixture()
@@ -117,6 +127,18 @@ defmodule LittleGrape.Swipes.SwipeTest do
       assert swipe.target_user_id == target_user.id
       assert swipe.action == "like"
       assert swipe.inserted_at != nil
+    end
+
+    test "database check constraint rejects self-swipes" do
+      user = user_fixture()
+
+      # Bypass the changeset validation to prove the DB constraint holds
+      changeset =
+        Ecto.Changeset.change(%Swipe{}, user_id: user.id, target_user_id: user.id, action: "like")
+
+      assert_raise Ecto.ConstraintError, ~r/cannot_swipe_self/, fn ->
+        Repo.insert(changeset)
+      end
     end
 
     test "can preload user association" do
