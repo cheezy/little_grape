@@ -29,7 +29,6 @@ defmodule LittleGrape.DataCase do
 
   setup tags do
     LittleGrape.DataCase.setup_sandbox(tags)
-    LittleGrape.DataCase.setup_upload_cleanup()
     :ok
   end
 
@@ -44,6 +43,14 @@ defmodule LittleGrape.DataCase do
   @doc """
   Sets up cleanup for uploaded files created during tests.
   Takes a snapshot of existing files before the test and removes any new files after.
+
+  Invariant for async safety: the uploads directory is shared across test
+  processes, so this must ONLY be called from the test modules that actually
+  write files (currently accounts_test.exs only) — never from a global
+  case-template setup. A concurrently finishing test's snapshot-based cleanup
+  deletes any file not present in *its* snapshot, racing `File.cp/2` in
+  `update_profile_picture/2` (data is copied, then the deleted destination's
+  file-info write fails with enoent).
   """
   def setup_upload_cleanup do
     uploads_dir =

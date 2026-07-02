@@ -17,6 +17,14 @@ defmodule LittleGrapeWeb.ConnCase do
 
   use ExUnit.CaseTemplate
 
+  # live/2 is a macro that reads the caller's @endpoint and expands to
+  # Phoenix.ConnTest calls — both are needed for mount_and_render/2 below.
+  import Phoenix.ConnTest
+
+  require Phoenix.LiveViewTest
+
+  @endpoint LittleGrapeWeb.Endpoint
+
   using do
     quote do
       # The default endpoint for testing
@@ -33,11 +41,19 @@ defmodule LittleGrapeWeb.ConnCase do
 
   setup tags do
     LittleGrape.DataCase.setup_sandbox(tags)
-    LittleGrape.DataCase.setup_upload_cleanup()
     # Force English in the test process so flash and UI assertions stay stable
     # — LiveView and async test processes don't run through the locale plug.
     Gettext.put_locale(LittleGrapeWeb.Gettext, "en")
     {:ok, conn: Phoenix.ConnTest.build_conn()}
+  end
+
+  @doc """
+  Mounts the LiveView at `path` and re-renders once so async assigns settle
+  before assertions.
+  """
+  def mount_and_render(conn, path) do
+    {:ok, view, _html} = Phoenix.LiveViewTest.live(conn, path)
+    {:ok, view, Phoenix.LiveViewTest.render(view)}
   end
 
   @doc """

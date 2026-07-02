@@ -10,39 +10,6 @@ defmodule LittleGrape.DiscoveryTest do
   alias LittleGrape.Repo
   alias LittleGrape.Swipes
 
-  # Helper to create a user with a complete profile
-  defp create_user_with_complete_profile(attrs \\ %{}) do
-    user = user_fixture()
-
-    # Separate profile_picture from other attrs since it has a separate changeset
-    {profile_picture, profile_attrs} =
-      Map.pop(attrs, :profile_picture, "https://example.com/photo.jpg")
-
-    profile_attrs =
-      Map.merge(
-        %{
-          first_name: "Test",
-          birthdate: ~D[1990-01-01],
-          gender: "male",
-          preferred_gender: "female"
-        },
-        profile_attrs
-      )
-
-    # Use Accounts context to properly create/update profile
-    {:ok, profile} = Accounts.get_or_create_profile(user)
-    {:ok, profile} = Accounts.update_profile(profile, profile_attrs)
-
-    # Update profile picture separately using profile_picture_changeset
-    if profile_picture do
-      profile
-      |> Profile.profile_picture_changeset(%{profile_picture: profile_picture})
-      |> Repo.update!()
-    end
-
-    Repo.preload(user, :profile, force: true)
-  end
-
   # Helper to execute query and get user IDs
   defp get_user_ids(query) do
     query

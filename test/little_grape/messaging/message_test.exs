@@ -1,38 +1,10 @@
 defmodule LittleGrape.Messaging.MessageTest do
   use LittleGrape.DataCase, async: true
 
-  import LittleGrape.AccountsFixtures
+  import LittleGrape.MessagingFixtures
 
-  alias LittleGrape.Matches.Match
-  alias LittleGrape.Messaging.Conversation
   alias LittleGrape.Messaging.Message
   alias LittleGrape.Repo
-
-  defp create_conversation_with_users do
-    user_a = user_fixture()
-    user_b = user_fixture()
-    {smaller_id, larger_id} = Match.normalize_user_ids(user_a.id, user_b.id)
-
-    {:ok, match} =
-      %Match{}
-      |> Match.changeset(%{
-        user_a_id: smaller_id,
-        user_b_id: larger_id,
-        matched_at: DateTime.utc_now()
-      })
-      |> Repo.insert()
-
-    {:ok, conversation} =
-      %Conversation{}
-      |> Conversation.changeset(%{match_id: match.id})
-      |> Repo.insert()
-
-    # Return users in the order they were created, not the normalized order
-    sender = if user_a.id == smaller_id, do: user_a, else: user_b
-    receiver = if user_a.id == smaller_id, do: user_b, else: user_a
-
-    {conversation, sender, receiver}
-  end
 
   describe "schema" do
     test "has expected fields" do
@@ -73,7 +45,7 @@ defmodule LittleGrape.Messaging.MessageTest do
 
   describe "changeset/2" do
     test "valid changeset with all required fields" do
-      {conversation, sender, _receiver} = create_conversation_with_users()
+      {conversation, sender, _receiver} = conversation_with_users_fixture()
 
       attrs = %{
         conversation_id: conversation.id,
@@ -87,7 +59,7 @@ defmodule LittleGrape.Messaging.MessageTest do
     end
 
     test "valid changeset with read_at" do
-      {conversation, sender, _receiver} = create_conversation_with_users()
+      {conversation, sender, _receiver} = conversation_with_users_fixture()
 
       attrs = %{
         conversation_id: conversation.id,
@@ -102,7 +74,7 @@ defmodule LittleGrape.Messaging.MessageTest do
     end
 
     test "invalid changeset when missing conversation_id" do
-      {_conversation, sender, _receiver} = create_conversation_with_users()
+      {_conversation, sender, _receiver} = conversation_with_users_fixture()
 
       attrs = %{
         sender_id: sender.id,
@@ -116,7 +88,7 @@ defmodule LittleGrape.Messaging.MessageTest do
     end
 
     test "invalid changeset when missing sender_id" do
-      {conversation, _sender, _receiver} = create_conversation_with_users()
+      {conversation, _sender, _receiver} = conversation_with_users_fixture()
 
       attrs = %{
         conversation_id: conversation.id,
@@ -130,7 +102,7 @@ defmodule LittleGrape.Messaging.MessageTest do
     end
 
     test "invalid changeset when missing content" do
-      {conversation, sender, _receiver} = create_conversation_with_users()
+      {conversation, sender, _receiver} = conversation_with_users_fixture()
 
       attrs = %{
         conversation_id: conversation.id,
@@ -144,7 +116,7 @@ defmodule LittleGrape.Messaging.MessageTest do
     end
 
     test "invalid changeset when content is empty string" do
-      {conversation, sender, _receiver} = create_conversation_with_users()
+      {conversation, sender, _receiver} = conversation_with_users_fixture()
 
       attrs = %{
         conversation_id: conversation.id,
@@ -160,7 +132,7 @@ defmodule LittleGrape.Messaging.MessageTest do
     end
 
     test "invalid changeset when content exceeds 2000 characters" do
-      {conversation, sender, _receiver} = create_conversation_with_users()
+      {conversation, sender, _receiver} = conversation_with_users_fixture()
 
       long_content = String.duplicate("a", 2001)
 
@@ -177,7 +149,7 @@ defmodule LittleGrape.Messaging.MessageTest do
     end
 
     test "valid changeset when content is exactly 2000 characters" do
-      {conversation, sender, _receiver} = create_conversation_with_users()
+      {conversation, sender, _receiver} = conversation_with_users_fixture()
 
       max_content = String.duplicate("a", 2000)
 
@@ -193,7 +165,7 @@ defmodule LittleGrape.Messaging.MessageTest do
     end
 
     test "counts codepoints so multi-codepoint graphemes cannot exceed the column limit" do
-      {conversation, sender, _receiver} = create_conversation_with_users()
+      {conversation, sender, _receiver} = conversation_with_users_fixture()
 
       # "👩‍🚀" is one grapheme but three codepoints: 1998 + 3 = 2001 codepoints,
       # which the varchar(2000) column would reject even though the grapheme
@@ -216,7 +188,7 @@ defmodule LittleGrape.Messaging.MessageTest do
 
   describe "database integration" do
     test "can insert a valid message" do
-      {conversation, sender, _receiver} = create_conversation_with_users()
+      {conversation, sender, _receiver} = conversation_with_users_fixture()
 
       attrs = %{
         conversation_id: conversation.id,
@@ -238,7 +210,7 @@ defmodule LittleGrape.Messaging.MessageTest do
     end
 
     test "can insert message with read_at" do
-      {conversation, sender, _receiver} = create_conversation_with_users()
+      {conversation, sender, _receiver} = conversation_with_users_fixture()
       read_time = DateTime.utc_now() |> DateTime.truncate(:second)
 
       attrs = %{
@@ -257,7 +229,7 @@ defmodule LittleGrape.Messaging.MessageTest do
     end
 
     test "enforces foreign key constraint on conversation_id" do
-      {_conversation, sender, _receiver} = create_conversation_with_users()
+      {_conversation, sender, _receiver} = conversation_with_users_fixture()
       non_existent_id = 999_999
 
       assert {:error, changeset} =
@@ -273,7 +245,7 @@ defmodule LittleGrape.Messaging.MessageTest do
     end
 
     test "enforces foreign key constraint on sender_id" do
-      {conversation, _sender, _receiver} = create_conversation_with_users()
+      {conversation, _sender, _receiver} = conversation_with_users_fixture()
       non_existent_id = 999_999
 
       assert {:error, changeset} =
@@ -289,7 +261,7 @@ defmodule LittleGrape.Messaging.MessageTest do
     end
 
     test "can preload conversation association" do
-      {conversation, sender, _receiver} = create_conversation_with_users()
+      {conversation, sender, _receiver} = conversation_with_users_fixture()
 
       {:ok, message} =
         %Message{}
@@ -306,7 +278,7 @@ defmodule LittleGrape.Messaging.MessageTest do
     end
 
     test "can preload sender association" do
-      {conversation, sender, _receiver} = create_conversation_with_users()
+      {conversation, sender, _receiver} = conversation_with_users_fixture()
 
       {:ok, message} =
         %Message{}
@@ -323,7 +295,7 @@ defmodule LittleGrape.Messaging.MessageTest do
     end
 
     test "message is deleted when conversation is deleted" do
-      {conversation, sender, _receiver} = create_conversation_with_users()
+      {conversation, sender, _receiver} = conversation_with_users_fixture()
 
       {:ok, message} =
         %Message{}
@@ -344,7 +316,7 @@ defmodule LittleGrape.Messaging.MessageTest do
     end
 
     test "message is deleted when sender is deleted" do
-      {conversation, sender, _receiver} = create_conversation_with_users()
+      {conversation, sender, _receiver} = conversation_with_users_fixture()
 
       {:ok, message} =
         %Message{}
@@ -365,7 +337,7 @@ defmodule LittleGrape.Messaging.MessageTest do
     end
 
     test "can update read_at on existing message" do
-      {conversation, sender, _receiver} = create_conversation_with_users()
+      {conversation, sender, _receiver} = conversation_with_users_fixture()
 
       {:ok, message} =
         %Message{}

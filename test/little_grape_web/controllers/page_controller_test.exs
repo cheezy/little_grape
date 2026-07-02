@@ -1,5 +1,5 @@
 defmodule LittleGrapeWeb.PageControllerTest do
-  use LittleGrapeWeb.ConnCase
+  use LittleGrapeWeb.ConnCase, async: true
 
   test "GET /", %{conn: conn} do
     conn = get(conn, ~p"/")

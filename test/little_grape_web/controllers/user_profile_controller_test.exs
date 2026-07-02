@@ -1,5 +1,5 @@
 defmodule LittleGrapeWeb.UserProfileControllerTest do
-  use LittleGrapeWeb.ConnCase
+  use LittleGrapeWeb.ConnCase, async: true
 
   describe "GET /users/profile (edit)" do
     setup :register_and_log_in_user

@@ -30,6 +30,33 @@ defmodule LittleGrape.MessagingFixtures do
     end
   end
 
+  @doc "Inserts a conversation for the given match id."
+  def conversation_fixture(match_id) do
+    {:ok, conversation} =
+      %Conversation{}
+      |> Conversation.changeset(%{match_id: match_id})
+      |> Repo.insert()
+
+    conversation
+  end
+
+  @doc """
+  Creates two users, a match, and a conversation. Returns
+  `{conversation, sender, receiver}` where `sender` is the user whose id equals
+  the match's normalized `user_a_id`.
+  """
+  def conversation_with_users_fixture do
+    user_a = LittleGrape.AccountsFixtures.user_fixture()
+    user_b = LittleGrape.AccountsFixtures.user_fixture()
+    match = LittleGrape.MatchesFixtures.match_fixture(user_a, user_b)
+    conversation = conversation_fixture(match.id)
+
+    sender = if user_a.id == match.user_a_id, do: user_a, else: user_b
+    receiver = if user_a.id == match.user_a_id, do: user_b, else: user_a
+
+    {conversation, sender, receiver}
+  end
+
   defp broadcast_to_participants(message) do
     conversation =
       Conversation

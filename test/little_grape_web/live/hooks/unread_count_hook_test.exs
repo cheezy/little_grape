@@ -5,22 +5,8 @@ defmodule LittleGrapeWeb.Hooks.UnreadCountHookTest do
   import LittleGrape.AccountsFixtures
   import LittleGrape.MessagingFixtures
 
-  alias LittleGrape.Accounts.Profile
   alias LittleGrape.Matches
   alias LittleGrape.Messaging
-  alias LittleGrape.Repo
-
-  defp set_profile_picture(profile) do
-    profile
-    |> Profile.profile_picture_changeset(%{profile_picture: "/uploads/test.jpg"})
-    |> Repo.update!()
-  end
-
-  defp mount_and_render(conn, path) do
-    {:ok, view, _html} = live(conn, path)
-    html = render(view)
-    {:ok, view, html}
-  end
 
   describe "UnreadCountHook (via DiscoverLive)" do
     setup :register_and_log_in_user

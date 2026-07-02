@@ -1,5 +1,5 @@
 defmodule LittleGrape.AccountsTest do
-  use LittleGrape.DataCase
+  use LittleGrape.DataCase, async: true
 
   import LittleGrape.AccountsFixtures
 
@@ -7,6 +7,16 @@ defmodule LittleGrape.AccountsTest do
   alias LittleGrape.Accounts.Profile
   alias LittleGrape.Accounts.User
   alias LittleGrape.Accounts.UserToken
+
+  # This module is the only one writing real files to the shared uploads
+  # directory; tests within a module run serially, so the snapshot-based
+  # cleanup is race-free here (see DataCase.setup_upload_cleanup/0).
+  setup :clean_uploads
+
+  defp clean_uploads(_context) do
+    LittleGrape.DataCase.setup_upload_cleanup()
+    :ok
+  end
 
   describe "get_user_by_email/1" do
     test "does not return the user if the email does not exist" do

@@ -6,7 +6,6 @@ defmodule LittleGrape.MatchesTest do
 
   alias LittleGrape.Matches
   alias LittleGrape.Matches.Match
-  alias LittleGrape.Messaging
   alias LittleGrape.Messaging.Conversation
   alias LittleGrape.Messaging.Message
 

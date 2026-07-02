@@ -10,20 +10,6 @@ defmodule LittleGrapeWeb.ChatLiveTest do
   alias LittleGrape.Messaging
   alias LittleGrape.Repo
 
-  # Helper to set profile_picture (required for complete profile)
-  defp set_profile_picture(profile) do
-    profile
-    |> Profile.profile_picture_changeset(%{profile_picture: "/uploads/test.jpg"})
-    |> Repo.update!()
-  end
-
-  # Helper to mount and wait for async loading to complete
-  defp mount_and_render(conn, path) do
-    {:ok, view, _html} = live(conn, path)
-    html = render(view)
-    {:ok, view, html}
-  end
-
   describe "ChatLive" do
     setup :register_and_log_in_user
 

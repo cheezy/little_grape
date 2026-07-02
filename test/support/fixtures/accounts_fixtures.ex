@@ -7,7 +7,9 @@ defmodule LittleGrape.AccountsFixtures do
   import Ecto.Query
 
   alias LittleGrape.Accounts
+  alias LittleGrape.Accounts.Profile
   alias LittleGrape.Accounts.Scope
+  alias LittleGrape.Repo
 
   def unique_user_email, do: "user#{System.unique_integer()}@example.com"
   def valid_user_password, do: "Password1!"
@@ -125,5 +127,48 @@ defmodule LittleGrape.AccountsFixtures do
       Accounts.update_profile(profile, valid_profile_attributes(attrs))
 
     profile
+  end
+
+  @doc "Sets profile_picture via its dedicated changeset (required for a complete profile)."
+  def set_profile_picture(profile) do
+    profile
+    |> Profile.profile_picture_changeset(%{profile_picture: "/uploads/test.jpg"})
+    |> Repo.update!()
+  end
+
+  @doc """
+  Creates a user with a complete profile (all required fields plus a picture),
+  returning the user with `:profile` preloaded.
+  """
+  def create_user_with_complete_profile(attrs \\ %{}) do
+    user = user_fixture()
+
+    # Separate profile_picture from other attrs since it has a separate changeset
+    {profile_picture, profile_attrs} =
+      Map.pop(attrs, :profile_picture, "https://example.com/photo.jpg")
+
+    profile_attrs =
+      Map.merge(
+        %{
+          first_name: "Test",
+          birthdate: ~D[1990-01-01],
+          gender: "male",
+          preferred_gender: "female"
+        },
+        profile_attrs
+      )
+
+    # Use Accounts context to properly create/update profile
+    {:ok, profile} = Accounts.get_or_create_profile(user)
+    {:ok, profile} = Accounts.update_profile(profile, profile_attrs)
+
+    # Update profile picture separately using profile_picture_changeset
+    if profile_picture do
+      profile
+      |> Profile.profile_picture_changeset(%{profile_picture: profile_picture})
+      |> Repo.update!()
+    end
+
+    Repo.preload(user, :profile, force: true)
   end
 end
